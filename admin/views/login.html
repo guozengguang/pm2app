@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title><%=title%></title>
+
+<link rel='stylesheet'  href='/stylesheets/css/logo_bootstrap.css' type='text/css' media='all' />
+<link rel='stylesheet' href='/stylesheets/css/icons.css ' type='text/css' media='all' />
+
+<link rel='stylesheet' href='/stylesheets/css/logo_style.css' type='text/css' media='all' />
+
+
+ 
+</head>
+	<body class=" admin-login">
+		 
+		<div class="login-box">
+
+		  <div class="loginbg"> </div>
+		  <div class="login-form">
+		  	<div class="login-logo" style="text-align: center;padding-top: 20px"><img class="img-circle" src="/images/login.png" style="width: 85%"/></div>
+		  	<h4>格局商学管理系统</h4>
+			<p class="text-center text-error" style="color: red"></p>
+			<form method="post">
+			  <div class="form-group">
+			    <label for="user">登录名</label>
+			    <input type="text" name="user_login" onkeyup="loginKey(event)" class="form-control ip-user" id="user" placeholder="登录名">
+			  </div>
+			  <div class="form-group">
+			    <label for="exampleInputPassword1">登录密码</label>
+			    <input type="password" name="user_pass" onkeyup="loginKey(event)" class="form-control ip-password" id="exampleInputPassword1" placeholder="输入你的登录密码">
+			  </div>
+
+			  <button type="button" class="btn btn-info go_submit">立即登录</button>
+			  <div class="bottom-ifnt">
+				<p><a  href="/reset">找回密码</a></p>
+				</div>
+			</form>
+			 
+		  </div>
+		
+		</div>
+	</body>
+</html>
+<script type='text/javascript' src='/javascripts/js/jquery.min.js'></script>
+<script>
+	function load() {
+		$.post('/signin', $("form").serializeArray(), function(result){
+			if (result.code == 200) {
+				window.setTimeout(function () { $("#success").hide() }, 3000);
+				location.href = '/index';
+			} else {
+				$('.text-error').text(result.message)
+				window.setTimeout(function () { $('.text-error').text('') }, 3000);
+			}
+		});
+	}
+	function loginKey(evt) {
+		if (evt.keyCode == 13) {
+			if ($("#user").val() != "" && $("#exampleInputPassword1").val())
+				load();
+		}
+	}
+	$(function () {
+		$('.go_submit').click(function () {
+			load();
+		});
+	});
+</script>

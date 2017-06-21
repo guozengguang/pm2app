@@ -1,0 +1,138 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#init" aria-controls="init" data-toggle="tab">APP参数</a></li>
+        <li><a href="#other" aria-controls="other" data-toggle="tab">其他</a></li>
+      </ul>
+      <div class="tab-content" style="margin-top:15px;">
+        <div class="tab-pane active" id="init">
+          <button class="btn btn-danger btn-sm creatInit" type="button">添加</button>
+            <table class="table table-hover table-striped table-condensed" id="initTable">
+              <thead>
+              <tr><th style="width:130px;">名称</th><th style="width:160px;">key值</th><th>val值</th><th style="width:360px;">参数描述</th><th style="width: 120px" class="text-center">操作</th><tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="other">待定</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    initList();
+    $('.creatInit').on('click',function(){
+      var btn=$(this);
+      var data={};
+      data.id=new Date().getTime();
+      btn.hide();
+      $('#inittmpl')
+          .tmpl(data)
+          .prependTo("#initTable tbody")
+    });
+    $(document).on('click','.initDel',function(){
+      var id=$(this).attr('data-id');
+      var uid=$(this).attr('data-uid');
+      if(uid){
+        $('#row_'+uid).remove();
+        $('.creatInit').show();
+      }
+      if(id){
+        $('#row_'+id).remove();
+        initDel(id);
+      }
+    });
+    $(document).on('click','.initSave',function(){
+      var id=$(this).attr('data-id');
+      var uid=$(this).attr('data-uid');
+      var data={};
+      if(uid){
+        var input=$('#row_'+uid).find('input');
+        data.name=input[0].value;
+        data.key=input[1].value;
+        data.val=input[2].value;
+        data.desc=input[3].value;
+        initSave(data);
+      }
+      if(id){
+        var input=$('#row_'+id).find('input');
+        data.id=id;
+        data.name=input[0].value;
+        data.key=input[1].value;
+        data.val=input[2].value;
+        data.desc=input[3].value;
+        initSave(data);
+      }
+    });
+  });
+  function initSave(data){
+    $.post('/admin/sysconfigs_save',data,function(result){
+      if(result.code==200){
+        effect.success(function(){
+          $('.creatInit').show();
+          initList();
+        });
+      }else{
+        effect.error();
+      }
+    })
+  };
+  function initDel(id){
+    $.get('/admin/sysconfigs_del',{id:id},function(result){
+      if(result.code==200){
+        effect.success(function(){
+          $('.creatInit').show();
+        });
+      }else{
+        effect.error();
+      }
+    })
+  }
+  function initList(){
+    effect.show();
+    $.get('/admin/sysconfigs_ajax',function(result){
+      if(result.code==200){
+        $("#initTable tbody").empty()
+        $('#listtmpl')
+            .tmpl(result.message.list)
+            .appendTo("#initTable tbody");
+        effect.hide();
+      }else{
+        effect.hide();
+      }
+    })
+  }
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="name"  placeholder="名称" value="${name}"></td>
+    <td><input type="text" class="form-control input-sm" name="key"  placeholder="key值" value="${key}"></td>
+    <td><input type="text" class="form-control input-sm" name="val"  placeholder="val值" value="${val}"></td>
+    <td><input type="text" class="form-control input-sm" name="desc"  placeholder="参数描述" value="${desc}"></td>
+    <td class="text-center"><span class="btn-group"><button class="btn btn-success btn-sm initSave" type="button" data-uid="${id}">保存</button><button class="btn btn-danger btn-sm initDel" type="button" data-uid="${id}">删除</button></span></td>
+  </tr>
+</script>
+<script id="listtmpl" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="name"  placeholder="名称" value="${name}"></td>
+    <td><input type="text" class="form-control input-sm" name="key"  placeholder="key值" value="${key}"></td>
+    <td><input type="text" class="form-control input-sm" name="val"  placeholder="val值" value="${val}"></td>
+    <td><input type="text" class="form-control input-sm" name="desc"  placeholder="参数描述" value="${desc}"></td>
+    <td class="text-center"><span class="btn-group"><button class="btn btn-success btn-sm initSave" type="button" data-id="${id}">保存</button><button class="btn btn-danger btn-sm initDel" type="button" data-id="${id}">删除</button></span></td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>

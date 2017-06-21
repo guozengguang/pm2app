@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>格局商学学员录入管理系统</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font/iocns.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+
+    <script type="text/javascript" src="js/comm.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a href="#" class="btn goHome"><span class="lw lw-icon-left-open-big"> </span></a>
+            <button type="button" class="navbar-toggle btn-link collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="lw lw-icon-menu-1"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!--li><a href="#"><span class="lw lw-icon-user-1"></span> 个人中心</a></li-->
+                <li class="active"><a href="#"><span class="lw lw-icon-vcard"></span> 学员信息</a></li>
+                <li><a href="#"><span class="lw lw-icon-shuffle-1"></span> 学员归属转移</a></li>
+                <li><a href="#"><span class="lw lw-icon-archive"></span> 报备中心</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="lw lw-icon-user-1"></span><span id="phoneSpan"></span><span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="lw lw-icon-key"></span> 密码修改</a></a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="quit()"><span class="lw lw-icon-logout-1"></span> 退出系统</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container con-list">
+    <div class="panel panel-default">
+
+        <div class="panel-body">
+            <div class="bodyTable">
+                <table style="width: 100%;height: 100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center" valign="middle">
+                            <table class="table table-hover"
+                                   style="text-align: center;vertical-align:middle;width: 60%;">
+                                <tr>
+                                    <td colspan="4" style="text-align: center;vertical-align: middle"><h2>详细学员信息</h2>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="20%" style="text-align: right">学员姓名</td>
+                                    <td width="30%" style="text-align: left"><label
+                                            id="userName_lbl" style="color: gray;"></label></td>
+                                    <td width="20%" style="text-align: right">学员电话</td>
+                                    <td width="30%" style="text-align: left"><label
+                                            id="userTelphone_lbl" style="color: gray;"></label></td>
+                                </tr>
+                                <tr>
+                                    <td width="20%" style="text-align: right">所报课程</td>
+                                    <td width="30%" style="text-align: left"><label id="good_lbl" style="color: gray;"></label></td>
+                                    <td width="20%" style="text-align: right">所属分院</td>
+                                    <td width="30%" style="text-align: left"><label id="classroom_lbl" style="color: gray;"></label></td>
+                                </tr>
+                                <tr>
+                                    <td width="20%" style="text-align: right">报备时间</td>
+                                    <td width="30%" style="text-align: left"><label id="reportTime_lbl" style="color: gray;"></label></td>
+                                    <td width="20%" style="text-align: right">公司名称</td>
+                                    <td width="30%" style="text-align: left"><label id="companyName_lbl" style="color: gray;"></label></td>
+                                </tr>
+                                <tr>
+                                    <td width="20%" style="text-align: right">缴费时间</td>
+                                    <td width="30%" style="text-align: left"><label id="payTime_lbl" style="color: gray;"></label></td>
+                                    <td width="20%" style="text-align: right">公司职务</td>
+                                    <td width="30%" style="text-align: left"><label id="companyPosition_lbl" style="color: gray;"></label></td>
+                                </tr>
+                                <tr>
+                                    <td width="20%" style="text-align: right">学员状态</td>
+                                    <td width="30%" style="text-align: left"><label id="userState_lbl" style="color: gray;"></label></td>
+                                    <td width="20%" style="text-align: right">推荐人姓名</td>
+                                    <td width="30%" style="text-align: left"><label id="referrerName_lbl" style="color: gray;"></label></td>
+                                </tr>
+                                <tr>
+                                    <td width="20%" style="text-align: right">合伙人归属</td>
+                                    <td width="30%" style="text-align: left"><label id="partnerDestination_lbl" style="color: gray;"></label></td>
+                                    <td width="20%" style="text-align: right">备注说明</td>
+                                    <td width="30%" style="text-align: left"><label id="remark_lbl" style="color: gray;"></label></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var uid = ToolUtils.getURLParam("uid");
+        $.ajax({
+            url: 'http://dev.geju.com/business/report/member/info/' + $.cookie("currentUserPhone"),
+            dataType: "json",
+            async: true,
+            data: {uid: uid},
+            type: "POST",
+            success: function (res) {
+                if (res.code == '200') {
+                    $("#userName_lbl").html(res.result.data.m_name);
+                    $("#userTelphone_lbl").html(res.result.data.m_phone);
+                    $("#companyName_lbl").html(res.result.data.m_company);
+                    $("#companyPosition_lbl").html(res.result.data.m_position);
+                } else {
+
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

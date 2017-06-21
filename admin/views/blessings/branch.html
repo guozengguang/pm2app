@@ -1,0 +1,395 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="http://g.alicdn.com/de/prismplayer/1.4.7/skins/default/index-min.css" />
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+<style>
+    .file_container{
+        position: relative;
+    }
+    .file_container input{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12 clearfix">
+                                        <div class="progress form-group">
+                                            <div id="progress" class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                                <span class="sr-only"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 clearfix form-group">
+                                        <input id="path" disabled name="name" type="text" class="form-control input-sm" placeholder="视频地址">
+                                    </div>
+                                    <div class="col-md-3 clearfix form-group">
+                                        <span class="btn btn-sm btn-info file_container">选择文件
+                                            <input id="file" style="height: 29px; " type="file" accept="video/*;capture=camcorder" value="">
+                                        </span>
+                                        <button id="upload" class="btn btn-sm btn-warning" type="button">上传视频</button>
+                                    </div>
+                                    <div class="col-md-3 clearfix form-group ">
+                                        <label for="file_image">
+                                            <input id="file_image" style="height: 29px;" type="hidden" value="">
+                                        </label>
+                                        <span id="preview" class="btn btn-sm btn-info file_container">
+                                            预览图片
+                                        </span>
+                                        <button id="upload_image" class="btn btn-sm btn-warning" type="button">上传图片</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10 clearfix form-group">
+                                        <input id="branch_name" name="name" type="text" class="form-control input-sm" placeholder="学院名称">
+                                    </div>
+                                    <div class="col-md-2 clearfix form-group">
+                                        <button id="save" class="btn btn-sm btn-success" type="button">保存</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>分院</th>
+                                            <th>票数</th>
+                                            <th>状态</th>
+                                            <th>发布时间</th>
+                                            <th style="width: 200px">操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                    <div id="page"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${id}</td>
+    <td>${name}</td>
+    <td>${vote}</td>
+    <td>${status ? '上架' : '下架'}</td>
+    <td>${createdAt}</td>
+    <td>
+        <span class="btn-group">
+            <button class="video btn btn-info btn-sm" type="button" data-path="${video}">视频</button>
+            <button class="preview btn btn-success btn-sm" type="button" data-url="${image}">封面</button>
+            {{if status == 0}}
+                <button class="online btn btn-sm btn-success" type="button" data-id="${id}">上架</button>
+            {{else}}
+                <button class="offline btn btn-sm btn-warning" type="button" data-id="${id}">下架</button>
+            {{/if}}
+            <button class="del btn btn-sm btn-danger" type="button" data-id="${id}">删除</button>
+        </span>
+    </td>
+  </tr>
+</script>
+
+<script>
+    function error_toaster(title, message) {
+        swal({
+            title: title,
+            text: message,
+            timer: 1000,
+            type: 'error',
+            showConfirmButton: false
+        });
+    }
+    /* 上传视频开始 */
+    function upload(file) {
+        var prefix = 'inputfile/' + moment().format('YYYY-MM-DD') + '/';
+        /* 上传视频 */
+        var uploader = new VODUpload({
+            // 文件上传失败
+            'onUploadFailed': function (fileName, code, message) {
+                uploading = false;
+                console.log("onUploadFailed: " + fileName + code + "," + message);
+            },
+            // 文件上传完成
+            'onUploadSucceed': function (fileName) {
+                $.post('/upload_video', {path: prefix + fileName}, function (result) {
+                    if (result.code == 200) {
+                        swal({
+                            title: "成功",
+                            text: "上传成功",
+                            type: 'success',
+                            showConfirmButton: true
+                        });
+                        uploading = false;
+                        $('#path').val(result.message.path);
+                    }
+                });
+            },
+            // 文件上传进度
+            'onUploadProgress': function (fileName, totalSize, uploadedSize) {
+                $("#progress").css("width", Math.ceil(uploadedSize * 100 / totalSize) + '%');
+            },
+            // token超时
+            'onUploadTokenExpired': function (callback) {
+                uploading = false;
+                console.log("onUploadTokenExpired");
+            }
+        });
+        uploader.init("LTAIaXMja3oR8aOV", "uadOQf55ZeZjQe98eyp98Wfu8rkO4P");
+        uploader.addFile(
+                file,
+                'http://oss-cn-beijing.aliyuncs.com',
+                'gejumedia',
+                prefix + $.trim(file.name)
+        );
+        uploader.startUpload();
+    }
+    $('#file').on('change',function () {
+        $("#progress").css("width", '0');
+    });
+    var uploading = false;
+    $('#upload').click(function () {
+        if(uploading){ return false;}
+        uploading = true;
+        var file = $('#file')[0].files[0];
+        if (file) {
+            upload(file)
+        } else {
+            uploading = false;
+            error_toaster("文件为空", "请添加文件");
+        }
+    });
+    $('#save').click(function () {
+        var branch_name = $('#branch_name').val();
+        var path = $('#path').val();
+        var image = $('#file_image').val();
+        if(!/\S/.test(branch_name)){
+            error_toaster("学院名称为空", "请填写学院名称");
+        }
+        if(!/\S/.test(path)){
+            error_toaster("文件路径为空", "请添加文件,并上传文件");
+        }
+        if(!/\S/.test(image)){
+            error_toaster("图片路径为空", "请上传图片");
+        }
+        $.post('/admin/blessings/create', {
+            name: branch_name,
+            video: path,
+            image: image
+        }, function (result) {
+            if (result.code === 200) {
+                location.reload();
+            } else {
+                swal("创建失败", result.message, "warning")
+            }
+        })
+    });
+
+    $(document).on('click','.video',function(){
+        $("#modal").modal('show');
+        var source=$(this).data('path');
+        //播放器设置
+        var player = new prismplayer({
+            id: "J_prismPlayer", // 容器id
+            source: decodeURI(source),  // 视频url 支持互联网可直接访问的视频地址
+            autoplay: true,      // 自动播放
+            width: "100%",       // 播放器宽度
+            height: "400px"      // 播放器高度
+        });
+    });
+</script>
+<% include ../inc/footer.html%>
+<script>
+    /* 上传图片 开始 */
+    var preview = $('#preview');
+    newupload($('#upload_image')[0], '', function (err, result) {
+        if (err) {
+            sweetAlert("上传失败", err, "error");
+        } else {
+            preview[0].dataset.url = result.message.url;
+            preview.data('url', result.message.url);
+            $('#file_image').val(result.message.name);
+        }
+    });
+    $(document).on('click', '.preview,#preview', function () {
+        var url = $(this).data('url');
+        if (url) {
+            swal({
+                title: '预览',
+                text: '<img style="max-height: 300px;max-width: 100%;" src="' + url +'">',
+                html: true
+            });
+        }
+    })
+    /* 上传图片 结束 */
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            writeList({
+                page: page
+            })
+        }
+    };
+    /* 删除 */
+    $(document).on('click', '.del', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定删除 " + name + " ?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: false,
+            html: false
+        }, function () {
+            $.post('/admin/blessings/delete', {id:id}, function (result) {
+                if (result.code === 200) {
+                    location.reload();
+                } else {
+                    swal("删除失败", result.message, "warning")
+                }
+            })
+        });
+    });
+    /* 上架 */
+    $(document).on('click', '.online', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定上架?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: false,
+            html: false
+        }, function () {
+            $.post('/admin/blessings/online', {id:id}, function (result) {
+                if (result.code === 200) {
+                    location.reload();
+                } else {
+                    swal("上架失败", result.message, "warning")
+                }
+            })
+        });
+    });
+    /* 下架 */
+    $(document).on('click', '.offline', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定下架?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: false,
+            html: false
+        }, function () {
+            $.post('/admin/blessings/offline', {id:id}, function (result) {
+                if (result.code === 200) {
+                    location.reload();
+                } else {
+                    swal("下架失败", result.message, "warning")
+                }
+            })
+        });
+    });
+
+
+
+    //默认加载
+    writeList();
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        data ? (data.type = 1) : data = {type: 1};
+        $.get('/admin/blessings/list', data, function (result) {
+            if (result.code == 200) {
+                var list = result.result.rows;
+                var count = result.result.count;
+                $("table tbody").empty('');
+                $.each(list, function (i, v) {
+                    v.createdAt = moment(v.createdAt).format('YYYY年MM月DD日 HH:mm:ss')
+                });
+                $("#inittmpl")
+                        .tmpl(list)
+                        .appendTo("table tbody");
+                options.totalPages = Math.ceil(count / 12);
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    }
+</script>
+<!-- 视频model -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title">
+                    视频预览
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="prism-player" id="J_prismPlayer"></div>
+            </div>
+        </div>
+    </div>
+</div>

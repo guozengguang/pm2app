@@ -1,0 +1,256 @@
+<% include ../inc/head.html%>
+<script src="http://cdn.bootcss.com/plupload/2.1.7/plupload.full.min.js"></script>
+<% include ../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>添加用户</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <form id="stu_form">
+                <div class="col-md-3" style="padding:0">
+                  <div class="well">
+                    <div class="form-group form-group-sm">
+                      <label for="m_phone" class="control-label">学员手机<span>*</span></label>
+                      <input id="userphone" type="text" name="m_phone" placeholder="输入手机号" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' pattern="^[1][0-9]{10}$" data-bv-regexp-message='请输入正确手机号'>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_sex" class="control-label">性别<span>*</span></label>
+                      <select name="m_sex" class="form-control">
+                        <option value="男" selected="selected">男</option>
+                        <option value="女">女</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_education" class="control-label">学历<span></span></label>
+                      <select name="m_education" class="form-control">
+                        <%education.forEach(function(item,index){%>
+                        <option value="<%=item.id%>" <%if(item.status==1){%>selected<%}%>><%=item.name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_lnasset" class="control-label">规模<span></span></label>
+                      <select name="m_lnasset" class="form-control">
+                        <%lnasset.forEach(function(item,index){%>
+                        <option value="<%=item.id%>" <%if(item.status==1){%>selected<%}%>><%=item.name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_trade" class="control-label">所属行业<span></span></label>
+                      <select name="m_trade" class="form-control">
+                        <%trade.forEach(function(item,index){%>
+                        <option value="<%=item.id%>" <%if(item.status==1){%>selected<%}%>><%=item.name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_pics" class="control-label">用户头像<span><small>建议规格450*450</small></span></label>
+                      <div class="input-group input-group-sm">
+                        <input type="text" name="m_pics" placeholder="上传用户头像" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <!--<span class="cropper-gml">上传</span>-->
+                          <span >上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="progress" style="width: 100%;">
+                        <div class="progress-bar" style="width: 0%;">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="thumbnail">
+                        <img src=""  id="m_pics_img">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-9" style="padding:0 0 0 15px">
+                  <div  class="panel panel-danger">
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_name" class="control-label">学员名称<span>*</span></label>
+                          <input type="text" name="m_name" placeholder="学员名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_email" class="control-label">邮箱<span></span></label>
+                          <input type="text" name="m_email" placeholder="邮箱" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_area" class="control-label">省<span></span></label>
+                          <input type="text" name="m_area" placeholder="所在省" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_city" class="control-label">市<span></span></label>
+                          <input type="text" name="m_city" placeholder="所在市" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                        <label for="m_company" class="control-label">公司名称<span></span></label>
+                          <input type="text" name="m_company" placeholder="公司名称" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_place" class="control-label">公司地址<span></span></label>
+                          <input type="text" name="m_place" placeholder="公司地址" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_url" class="control-label">企业网址<span></span></label>
+                          <input type="text" name="m_url" placeholder="企业网址" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_depart" class="control-label">所在部门<span></span></label>
+                          <input type="text" name="m_depart" placeholder="所在部门" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                        <label for="m_position" class="control-label">当前职务<span></span></label>
+                          <input type="text" name="m_position" placeholder="当前职务" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_school" class="control-label">毕业院校<span></span></label>
+                          <input type="text" name="m_school" placeholder="毕业院校" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_card" class="control-label">身份证号码<span></span></label>
+                          <input type="text" name="m_card" placeholder="身份证号码" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_age" class="control-label">年龄<span></span></label>
+                          <input type="text" name="m_age" placeholder="年龄" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_birthday" class="control-label">出生日期<span></span></label>
+                          <input type="text" name="m_birthday" placeholder="出生日期" class="form-control input_date">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_telephone" class="control-label">办公电话<span></span></label>
+                          <input type="text" name="m_telephone" placeholder="办公电话" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_fax" class="control-label">传真<span></span></label>
+                          <input type="text" name="m_fax" placeholder="传真" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //时间
+    $(".input_date").datetimepicker({
+      step:15,
+      lang:'ch',
+    });
+    //验证提交
+    $('#stu_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      var data=$('#stu_form').serializeArray();
+
+      if($('input[name="m_name"]').val()==""){
+        return effect.error('错误')
+      }
+      $.post("/admin/financial_member_create",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/member'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    newupload('addImg','m_pics',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //带入存在会员的数据
+    $("#userphone").on('blur',function(){
+      var phone=$(this).val()
+      $.get('/admin/students_ajax', {phone: phone}, function(result){
+        var info={};
+        if(result.code==200){
+          info=result.message.list[0]?result.message.list[0]:{}
+        }
+        console.log(info)
+      infoMembers(info)
+      });
+    })
+    function infoMembers(m){
+      $('[name="m_name"]').val(m.m_name);
+      $('[name="m_email"]').val(m.m_email);
+      $('[name="m_url"]').val(m.m_url);
+      $('[name="m_position"]').val(m.m_position);
+      $('[name="m_company"]').val(m.m_company);
+      $('[name="m_place"]').val(m.m_place);
+      if(isEmpty(m)){
+        $('[name="m_education"]').val(verify(m.m_education));
+        $('[name="m_lnasset"]').val(verify(m.m_lnasset));
+        $('[name="m_trade"]').val(verify(m.m_trade));
+        $('[name="m_sex"]').val(m.m_sex);
+      }else {
+        $('[name="m_education"]').val(10);
+        $('[name="m_lnasset"]').val(20);
+        $('[name="m_trade"]').val(1);
+        $('[name="m_sex"]').val()
+      }
+      $('[name="m_pics"]').val(m.m_pics);
+      $("#m_pics_img").attr("src",'<%=aly%>/'+m.m_pics);
+      $('[name="m_area"]').val(m.m_area);
+      $('[name="m_city"]').val(m.m_city);
+      $('[name="m_depart"]').val(m.m_depart);
+      $('[name="m_school"]').val(m.m_school);
+      $('[name="m_card"]').val(m.m_card);
+      $('[name="m_age"]').val(m.m_age);
+      $('[name="m_telephone"]').val(m.m_telephone);
+      $('[name="m_fax"]').val(m.m_fax);
+      $('[name="m_birthday"]').val(m.m_birthday);
+    }
+    function verify(str) {
+      return str==''?0:str
+    }
+    function isEmpty(obj)
+    {
+      for (var name
+              in obj)
+      {
+        return true;
+      }
+      return false;
+    };
+  })
+</script>
+<% include ../inc/footer.html%>

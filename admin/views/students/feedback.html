@@ -1,0 +1,166 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th style="width: 260px">图片</th>
+          <th >反馈内容</th>
+          <th style="width: 80px">反馈者</th>
+          <th style="width: 80px">手机号</th>
+          <th style="width: 80px">类别</th>
+          <th style="width: 80px">状态</th>
+          <th style="width: 180px">反馈时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+$(function(){
+  //分页初始值
+  var options = {
+    currentPage: 1,//当前页数
+    totalPages: 0,//总页数
+    numberOfPages: 12,//做多显示page页
+    bootstrapMajorVersion: 1,//版本
+    alignment: "center",
+    onPageClicked: function (e, originalEvent, type, page) {
+      if (page > options.totalPages) {
+        options.currentPage = options.totalPages;
+      } else {
+        options.currentPage = page;
+      }
+      writeList({page:page})
+    }
+  };
+  //默认加载
+  writeList()
+  //写列表ajax
+  function writeList(data){
+    effect.show();
+    $.get('/admin/feedback_ajax',data,function(result){
+      if(result.code==200){
+        $("table tbody").empty('');
+        $("#inittmpl")
+            .tmpl(result.message.list)
+            .appendTo("table tbody");
+        options.totalPages=result.message.pagecount;
+        if (options.totalPages > 0) {
+          $('#page').bootstrapPaginator(options);
+        } else {
+          $('#page').empty();
+        }
+        effect.hide();
+      }else{
+        effect.hide();
+        effect.error('请求失败')
+      }
+    })
+  };
+  var feedbackid=0
+  $(document).on('click','.reply',function(){
+    feedbackid=$(this).data('feedbackid');
+    var feedback_reply=$(this).data('reply');
+    $('textarea[name="feedback_reply"]').val(feedback_reply)
+    $("#modal").modal('show')
+  })
+  //回复
+  $('#reply_add').on('click',function(e) {
+    var data=$('#reply_form').serializeArray();
+    data.push({name:"feedbackid",value:feedbackid})
+    $.post("/admin/feedback_update",data,function(result){
+      if(result.code==200){
+        $("#modal").modal("hide");
+        writeList()
+      }else{
+        effect.error();
+      }
+    })
+  });
+});
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+        <td>
+    {{each(i,v) img}}
+        {{if v}}
+          <a href="${v.feedback_img}" target="_blank"><img class="img-rounded" src="${v.feedback_img}" width="45" height="45" ></a>
+        {{/if}}
+    {{/each}}
+    </td>
+    <td>
+    ${feedback_content}
+    <a href="javascript:void(0)" class="reply" data-feedbackid="${feedbackid}" data-reply="${feedback_reply}"> <span class="label label-primary">回复</span></a>
+    </td>
+    <td>{{if Member}}${Member.m_name}{{/if}}</td>
+    <td>
+    ${feedback_phone}
+    </td>
+    <td>
+    {{if feedback_type==0}}
+    功能建议
+    {{else feedback_type==1}}
+    内容意见
+    {{else feedback_type==2}}
+    广告问题
+    {{else feedback_type==3}}
+    网络问题
+    {{else feedback_type==4}}
+    其他
+    {{/if}}
+    </td>
+    <td>
+    {{if feedback_status==1}}
+       正常
+    {{else}}
+      已删除
+    {{/if}}
+    </td>
+    <td>${createdAt}</td>
+  </tr>
+</script>
+<!-- 视频model -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          反馈回复
+        </h5>
+      </div>
+      <form id="reply_form" class="form-horizontal" method="post">
+        <div class="modal-body">
+          <div class="form-group form-group-sm">
+            <div class="col-xs-12">
+              <textarea name="feedback_reply" cols="30" rows="10" class="form-control" style="height: 200px"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="reply_add">确认</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

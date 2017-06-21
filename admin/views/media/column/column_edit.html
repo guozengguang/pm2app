@@ -1,0 +1,117 @@
+<% include ../../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="/admin/user"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>编辑栏目</b></div>
+        <div class="panel-body">
+          <form class="form-horizontal">
+            <div class="form-group form-group-sm col-md-12">
+              <input type="hidden" value="<%=columnitem.columnid%>" name="columnid">
+              <label for="column_title" class="control-label">栏目名称<span>*</span></label>
+              <input type="text" value="<%=columnitem.column_title%>" name="column_title" placeholder="栏目名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            <div class="form-group form-group-sm col-md-12">
+              <label for="column_order" class="control-label">排序<span>*</span></label>
+              <input type="text" value="<%=columnitem.column_order%>" name="column_order"  placeholder="排序" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+
+            <div class="form-group form-group-sm col-md-12">
+              <label for="column_indexes" class="control-label">媒资索引(关联app数据)</label>
+              <select id="column_indexes" name="column_indexes" class="form-control" value="<%=columnitem.column_indexes%>">
+              </select>
+            </div>
+
+            <div class="form-group form-group-sm col-md-12">
+              <label for="column_url" class="control-label">导航路径<span></span></label>
+              <input type="text" value="<%=columnitem.column_url%>" name="column_url"  placeholder="导航路径" class="form-control" >
+            </div>
+            <div class="form-group form-group-sm col-md-12">
+              <label for="column_path" class="control-label">父栏目(默认为根栏目)<span>*</span></label>
+              <input type="hidden" value="<%=columnitem.column_path%>" id="hideColumnPath"/>
+              <select id="column_path" name="column_path" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                <option value="0">--选择父栏目(默认为根栏目)--</option>
+               <%item.forEach(function(node,index){
+                    var tree="";
+                    var level=node.column_level;
+                    if(node.column_level>1){tree+='|';for(var i=0;i<level-1;i++){
+                      tree+='--'
+                    }}
+                    %>
+                  <% if(columnitem.columnid!=node.columnid){ %>
+                    <option value="<%=node.column_path%>,<%=node.columnid%>" <%if(columnitem.column_path==node.column_path){%>selected<%}%>><%=tree%><%=node.column_title%></option>
+                  <% } %>
+                <%})%>
+              </select>
+            </div>
+            <div class="form-group form-group-sm col-md-12">
+              <button type="submit" class="btn btn-danger btn-submit">提交</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+  //页面初始化设置父栏目
+   $("#column_path").val($("#hideColumnPath").val());
+    /* 获取关联列表 */
+    var column_indexes = {
+      init: function (id) {
+        this.branch = $('#' + id);
+        this.getDate();
+      },
+      getDate: function () {
+        $.get('/admin/column/indexes', function (result) {
+          column_indexes.insertDom(result.result.list);
+        })
+      },
+      insertDom: function (data) {
+        var html = '<option value="0">非关联类型</option>';
+        $.each(data, function (i, v) {
+          html += '<option ' + (<%=columnitem.column_indexes || 0%> == v.id ? "selected" : "") +' value="' + v.id + '">' + v.name + '</option>'
+        });
+        this.branch.html(html);
+      }
+    };
+    column_indexes.init('column_indexes');
+
+    $('.form-horizontal').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('.form-horizontal').serializeArray();
+      console.log(data);
+      console.log(typeof data);
+      $.post("/admin/column_update",data,function(result){
+        if(result.code=200){
+          effect.success(function(){
+            location.href='/admin/column'
+          })
+        }else{
+          effect.error()
+        }
+      })
+    });
+  })
+</script>
+<% include ../../inc/footer.html%>

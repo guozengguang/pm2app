@@ -1,0 +1,203 @@
+<% include ../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>添加新课程班</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <form id="goods_form">
+                <div class="col-md-3" style="padding:0">
+                  <div class="well">
+                    <div class="form-group form-group-sm">
+                      <label for="goods_attr" class="control-label">推荐位 <span> &nbsp;</span></label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_attr" value="0" checked> 不推荐
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_attr" value="1"> 推荐
+                      </label>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_ismore" class="control-label">是否完结 <span> &nbsp;</span></label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_ismore" value="0" checked> 待续
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_ismore" value="1"> 完结
+                      </label>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_start" class="control-label">开始时间<span>*</span></label>
+                      <input type="text" name="goods_start" placeholder="选择开始时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_end" class="control-label">结束时间<span>*</span></label>
+                      <input type="text" name="goods_end" placeholder="选择结束时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_img" class="control-label">课程班封面照<span><small>建议规格1156*442</small></span></label>
+                      <div class="input-group input-group-sm">
+                        <input type="text" name="goods_img" placeholder="上传课程班封面照" class="form-control" readonly>
+                        <span class="input-group-btn">
+                          <span class="btn btn-danger fileinput-button btn-sm">
+                              <span>上传</span>
+                              <input id="addImg" type="file" name="files[]" accept="image/*">
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="progress" style="width: 100%;">
+                        <div class="progress-bar" style="width: 0%;">  
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="thumbnail">
+                        <img src=""  id="goods_img_img">
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_img_small" class="control-label">通讯录图片<span><small>建议规格200*200</small></span></label>
+                      <input type="hidden" name="goods_img_small" placeholder="上传课程班封面照" class="form-control" readonly value="public/groupdefault.png">
+                      <div class="thumbnail">
+                        <img id='goods_img_small_img' class="img-circle" src="http://files.geju.com/public/groupdefault.png" width="135" height="135">
+                      </div>
+                    </div>
+                    <!--<div class="form-group form-group-sm">
+                      <label for="goods_titleimg" class="control-label">首页展示图<span><small>建议规格</small></span></label>
+                      <input type="hidden" name="goods_titleimg" placeholder="上传课程班封面照" class="form-control" readonly value="public/groupdefault.png">
+                      <div class="thumbnail">
+                        <img id='goods_titleimg_img' src="http://files.geju.com/public/groupdefault.png" width="135" height="135">
+                      </div>
+                    </div>-->
+                  </div>
+                </div>
+                <div class="col-md-9" style="padding:0 0 0 15px">
+                  <div  class="panel panel-danger">
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_name" class="control-label">课程班名称<span>*</span></label>
+                          <input type="text" name="goods_name" placeholder="课程班名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_fee" class="control-label">课程班费用<span></span></label>
+                          <input type="text" name="goods_fee" placeholder="课程班费用" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_subtitle" class="control-label">课程班简称(群简称字段)<span>*</span></label>
+                          <input type="text" name="goods_subtitle" placeholder="课程班简称(群简称字段)" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <!--<div class="form-group form-group-sm col-md-6">-->
+                          <!--<label for="goods_time" class="control-label">上课描述<span></span></label>-->
+                          <!--<input type="text" name="goods_time" placeholder="上课时间(每周一晚上17:30)" class="form-control">-->
+                        <!--</div>-->
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_type" class="control-label">课程班类型</label>
+                          <select name="goods_type" class="form-control">
+                            <option value="2">公开课</option>
+                            <option value="1">公益课</option>
+                            <option value="0">定制课</option>
+                          </select>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="goods_summary" class="control-label">课程班描述（分享内容）<span>*</span></label>
+                          <input type="text" name="goods_summary" placeholder="课程班描述" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="goods_desc" class="control-label">招生简章描述<span>*</span></label>
+                          <textarea name="goods_desc" class="form-control" style="height: 120px"></textarea>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div id="group_editor">
+                            <label for="goods_content" class="control-label">详细介绍</label>
+                            <textarea id="goods_content" name="goods_content" value='' style="width:100%;height:320px;" class="setEditor"></textarea>
+                          </div>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  //功能
+  $(function(){
+    //时间
+    $(".input_date").datetimepicker({
+      lang:'ch',
+      step:30
+    });
+    //验证提交
+    $('#goods_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      $("#goods_content").val(editor[0].html())
+      var data=$('#goods_form').serializeArray();
+      $.post("/admin/class_create",data,function(result){
+        console.log(result)
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/goods_edit?goodsid='+result.message.goodsid;
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    newupload('addImg','goods_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //通讯录图片goods_titleimg
+    newupload('goods_img_small_img','goods_img_small',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //通讯录图片goods_titleimg
+    newupload('goods_titleimg_img','goods_titleimg',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+  })
+</script>
+<% include ../inc/footer.html%>

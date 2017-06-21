@@ -1,0 +1,239 @@
+<% include ../../inc/head.html%>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script src="/javascripts/js/month.js"></script>
+<script src="/javascripts/js/clipboard.min.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            <li><small style="color: red">*名称和路径不能为空 相同文件名会被覆盖 APP1.7以后需要转码才能使用(大文件转码时间可能会很长，请耐心等待)</small></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="progress" style="width: 100%;margin:0 auto";>
+        <div class="progress-bar" style="width: 0%;">
+        </div>
+      </div>
+      <table class="table table-hover table-striped table-condensed" id="initTable">
+        <form id='ref_form' class="form-horizontal" method="post">
+          <thead>
+            <tr>
+            <td style="width: 180px">
+              <select name="cou_type" class="form-control input-sm">
+                <option value="1">课件</option>
+                <option value="2">笔记</option>
+              </select>
+            </td>
+              <td style="width: 180px">
+                <select name="cou_pics" class="form-control input-sm">
+                  <option value="public/pdf.png">pdf</option>
+                  <!--<option value="public/doc.png">doc</option>-->
+                  <!--<option value="public/ppt.png">ppt</option>-->
+                </select>
+              </td>
+              <td style="width: 180px"><input type="text" class="form-control input-sm" name="cou_title"  placeholder="名称" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'></td>
+            <td style="width: 180px">
+              <div class="input-group input-group-sm" style="overflow: hidden">
+                <input type="hidden" name="cou_path_size">
+                <input type="hidden" name="couid">
+                <input type="hidden" name="cou_transcoding" value="0">
+                <input type="text" name="cou_path" placeholder="路径" class="form-control input-sm"  readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                <span class="input-group-btn" onclick="$('input[id=files]').click();">
+                  <span class="btn btn-danger fileinput-button btn-sm">
+                      <span >上传</span>
+                  </span>
+                </span>
+                <input id="files" type="file" name="files[]" accept="pdf/*" style="display:none">
+              </div>
+            </td>
+            <td class="text-center"><span class="btn-group"><button class="btn btn-success btn-sm" type="submit">保存</button></span></td>
+          </tr>
+          </thead>
+        </form>
+          <tbody>
+
+          </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    var classid=location.search.substr(9);
+    //验证提交
+    $('#ref_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#ref_form').serializeArray();
+      data.push({name:'cou_classid',value:classid});
+      if(!$('input[name="cou_title"]').val() || !$('input[name="cou_path"]').val()){
+        return
+      }
+      effect.show()
+      $.post("/admin/class/courseware_update",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+//            $('#ref_form')[0].reset()
+            location.reload()
+//            writeList({classid:classid});
+          })
+        }else{
+          effect.error(result.message)
+          effect.hide()
+        }
+      })
+    });
+
+    var m=moment().format('YYYY-MM-DD');
+    var md='';
+    var uploader = new VODUpload({
+      // 文件上传失败
+      'onUploadFailed': function (fileName, code, message) {
+        console.log("onUploadFailed: " + fileName + code + "," + message);
+      },
+      // 文件上传完成
+      'onUploadSucceed': function (fileName) {
+        $('input[name="cou_path"]').val('file/'+m+'/'+md);
+//        $(".progress-bar").html('').css("width",'0%');
+        console.log("onUploadSucceed: " + fileName);
+      },
+      // 文件上传进度
+      'onUploadProgress': function (fileName, totalSize, uploadedSize) {
+        $('input[name="cou_path_size"]').val(totalSize);
+        $(".progress-bar").html(Math.ceil(uploadedSize * 100 / totalSize) + '%').css("width",Math.ceil(uploadedSize * 100 / totalSize) + '%');
+        console.log("file:" + fileName + ", " + totalSize, uploadedSize, "percent:", Math.ceil(uploadedSize * 100 / totalSize));
+      },
+      // token超时
+      'onUploadTokenExpired': function (callback) {
+        console.log("onUploadTokenExpired");
+      }
+    });
+
+    uploader.init("LTAIaXMja3oR8aOV", "uadOQf55ZeZjQe98eyp98Wfu8rkO4P");
+    document.getElementById("files")
+            .addEventListener('change', function (event) {
+              for(var i=0; i<event.target.files.length; i++) {
+                md=getMd()+'.'+event.target.files[i].name.split('.').slice('-1')
+                console.log(md)
+                uploader.addFile(event.target.files[i], 'http://oss-cn-beijing.aliyuncs.com', 'gejubusinessbucket', 'file/'+m+'/'+md);
+              }
+
+              uploader.startUpload();
+            });
+    function getMd() {
+      return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      }).toLowerCase();
+    }
+    //默认加载
+    writeList({classid:classid});
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/class/courseware_ajax',data,function(result){
+        console.log(result)
+        if(result.code==200){
+          $("table tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("table tbody");
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //修改
+    $(document).on('click','.couEdit',function(){
+      var data=$(this).data();
+      $('select[name="cou_type"]').val(data.type);
+      $('select[name="cou_pics"]').val(data.pics);
+      $('input[name="cou_title"]').val(data.title);
+      $('input[name="cou_path"]').val(data.path);
+      $('input[name="cou_path_size"]').val(data.size);
+      $('input[name="couid"]').val(data.couid)
+    });
+    //删除
+    $(document).on('click','.couDel',function(){
+      var data=$(this).data();
+      var couid=data.couid;
+      var status=data.status;
+      $.post("/admin/class/courseware_update",{couid:couid,cou_status:status},function(result){
+        if(result.code==200){
+          effect.success(function(){
+            writeList({classid:classid});
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    })
+    //转码
+    $(document).on('click','.couTranscoding',function(){
+      effect.show()
+      var couid=$(this).data('couid');
+      $.post("/admin/class/courseware_transcoding",{couid:couid},function(result){
+        console.log(result)
+        if(result.code==200){
+          effect.success(function(){
+            writeList({classid:classid});
+          })
+        }else{
+          effect.error(result.message)
+        }
+        effect.hide()
+      })
+    })
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<tr>
+  <td>
+  {{if cou_type==1}}课件{{/if}}
+  {{if cou_type==2}}笔记{{/if}}
+  </td>
+  <td>
+  {{if cou_pics=="public/pdf.png"}}pdf{{/if}}
+  {{if cou_pics=="public/doc.png"}}doc{{/if}}
+  {{if cou_pics=="public/ppt.png"}}ppt{{/if}}
+  </td>
+  <td>${cou_title}</td>
+  <td>
+  {{if cou_path}}
+    <a href="<%=aly%>/${cou_path}" target="_blank"><%=aly%>/${cou_path}</a>
+  {{/if}}
+  </td>
+  <td class="text-center">
+  <span class="btn-group">
+  <button class="btn btn-info btn-xs couEdit" data-type='${cou_type}' data-title='${cou_title}' data-path='${cou_path}' data-couid='${couid}' data-size='${cou_path_size}' data-pics='${cou_pics}'>修改</button>
+  {{if cou_status==1}}
+    <button class="btn btn-success btn-xs couDel" data-couid='${couid}' data-status='0'>上架</button>
+  {{/if}}
+  {{if cou_status==0}}
+    <button class="btn btn-danger btn-xs couDel" data-couid='${couid}' data-status='1'>下架</button>
+  {{/if}}
+  {{if cou_transcoding==1}}
+    <button class="btn btn-warning btn-xs">已转码</button>
+  {{/if}}
+  {{if cou_transcoding==0}}
+    <button class="btn btn-warning btn-xs couTranscoding" data-couid='${couid}'>转码</button>
+  {{/if}}
+  </span>
+  </td>
+</tr>
+</script>
+<% include ../../inc/footer.html%>

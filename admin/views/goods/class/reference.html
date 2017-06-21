@@ -1,0 +1,197 @@
+<% include ../../inc/head.html%>
+<script src="https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.js"></script>
+<script type="text/javascript" src="/javascripts/js/masonry.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            <li><a href="javascript:void (0)"  class="setRef" data-id="xinzeng"><span class="glyphicon glyphicon-plus"></span>新增</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div id="reference" class="row masonry-container">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal_group_add">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">推荐书目</h4>
+      </div>
+      <div id="model_itme"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    var classid=location.search.substr(9);
+    writeList({classid:classid});
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/class/reference_list',data,function(result){
+        if(result.code==200){
+          console.log(result.message.list)
+          $("#reference").empty();
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#reference");
+          $('.masonry-container').imagesLoaded( function () {
+            $('.masonry-container').masonry({
+              columnWidth: '.item',
+              itemSelector: '.item'
+            });
+          });
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //显示添加表
+    $(document).on('click','.setRef',function(event) {
+      $("#modal_group_add").modal("show");
+      $("#model_itme").empty('');
+      $("#reftmpl").tmpl().appendTo("#model_itme");
+      //上传图片
+      newupload('ref_pics_img','ref_pics',function(err,result){
+        console.log(result)
+        if (err){
+          effect.error(err);
+        }else {
+          $('input[name="'+result.src+'"]').val(result.message.name);
+          $("#"+result.src+"_img").attr("src",result.message.url);
+        }
+      });
+      var id=$(this).attr('data-id');
+      //如果不是新增需要添加
+      if (id!='xinzeng'){
+        $.get("/admin/class/reference_list",{refid:id,classid:classid},function(result){
+          console.log(result)
+          if(result.code==200){
+            var result=result.message.list[0];
+            if (result) {
+              $('input[name="ref_title"]').val(result.ref_title)
+              $('textarea[name="ref_content"]').val(result.ref_content)
+              $('input[name="ref_author"]').val(result.ref_author)
+              $('input[name="ref_pics"]').val(result.old_ref_pics)
+              $("#ref_pics_img").attr("src",result.ref_pics);
+            }
+          }
+        })
+      }
+      //验证提交
+      $('#ref_form').bootstrapValidator().on('success.form.bv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target),
+                validator = $form.data('bootstrapValidator');
+        var data=$('#ref_form').serializeArray();
+        data.push({name:'ref_classid',value:classid});
+        if (id!='xinzeng') {data.push({name:'refid',value:id})}
+        $.post("/admin/class/reference_create",data,function(result){
+          if(result.code==200){
+            effect.success(function(){
+              $("#modal_group_add").modal("hide");
+              writeList({classid:classid});
+            })
+          }else{
+            effect.error(result.message)
+          }
+        })
+      });
+    });
+
+    $(document).on('click','.delref',function(){
+      var id=$(this).data('id')
+      $.post('/admin/class/reference_del',{id:id},function(result){
+        if(result.code==200){
+          location.reload()
+        }
+      })
+    })
+  });
+</script>
+<!--<script id="inittmpl" type="text/x-jquery-tmpl">-->
+  <!--<div class="col-sm-6 col-md-4 item">-->
+    <!--<div class="thumbnail">-->
+      <!--<img src="${ref_pics}" alt="无封面">-->
+      <!--<div class="caption">-->
+        <!--<h3 style="margin-top:0">${ref_title}-&#45;&#45;${ref_author}</h3>-->
+        <!--<p>${ref_content}</p>-->
+        <!--<p>-->
+        <!--<div class="btn-group">-->
+          <!--<button type="button" class="btn btn-primary setRef" data-id="${refid}">编辑</button>-->
+          <!--<button type="button" class="btn btn-danger delref" data-id="${refid}">删除</button>-->
+        <!--</div>-->
+        <!--</p>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</div>-->
+<!--</script>-->
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<div class="media col-md-12">
+  <a class="media-left media-middle" href="#">
+    <img class="media-object img-rounded" src="${ref_pics}" alt="无封面" width="90" height="120">
+  </a>
+  <div class="media-body">
+    <h4 class="media-heading" style="color:red">标题:${ref_title}/作者:${ref_author}</h4>
+    <p>详细介绍: ${ref_content}</p>
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary setRef btn-xs" data-id="${refid}">编辑</button>
+      <button type="button" class="btn btn-danger delref btn-xs" data-id="${refid}">删除</button>
+    </div>
+  </div>
+</div>
+</script>
+<script  id="reftmpl" type="text/x-jquery-tmpl">
+  <form id="ref_form" class="form-horizontal" method="post">
+      <div class="modal-body">
+        <div class="media">
+          <div class="media-left">
+            <a href="#">
+            <img class="media-object img-rounded" src="http://files.geju.com/public/ref.png" id="ref_pics_img" width="180" height="240">
+            <input type="hidden" name="ref_pics" value="public/ref.png" id="groupinput">
+            </a>
+          </div>
+          <div class="media-body">
+            <div class="form-group form-group-sm">
+            <label for="ref_title" class="control-label col-xs-3">书名<span>*</span></label>
+            <div class="col-xs-9">
+            <input type="text" name="ref_title" placeholder="书名" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            </div>
+            <div class="form-group form-group-sm">
+            <label for="ref_author" class="control-label col-xs-3">作者<span>*</span></label>
+            <div class="col-xs-9">
+            <input type="text" name="ref_author" placeholder="作者" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            </div>
+            <div class="form-group form-group-sm">
+            <label for="ref_content" class="control-label col-xs-3">详细介绍</label>
+            <div class="col-xs-9">
+            <textarea name="ref_content" class="form-control" style="width:100%;height:140px;"></textarea>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      <button type="submit" class="btn btn-primary">确认</button>
+      </div>
+  </form>
+</script>
+<% include ../../inc/footer.html%>

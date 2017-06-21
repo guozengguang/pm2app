@@ -1,0 +1,354 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="http://g.alicdn.com/de/prismplayer/1.4.7/skins/default/index-min.css"/>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../inc/editor_mode.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>媒资创建</b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <form id="media_form">
+                                <div class="col-md-3" style="padding:0">
+                                    <div class="well">
+                                        <div class="form-group form-group-sm">
+                                            <label for="media_columnid" class="control-label">栏目选择<span>*</span></label>
+                                            <select name="media_columnid" class="form-control" required
+                                                    data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                                <option value="0" name="1">--点击选择栏目--</option>
+                                                <%item.forEach(function(node,index){
+                                                var tree="";
+                                                var level=node.column_level;
+                                                if(node.column_level>1){tree+='|';for(var i=0;i
+                                                <level-1
+                                                        ;i++){
+                                                        tree+='--'
+                                                        }}
+                                                        %>
+                                                    <option value="<%=node.columnid%>" name="<%=node.column_level%>"><%=tree%><%=node.column_title%>
+                                                    </option>
+                                                    <%})%>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="media_type"  class="control-label">媒资类型<span>*</span></label>
+                                            <select name="media_type" class="form-control" id="media_type">
+                                                <option value="3">内容媒资</option>
+                                                <option value="2">轮播广告</option>
+                                                <option value="1">视频媒资</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-sm" id="media_pics_id" style="display: none;">
+                                            <label for="media_pics" class="control-label">媒资封面照</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="media_pics" placeholder="媒资封面照"
+                                                       class="form-control" readonly>
+                                                <span class="input-group-btn">
+                                              <span class="btn btn-danger fileinput-button btn-sm">
+                                                  <span>上传</span>
+                                                  <input id="addImg" type="file" name="files[]" accept="image/*">
+                                              </span>
+                                            </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm" id="media_vedio_id" style="display: none;">
+                                            <label for="media_pics" class="control-label">媒资视频</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="media_video" placeholder="媒资视频路径"
+                                                       class="form-control input-sm" data-bv-trigger="blur"
+                                                       data-bv-notempty-message='必填项目'>
+                                                <span class="input-group-btn">
+                                                    <span class="btn btn-danger fileinput-button btn-sm addVideo">
+                                                        <span>选择</span>
+                                                    </span>
+                                                  </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="progress" style="width: 100%;">
+                                                <div class="progress-bar" style="width: 0%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="thumbnail">
+                                                <img src="" id="media_pics_img">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9" style="padding:0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <label for="media_title"
+                                                           class="control-label">标题<span>*</span></label>
+                                                    <input type="text" name="media_title" placeholder="标题"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="media_description"
+                                                           class="control-label">描述<span>*</span></label>
+                                                    <input type="text" name="media_description" placeholder="描述"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="media_keywords" class="control-label">关键字<span>*</span></label>
+                                                    <input type="text" name="media_keywords" placeholder="关键字"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="media_author"
+                                                           class="control-label">作者<span>*</span></label>
+                                                    <input type="text" name="media_author" placeholder="作者"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="media_pushtime" class="control-label">发布时间<span>*</span></label>
+                                                    <input type="text" name="media_pushtime" placeholder="选择发布时间"
+                                                           class="form-control input_date" required
+                                                           data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12" id="media_content_id">
+                                                    <div id="group_editor">
+                                                        <label for="media_content" class="control-label">主题内容<span>*</span></label>
+                                                        <textarea id="media_content" name="media_content" value='' style="width:100%;height:240px;" class="setEditor"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <div>
+                                                        <label for="media_href" class="control-label">跳转链接<span>*</span></label>
+                                                        <input type="text" id="media_href" name="media_href" placeholder="跳转链接" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <div class="">
+                                                        <button type="submit" class="btn btn-danger btn-submit">提交
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        //时间
+        $(".input_date").datetimepicker({
+            step: 30,
+            lang: 'ch'
+        })
+        //验证提交
+        $('#media_form').bootstrapValidator().on('success.form.bv', function (e) {
+            if($('select[name="media_columnid"] option:selected').attr('name') == 1){
+                effect.error("请选择二级栏目!");
+                return false;
+            }
+            e.preventDefault();
+            $("#media_content").val(editor[0].html());
+            var $form = $(e.target),
+                    validator = $form.data('bootstrapValidator');
+            var data = $('#media_form').serializeArray();
+            $.post("/admin/media_create", data, function (result) {
+                if (result.code == 200) {
+                    effect.success(function () {
+                        location.href = '/admin/media'
+                    })
+                } else {
+                    effect.error(result.message)
+                }
+            })
+        });
+        //首次进入默认选中内容媒资
+        initMediaType();
+        function initMediaType() {
+            $("#media_type option:first").prop("selected", 'selected');
+        }
+        //切换媒资类型下拉框 create by guozengguang
+        $("#media_type").bind('change',function () {
+            //获取选中的option的value值
+            var selectedOptionValue = $('#media_type option:selected').attr("value");
+            if(selectedOptionValue == '2'){
+                //当选中的媒资类型为轮播广告
+                $("#media_content_id").hide();
+                $("#media_vedio_id").hide();
+                $("#media_pics_id").show();
+            }else if(selectedOptionValue == '3'){
+                //当选中的媒资类型为内容媒资
+                $("#media_vedio_id").hide();
+                $("#media_pics_id").hide();
+                $("#media_content_id").show();
+            }else {
+                //当选中的媒资类型为视频媒资
+                $("#media_content_id").show();
+                $("#media_vedio_id").show();
+                $("#media_pics_id").show();
+            }
+        });
+
+        //上传图片
+        newupload('addImg', 'media_pics', function (err, result) {
+            if (err) {
+                effect.error(err);
+            } else {
+                $('input[name="' + result.src + '"]').val(result.message.name);
+                $("#" + result.src + "_img").attr("src", result.message.url);
+            }
+        });
+
+
+        /* 视频相关JS 开始 */
+
+        $('.addVideo').on('click', function (event) {
+            $("#modal_video").modal('show');
+            writeListVideo({});
+        });
+
+        //搜索
+        $('#video_find').on('click', function () {
+            var data = $('.select_form').serializeArray();
+            options.currentPage = 1;
+            writeListVideo(data);
+        })
+
+        //写列表ajax
+        function writeListVideo(data) {
+            effect.show();
+            $.get('/admin/attach_list', data, function (result) {
+                if (result.code == 200) {
+                    $(".video tbody").empty('');
+                    $("#inittmplvideo")
+                            .tmpl(result.message.list)
+                            .appendTo(".video tbody");
+                    options.totalPages = result.message.pagecount;
+                    if (options.totalPages > 0) {
+                        $('#page').bootstrapPaginator(options);
+                    } else {
+                        $('#page').empty();
+                    }
+                    effect.hide();
+                } else {
+                    effect.hide();
+                    effect.error('请求失败')
+                }
+            })
+        };
+        $(document).on('click', '.addToVideo', function (event) {
+            $('input[name="media_video"]').val(this.dataset.path);
+            $("#modal_video").modal('hide');
+        });
+        //视频模仿
+        $(document).on('click', '.Play', function () {
+            $("#modal").modal('show');
+            var source = $(this).data('path')
+            //播放器设置
+            var player = new prismplayer({
+                id: "J_prismPlayer", // 容器id
+                source: source,  // 视频url 支持互联网可直接访问的视频地址
+                autoplay: true,      // 自动播放
+                width: "100%",       // 播放器宽度
+                height: "400px"      // 播放器高度
+            });
+        })
+
+        /* 视频相关JS 结束 */
+    })
+
+</script>
+
+
+<!-- 视频model -->
+<div class="modal fade" id="modal_video" tabindex="-10" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title">
+                    选择视频
+                </h5>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline select_form" style="margin-bottom:15px;">
+                    <div class="form-group form-group-sm">
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="attach_title" class="form-control input-sm" placeholder="视频名称"/>
+                            <span class="input-group-btn">
+                                <span type="button" class="btn btn-danger" id="video_find">查询</span>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-striped table-condensed video">
+                    <thead>
+                    <tr>
+                        <th>视频名称</th>
+                        <th style="width:80px" class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div id="page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title">
+                    视频预览
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="prism-player" id="J_prismPlayer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="inittmplvideo" type="text/x-jquery-tmpl">
+<tr>
+  <td><a href="javascript:void(0)" data-path='${attach_path}' class="Play"> ${attach_title}</td>
+  <td class="text-center">
+  <span class="btn-group">
+  <button class="btn btn-info btn-xs addToVideo" data-attachid='${attachid}' data-path='${source_attach_path}' >添加</button>
+  </span>
+  </td>
+</tr>
+
+</script>
+
+<!-- 视频模块结束 -->
+<% include ../inc/footer.html%>

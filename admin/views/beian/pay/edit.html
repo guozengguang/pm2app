@@ -1,0 +1,164 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>编辑订单</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <div class="col-md-12 col-sm-12" style="padding:0 0 0 15px">
+                <div class="panel panel-danger">
+                  <div class="panel-body">
+                    <div class="row">
+                      <form id="pay_form">
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="stime" class="control-label">缴费时间<span>*</span></label>
+                          <input value="<%=item.stime%>" type="text" name="stime" placeholder="缴费时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                          <input value="<%=item.id%>" type="hidden" name="id">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="fee" class="control-label">订单金额<span>*</span></label>
+                          <input value="<%=item.fee%>" type="text" name="fee" placeholder="订单金额" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' pattern="^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$" data-bv-regexp-message='金额错误' disabled>
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="order" class="order">流水号<span>*</span></label>
+                          <input value="<%=item.order%>" type="text" name="order" placeholder="流水号" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="method" class="order">缴费方式<span>*</span></label>
+                          <select name="method" class="form-control">
+                            <option value="刷pos机" <%if(item.method=='刷pos机'){%>selected<%}%>>刷pos机</option>
+                            <option value="学员转账" <%if(item.method=='学员转账'){%>selected<%}%>>学员转账</option>
+                            <option value="分院转账" <%if(item.method=='分院转账'){%>selected<%}%>>分院转账</option>
+                            <option value="扫码支付" <%if(item.method=='扫码支付'){%>selected<%}%>>扫码支付</option>
+                          </select>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="user_branch" class="control-label">所属分院<span>*</span></label>
+                          <input type="hidden" id="hideUserBranch" value="<%=item.branch%>" />
+                          <select name="user_branch" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' disabled>
+                            <%branch.forEach(function(item){%>
+                            <option value="<%=item.classroom%>"><%=item.classroom_name%></option>
+                            <%})%>
+                          </select>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="desc" class="control-label">备注说明<span>*</span></label>
+                          <input type="text" name="desc" placeholder="付款说明" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="" class="control-label">备注历史</label>
+                          <%remakeList.forEach(function(node){%>
+                          <p>提交者: 【<b> <%=node.create%> </b>】 内容：【<b> <%=node.content%> </b>】 </p>
+                          <%})%>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <span class="btn btn-danger btn-sm" id="addImg">
+                            <span class="glyphicon glyphicon-plus"></span>添加凭证
+                          </span>
+                          <span style="color: red">*双击凭证删除</span>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div id="addPics" style="display: inline-block">
+                            <%if(item.pics){item.pics.forEach(function(node){%>
+                            <img src="<%=aly%>/<%=node%>" data-src="<%=node%>" height="150px" width="150px" class="img-thumbnail delPics">
+                            <%})}%>
+                          </div>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <!--<span class="btn btn-danger btn-sm addShow">
+                            <span class="glyphicon glyphicon-plus"></span>关联学员
+                          </span>-->
+                          <span style="color: red">已关联学员信息</span>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <ul class="list-group" id="options">
+                            <%list.forEach(function(node){%>
+                            <li class="list-group-item">
+                              学员姓名：【<b><%=node.m_name%></b>】  电话: 【<b><%=node.m_phone%></b>】  身份证 ： 【<b><%=node.m_card%></b>】  报备课程 ：【<b><%=node.goods_name%></b>】  缴费金额 ：【<b><%=node.en_fee%></b>】
+                            </li>
+                            <%})%>
+                          </ul>
+                        </div>
+                        <%if(item.status==1){%>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                        <%}%>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function () {
+
+     //给所属分院赋值
+      $("select[name=user_branch]").val($("#hideUserBranch").val());
+    //时间
+    $(".input_date").datetimepicker({
+      step:15,
+      lang:'ch',
+    });
+    $('#pay_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#pay_form').serializeArray();
+      var img=[]//图片凭证验证
+      $("#addPics").find('img').each(function(i,v){
+        img.push($(v).data('src'))
+      })
+      if(img.length==0){
+         return swal({
+         title: "创建失败",
+         text: "请上传凭证",
+         timer: 2000,
+         showConfirmButton: false
+         });
+      }
+      data.push({name:'pics',value:img.join()})
+      $.post("/admin/beian/pay/update",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href="/admin/beian/pay/list"
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    //双击删除
+    $(document).on('dblclick',".delPics",function(){
+      $(this).remove()
+    })
+    //添加图片
+    newupload('addImg','en_pics',function(err,result){
+      console.log(result)
+      if (err){
+        effect.error(err);
+      }else {
+        $('<img src="'+result.message.url+'" data-src="'+result.message.name+'" height="150px" width="150px" class="img-thumbnail delPics">').appendTo('#addPics')
+      }
+    });
+  })
+</script>
+<% include ../../inc/footer.html%>

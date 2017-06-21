@@ -1,0 +1,150 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="/admin/column_add" ><span class="glyphicon glyphicon-plus"></span> 新建</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <!-- 树形代碼 -->
+      <div id="tree" class="tree ">
+      </div>
+      <!-- 树形代碼 -->
+
+    </div>
+  </div>
+</div>
+<script>
+  /* 树形菜单 开始 */
+  var column = {
+    $dom: null,
+    init: function (id) {
+      this.$dom = $('#' + id);
+      this.getData();
+    },
+    getData: function () {
+      var self = this;
+      $.get('/admin/column_list', function (result) {
+        console.log('result', result.message.list);
+        if (result.code == 200) {
+          self.rebuild(result.message.list)
+        }
+      })
+    },
+    rebuild: function rebuild(list) {//格式化数据
+      list.forEach(function (v, i) {
+        var column_path = v.column_path;
+        var lastIndex = column_path.lastIndexOf(',');
+        if (lastIndex > 0) {
+          var id = column_path.slice(lastIndex + 1);//parent_id
+          list.forEach(function (item) {
+            if (item.columnid == id) {
+              if (item.children) {
+                item.children.push(v);
+              } else {
+                item.children = [v];
+              }
+            }
+          })
+
+        }
+      });
+      _.remove(list, function (n) {
+        return n.column_path != '0';
+      });
+      var html = this.create_elements(list);
+      this.$dom.html(html);//渲染dom
+      this.init_tree();//绑定事件
+    },
+    create_elements: function (list) {
+      var html = '<ul>';
+      $.each(list,function () {
+        html += '<li class="parent_li">' +
+                '<span title="Collapse this branch">' +
+                (this.children ? '<i class="icon-calendar glyphicon glyphicon-minus"></i>' : '') + this.column_title + '</span>' +
+                '<button data-id="'+this.columnid+'" class="delete pull-right btn-sm btn btn-danger">删除</button>' +
+                '<button data-id="'+this.columnid+'" class="edit pull-right btn-sm btn btn-info">编辑</button>';
+        if(this.children){
+          html += column.create_elements(this.children);
+        }
+        html += '</li>';
+      });
+      html += '</ul>';
+      return html;
+    },
+    init_tree:function () {
+      $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
+      $('.tree li.parent_li > span').on('click', function (e) {
+        var children = $(this).parent('li.parent_li').find(' > ul > li');
+        if (children.is(":visible")) {
+          children.hide('fast');
+          $(this).attr('title', 'Expand this branch').find(' > i').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+        } else {
+          children.show('fast');
+          $(this).attr('title', 'Collapse this branch').find(' > i').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+        }
+        e.stopPropagation();
+      });
+      $('.choose').on('click',function (e) {
+        e.stopPropagation();
+      });
+    }
+  };
+  column.init('tree');
+  /* 树形菜单 结束 */
+  $(document).on('click','.edit',function(){
+    location.href = '/admin/column_edit?id=' + $(this).data('id');
+  });
+  $(document).on('click','.delete',function(){
+    var $this = $(this);
+    var id = $this.data('id');
+    var hasChild = $this.parent().find('ul').length;
+    if(hasChild){
+      return swal({
+        title: "当前栏目有子栏目，不允许删除!",
+        text: "请移走子项目，或者删除旗下子项目",
+        type: "warning",
+        showCancelButton: false,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "确定",
+        cancelButtonText:"取消",
+        animation: "slide-from-top",
+        closeOnConfirm: true,
+        html: false
+      })
+    }
+    swal({
+      title: "确定删除当前栏目?",
+      text: "",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "确定",
+      cancelButtonText:"取消",
+      animation: "slide-from-top",
+      closeOnConfirm: true,
+      html: false
+    }, function(){
+      $.post('/admin/column/delete',{
+        id:id
+      },function (result) {
+        if(result.code === 200){
+          location.reload();
+        }else {
+          swal("删除失败", result.message.message, "warning")
+        }
+      })
+    });
+  })
+
+</script>
+<% include ../../inc/footer.html%>

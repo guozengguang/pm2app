@@ -1,0 +1,145 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>编辑项目</b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <form id="form" onsubmit="return false">
+
+                                <input type="hidden" name="id" placeholder="id" value="<%= item.id %>"
+                                       class="form-control">
+
+                                <div class="col-md-12" style="padding:0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="form-group form-group-sm col-md-3">
+                                                    <label for="hierarchy" class="control-label">项目级别<span>*</span></label>
+                                                    <select id="hierarchy" disabled="disabled" name="hierarchy" class="form-control" value="<%= item.hierarchy %>">
+                                                        <option value="1" <%= item.hierarchy === 1 ? 'selected': '' %> >主项目</option>
+                                                        <option value="2" <%= item.hierarchy === 2 ? 'selected': '' %> >子项目</option>
+                                                    </select>
+                                                </div>
+                                                <div id="parent_id_container" <%= item.hierarchy === 2 ? '': 'style="display: none"' %> class="form-group form-group-sm col-md-3">
+                                                    <label for="parent_id" class="control-label">父级主项目<span>*</span></label>
+                                                    <select id="parent_id" name="parent_id" class="form-control" value=""></select>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="name"
+                                                           class="control-label">名称<span>*</span></label>
+                                                    <input id="name" type="text" name="name" placeholder="名称" value="<%= item.name %>"
+                                                           class="form-control">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <div class="">
+                                                        <button id="submit" type="submit" class="btn btn-danger btn-submit">提交
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var parent_id = {
+        dom: null,
+        get_data: function (hierarchy, parent_id) {
+            var that = this;
+            if(!hierarchy){
+                return false;
+            }
+            $.ajax({
+                url: '/admin/questionnaire/primary/get',
+                method: 'GET',
+                dataType: 'json',
+                data: {
+                    hierarchy: hierarchy - 1
+                },
+                success: function (result) {
+                    if(result.code === 200){
+                        that.insertDom(result.result.list, parent_id);
+                    }
+                },
+                error: function (err) {
+
+                }
+            })
+        },
+        insertDom: function (list , parent_id) {
+            this.dom || (this.dom = $('#parent_id_container'));
+            this.parent_id || (this.parent_id = $('#parent_id'));
+            var length = list.length;
+            if(length){
+                var string = '';
+                $.each(list,function (i, v) {
+                    string += '<option value="'+ this.id + '" '+ (parent_id == this.id ? 'selected' : '') +'>' + this.name + '</option>'
+                });
+                this.parent_id.html(string);
+                this.dom.show();
+            }else {
+                this.dom.hide();
+                this.parent_id.html('');
+            }
+        }
+    };
+    parent_id.get_data(<%= item.hierarchy %>,<%= item.parent_id %>);//默认获取第一层级数据
+
+    var hierarchy = {
+        dom: null,
+        bindEvent: function () {
+            this.dom || (this.dom = $('#hierarchy'));
+            this.parent || (this.parent = $('#parent'));
+            this.dom.on('change', this.change);
+        },
+        change: function () {
+            parent_id.get_data(+$(this).val());//默认获取第一层级数据
+            hierarchy.parent.val('');
+        }
+    };
+    hierarchy.bindEvent();//绑定数据
+
+
+    $(function () {
+//    setcampus('province','city');
+        //验证提交
+        $('#form').bootstrapValidator().on('success.form.bv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target),
+                    validator = $form.data('bootstrapValidator');
+            var data = $('#form').serialize();
+            console.log(data);
+            $.post("/admin/questionnaire/primary/update", data, function (result) {
+                if (result.code == 200) {
+                    location.href = '/admin/questionnaire';
+                } else {
+                    swal('失败', result.message, 'error');
+                    submit.attr('disabled', false).prop('disabled', false);
+                }
+            })
+        });
+    })
+</script>
+<% include ../inc/footer.html%>

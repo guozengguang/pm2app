@@ -1,0 +1,543 @@
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <!--待用编号-->
+    <%if(locals.current_user_roles.r_permission.indexOf('1000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse0" aria-expanded="false" aria-controls="collapseOne"><span
+                    class="glyphicon glyphicon-th-large"></span> 报名列表 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse0" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse0">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('1200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/enroll" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    招生简章 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/manage" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    学员报名管理 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/branch/manage" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    学院报名管理 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/silicon/manage" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    硅谷报名管理 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/education/manage" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    家长学院报名 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1650')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/israel/manage" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    以色列报名付费 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1700')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/newenroll/newenroll" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    新招生简章 </a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('1800')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/newenroll/apply_template_manager" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    报名模板管理 </a>
+                <%}%>
+
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!-- app配置 -->
+    <%if(locals.current_user_roles.r_permission.indexOf('8000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" >
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse8" aria-expanded="false" aria-controls="headingThree"><span
+                    class="glyphicon glyphicon-leaf"></span> APP配置 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse8" class="panel-collapse collapse" role="tabpane4" aria-labelledby="collapse4">
+            <div class="list-group">
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/app_home" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    首页配置</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('8200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/sysconfigs" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    APP参数</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('8300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/diagram" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    启动图设置</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--格局产品-->
+    <%if(locals.current_user_roles.r_permission.indexOf('2000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingTow">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse1" aria-expanded="false" aria-controls="headingTow"><span
+                    class="glyphicon glyphicon-th-large"></span> 格局商学 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse1">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('2100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/goods" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span>
+                    课程班列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/activity" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 活动列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/special" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 专辑列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/international" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 国际化列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/student" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 会员列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/area" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 学区列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2700')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enterprise" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 企业列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('2800')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/payment" class="list-group-item"><span class="glyphicon glyphicon-th-list"></span> 付款码</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--格局用户-->
+    <%if(locals.current_user_roles.r_permission.indexOf('3000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingThree">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse2" aria-expanded="false" aria-controls="headingThree"><span
+                    class="glyphicon glyphicon-user"></span> 格局用户 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse2">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('3100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/vip_list" class="list-group-item"><span class="glyphicon glyphicon-list"></span>
+                    用户列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3800')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/staff_list" class="list-group-item"><span class="glyphicon glyphicon-list"></span> 员工列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3700')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/sales_list" class="list-group-item"><span class="glyphicon glyphicon-list"></span> 招生老师列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/lecturer_list" class="list-group-item"><span class="glyphicon glyphicon-list"></span>
+                    讲师列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3900')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/council_list" class="list-group-item"><span class="glyphicon glyphicon-list"></span>
+                    院办列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/system_list" class="list-group-item"><span class="glyphicon glyphicon-list"></span> 系统用户</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/feedback" class="list-group-item"><span class="glyphicon glyphicon-tags"></span>
+                    用户反馈</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('3300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/reward/wechat" class="list-group-item"><span class="glyphicon glyphicon-qrcode"></span>
+                    微信打赏</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--格局媒资 -->
+    <%if(locals.current_user_roles.r_permission.indexOf('4000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingFour">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse3" aria-expanded="false" aria-controls="headingFour"><span
+                    class="glyphicon glyphicon-globe"></span> 格局媒资 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse3">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('4100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/media" class="list-group-item"><span class="glyphicon glyphicon-list"></span> 媒资列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('4200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/column" class="list-group-item"><span class="glyphicon glyphicon-list"></span> 栏目列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('4300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/media/online" class="list-group-item"><span class="glyphicon glyphicon-list"></span>
+                    媒资上下架</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('4400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <!--<a href="/admin/media/offline" class="list-group-item"><span class="glyphicon glyphicon-list"></span>-->
+                <!--媒资下架</a>-->
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--附件其他-->
+    <%if(locals.current_user_roles.r_permission.indexOf('5000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingFive">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse4" aria-expanded="false" aria-controls="headingThree"><span
+                    class="glyphicon glyphicon-leaf"></span> 附件其他 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse4" class="panel-collapse collapse" role="tabpane4" aria-labelledby="collapse4">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('5200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/ads" class="list-group-item"><span class="glyphicon glyphicon-th-large"></span>
+                    广告位管理</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('5500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/video" class="list-group-item"><span class="glyphicon glyphicon-film"></span> 视频上传</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('5400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/notifics" class="list-group-item"><span class="glyphicon glyphicon-certificate"></span> 格局公告</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('5800')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/inform" class="list-group-item"><span class="glyphicon glyphicon-random"></span> 内部通知</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('5900')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/note" class="list-group-item"><span class="glyphicon glyphicon-random"></span> 短信通知</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('5600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/um" class="list-group-item"><span class="glyphicon glyphicon-random"></span> 友盟推送</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('5700')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/splendid" class="list-group-item"><span class="glyphicon glyphicon-star"></span> 精彩锦集</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!-- 宣传页 -->
+    <%if(locals.current_user_roles.r_permission.indexOf('7000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse7" aria-expanded="false" aria-controls="headingThree"><span
+                    class="glyphicon glyphicon-leaf"></span> 宣传页 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse7" class="panel-collapse collapse" role="tabpane4" aria-labelledby="collapse4">
+            <div class="list-group">
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7001')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/advertisement/manage" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    参数管理</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('7002')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/advertisement/value" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    参数修改</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7003')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/questionnaire" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    问题调查</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/rating/manage" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    评价表列表</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/rating/statistics" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    评价表统计</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/blessings/branch" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    学院祝福添加</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7700')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/blessings/student" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    学员祝福审核</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7800')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/master/enroll" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    格局达人报名</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7900')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/master/winning" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    格局达人中奖</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('7005')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/good_project/manage" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    好项目报名</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('7006')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/xtx" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    活动专辑</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('7007')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/forum" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    动态论坛管理</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('7007')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/enroll/sensitive" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    敏感词管理</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--客户报备  -->
+    <%if(locals.current_user_roles.r_permission.indexOf('6000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingSix">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse6" aria-expanded="false" aria-controls="headingThree"><span
+                    class="glyphicon glyphicon-volume-up"></span> 学员报备 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse6" class="panel-collapse collapse" role="tabpane6" aria-labelledby="collapse6">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('6100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/list" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 学员列表(高级)</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6150')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/branch" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 学员列表</a>
+                <%}%>
+
+                <!--<%if(locals.current_user_roles.r_permission.indexOf('6200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/apply/info" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>
+                    申请信息修改（C端处理）</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/apply/affiliation" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 申请归属转移（C端处理）</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/apply/transfer" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 申请转院(客户列表处理)</a>
+                <%}%>-->
+
+                <%if(locals.current_user_roles.r_permission.indexOf('6500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/check/info" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 信息修改列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/check/affiliation" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 归属转移列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6700')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/check/transfer" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 转院列表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6800')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/pay/list" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 缴费管理</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6900')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/beian/aging" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 时效设置</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--财务缴费  -->
+    <%if(locals.current_user_roles.r_permission.indexOf('9000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingNine">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse9" aria-expanded="false" aria-controls="headingNine"><span
+                    class="glyphicon glyphicon-usd"></span> 财务部 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse9" class="panel-collapse collapse" role="tabpane9" aria-labelledby="collapse9">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('9100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/caiwu/list" class="list-group-item"><span class="glyphicon glyphicon-grain"></span>审核列表</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <!--历史学院缴费  -->
+    <!--
+    <%if(locals.current_user_roles.r_permission.indexOf('6000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingSix">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse6" aria-expanded="false" aria-controls="headingThree"><span
+                    class="glyphicon glyphicon-volume-up"></span> 报名付费 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse6" class="panel-collapse collapse" role="tabpane6" aria-labelledby="collapse6">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('6100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/swipe" class="list-group-item"><span class="glyphicon glyphicon-th-large"></span> pos总院</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/branch_swipe" class="list-group-item"><span class="glyphicon glyphicon-th-large"></span>
+                    pos分院</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6500')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/transfer" class="list-group-item"><span class="glyphicon glyphicon-th-large"></span>
+                    转账总院</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6600')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/branch_transfer" class="list-group-item"><span
+                        class="glyphicon glyphicon-th-large"></span> 转账分院</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6300')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/pos" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> pos对应表</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('6400')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/member" class="list-group-item"><span class="glyphicon glyphicon-grain"></span> 客户列表</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    -->
+    <!-- 酒店管理 -->
+    <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcb')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse11" aria-expanded="false" aria-controls="headingEnd"><span
+                    class="glyphicon glyphicon-grain"></span> 活动管理 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse11" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse10">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcba02b70284bee20c4')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/activity/publish" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 发布活动</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcb07179c6b0ee1557d')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/activity/review" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 活动审核</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcbj0td7k6m08eg09147a9iq1fz')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/activity/manage" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 活动管理</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcb71b837b9d8c0998f')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/manage" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 酒店管理</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcbba0e65e983dc0003')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/detail" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 酒店介绍</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcbcc98f38b47f453fc')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/reservation/record" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 预定记录</a>
+                <%}%>
+
+                <%if(locals.current_user_roles.r_permission.indexOf('8fddf4df95dfcfcbb72de041b1c7e6ee')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/hotel/reservation/list" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span> 预定房间</a>
+                <%}%>
+
+            </div>
+        </div>
+    </div>
+    <%}%>
+
+    <!--系统管理-->
+    <%if(locals.current_user_roles.r_permission.indexOf('10000')>=0 || locals.current_user_roles.r_permission===""){%>
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingEnd">
+            <h4 class="panel-title"><a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                       href="#collapse10" aria-expanded="false" aria-controls="headingEnd"><span
+                    class="glyphicon glyphicon-cog"></span> 系统管理 <span class="caret"></span></a></h4>
+        </div>
+        <div id="collapse10" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse10">
+            <div class="list-group">
+                <%if(locals.current_user_roles.r_permission.indexOf('10100')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/role" class="list-group-item"><span class="glyphicon glyphicon-user"></span> 角色管理</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('10200')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/user" class="list-group-item"><span class="glyphicon glyphicon-lock"></span> 操作员管理</a>
+                <%}%>
+                <%if(locals.current_user_roles.r_permission.indexOf('10900')>=0 ||
+                locals.current_user_roles.r_permission===""){%>
+                <a href="/admin/logs" class="list-group-item"><span class="glyphicon glyphicon-list-alt"></span>
+                    操作日志</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <%}%>
+</div>

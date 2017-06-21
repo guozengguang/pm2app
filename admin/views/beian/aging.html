@@ -1,0 +1,152 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div>
+                <div class="pull-left">
+                </div>
+                <div class="pull-right">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <small>有效时长（单位天）</small>
+            <br>
+            <script>
+                angular.module("cms")
+                    .service('agingService', function ($http) {
+                        this.dataFormat = function (data) {
+                            return JSON.parse(data.replace(/&#34;/ig, '"'))
+                        },
+                            this.push = function (data) {
+                                return $http({
+                                    url: '/admin/beian/set_aging',
+                                    method: 'POST',
+                                    data: data
+                                })
+                            }
+                    })
+                    .controller('agingControl', function ($scope, agingService, $log) {
+                        $scope.branch = agingService.dataFormat('<%=branch%>')
+                        if ($scope.branch == 0) {
+                            $scope.flag = false;
+                        } else {
+                            $scope.flag = true;
+                        }
+                        $scope.room = agingService.dataFormat('<%=list%>')//分院
+                        $scope.roomSelect = $scope.room[0].classroom.toString();
+                        $scope.time = $scope.room[0].classroom_report_time;
+                        $scope.min = $scope.room[0].classroom_report_time_min
+                        $scope.max = $scope.room[0].classroom_report_time_max
+                        $scope.max_num = $scope.room[0].max_query_num
+                        $scope.setRoom = function () {
+                            angular.forEach($scope.room, function (data, index, array) {
+                                if (data.classroom == $scope.roomSelect) {
+                                    $scope.time = data.classroom_report_time
+                                    $scope.min = data.classroom_report_time_min
+                                    $scope.max = data.classroom_report_time_max
+                                    $scope.max_num = data.max_query_num
+                                    return false
+                                }
+                            });
+                        };
+                        $scope.putTime = function () {
+                            if (parseInt($scope.time) < parseInt($scope.min) || parseInt($scope.time) > parseInt($scope.max)) {
+                                swal("提示","报备时间不在有效区间","warning");
+                                return;
+                            }
+                            swal({
+                                    title: "确认修改！",
+                                    text: $scope.titleSelect,
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "确认!",
+                                    cancelButtonText: "取消!",
+                                    closeOnConfirm: true
+                                },
+                                function () {
+                                    if ($scope.time <= 0 || !(/\d+/.test($scope.time))) {
+                                        swal({
+                                            title: "操作失败",
+                                            text: "时间格式错误",
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        });
+                                    }
+                                    $scope.pushData = {
+                                        time: $scope.time,
+                                        id: $scope.roomSelect,
+                                        max_num: $scope.max_num,
+                                        min: $scope.min,
+                                        max: $scope.max
+                                    };
+                                    agingService.push($scope.pushData).success(function (result) {
+                                        if (result.code == 200) {
+                                            swal({
+                                                title: "操作成功",
+                                                text: "修改成功",
+                                                timer: 2000,
+                                                showConfirmButton: false
+                                            });
+                                            if ($scope.room.length > 1) {
+                                                location.reload()
+                                            }
+                                        }
+                                    })
+                                });
+                        }
+                    })
+            </script>
+            <div class="well" style="padding: 10px;margin-bottom: 0px" ng-controller="agingControl">
+                <div class="row form-inline">
+                    <div class="form-group" style="margin-left: 15px">
+                        <label for="" class="sr-only">类型<span>*</span></label>
+                        <select class="form-control" ng-change="setRoom()" ng-model="roomSelect">
+                            <option value="{{x.classroom}}" ng-repeat="x in room">{{x.classroom_name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0px">
+                        <label for="" class="sr-only">有效时长（单位天）<span>*</span></label>
+                        <input type="text" ng-model="time" placeholder="有效时长（单位天）" class="form-control"
+                               onkeyup="value=value.replace(/[^\d]/g,'')">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0px">
+                        <label for="" class="sr-only">报备有效时间区间</label>
+                        <input type="text" ng-model="min" placeholder="起始值" class="form-control" ng-disabled="{{flag}}"
+                               onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                        - <input type="text" ng-model="max" placeholder="结束值" class="form-control"
+                                 ng-disabled="{{flag}}" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0px">
+                        <label for="" class="sr-only">分院最大报备查询次数</label>
+                        <input type="text" ng-model="max_num" placeholder="分院最大报备查询次数" class="form-control"
+                               ng-disabled="{{flag}}" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                    </div>
+                    <div class="form-group">
+                        <button ng-click="putTime()" class="btn btn-info btn-sm">设置</button>
+                    </div>
+                </div>
+                <div class="row" style="font-size:12px;color:red">
+                    <div class="col-sm-2">
+                        <span for="">选择分院</span>
+                    </div>
+                    <div class="col-sm-2">
+                        <span for="">报备有效时间</span>
+                    </div>
+                    <div class="col-sm-2">
+                        <span for="">报备最短时间</span>
+                    </div>
+                    <div class="col-sm-2">
+                        <span for="">报备最长时间</span>
+                    </div>
+                    <div class="col-sm-2">
+                        <span for="">报备查询次数</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>

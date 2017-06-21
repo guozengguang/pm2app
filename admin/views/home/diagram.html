@@ -1,0 +1,172 @@
+<% include ../inc/head.html%>
+<script src="https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.js"></script>
+<script type="text/javascript" src="/javascripts/js/masonry.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:void (0)"  class="setDiagram"><span class="glyphicon glyphicon-plus"></span>新增</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div id="diagram" class="row masonry-container">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="diagram_add">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">新增启动图</h4>
+      </div>
+      <div id="model_diagram"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    writeList({});
+    var endTime=0;
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/diagram_list',data,function(result){
+        if(result.code==200){
+          console.log(result.message.list)
+          endTime=result.message.list.length>0?result.message.list[0].etime:''
+          $("#diagram").empty();
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#diagram");
+//          $('.masonry-container').imagesLoaded( function () {
+//            $('.masonry-container').masonry({
+//              columnWidth: '.item',
+//              itemSelector: '.item'
+//            });
+//          });
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //显示添加表
+    $(document).on('click','.setDiagram',function(event) {
+      $("#diagram_add").modal("show");
+      $("#model_diagram").empty('');
+      $("#diagramtmpl").tmpl().appendTo("#model_diagram");
+      //时间
+      console.log(endTime)
+      $(".input_stime").datetimepicker({
+        lang:'ch',
+        step:30,
+        timepicker:false,
+        format:'Y-m-d',
+        minDate:moment(endTime).add('days', 1).format("YYYY/MM/DD"),
+        onSelectDate:function(a){
+          $(".input_etime").datetimepicker({
+            lang:'ch',
+            step:30,
+            timepicker:false,
+            format:'Y-m-d',
+            minDate:moment(a).format("YYYY/MM/DD")
+          });
+        }
+      });
+      //上传图片
+      newupload('pics_img','pics',function(err,result){
+        console.log(result)
+        if (err){
+          effect.error(err);
+        }else {
+          $('input[name="'+result.src+'"]').val(result.message.name);
+          $("#"+result.src+"_img").attr("src",result.message.url);
+        }
+      });
+      var id=$(this).attr('data-id');
+      //验证提交
+      $('#diagram_form').bootstrapValidator().on('success.form.bv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target),
+                validator = $form.data('bootstrapValidator');
+        var data=$('#diagram_form').serializeArray();
+        $.post("/admin/diagram_create",data,function(result){
+          if(result.code==200){
+            effect.success(function(){
+              $("#diagram_add").modal("hide");
+              writeList({});
+            })
+          }else{
+            effect.error(result.message)
+          }
+        })
+      });
+    });
+
+    $(document).on('click','.update',function(){
+      var id=$(this).data('id')
+      $.post('/admin/diagram_update',{id:id},function(result){
+        if(result.code==200){
+          writeList({})
+        }
+      })
+    })
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<div class="col-md-2" style="margin-bottom:10px">
+  <a href="${pics}" target="_blank" class="thumbnail" style="min-height:260px"><img class="media-object img-rounded" src="${pics}" alt="无封面"></a>
+  <div class="media-body">
+    <h4 class="media-heading" style="color:red"></h4>
+    <p>${stime} 至 ${etime}</p>
+    <div class="btn-group">
+      <button type="button" class="btn btn-danger update btn-xs" data-id="${id}">删除</button>
+    </div>
+  </div>
+</div>
+</script>
+<script  id="diagramtmpl" type="text/x-jquery-tmpl">
+  <form id="diagram_form" class="form-horizontal" method="post">
+      <div class="modal-body">
+        <div class="media">
+          <div class="media-left">
+            <a href="#">
+            <img class="media-object img-rounded" src="http://files.geju.com/public/ref.png" id="pics_img" width="180" height="240">
+            <input type="hidden" name="pics" value="public/ref.png" id="groupinput">
+            </a>
+          </div>
+          <div class="media-body">
+            <div class="form-group form-group-sm col-xs-12">
+            <label for="stime" class="control-label">开始时间<span>*</span></label>
+            <div class="">
+            <input type="text" name="stime" placeholder="开始时间" class="form-control input_stime" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            </div>
+            <div class="form-group form-group-sm col-xs-12">
+            <label for="etime" class="control-label">结束时间<span>*</span></label>
+            <div class="">
+            <input type="text" name="etime" placeholder="结束时间" class="form-control input_etime" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      <button type="submit" class="btn btn-primary">确认</button>
+      </div>
+  </form>
+</script>
+<% include ../inc/footer.html%>

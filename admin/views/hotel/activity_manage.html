@@ -1,0 +1,391 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<div ng-controller="HotelManageController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <%if (branch==0){%>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button  id = "fresh_top" type="button"
+                                            class="btn btn-sm btn-info">
+                                        总院发起的活动
+                                    </button>
+                                    <button id = "fresh_branch" type="button"
+                                            class="btn btn-sm btn-info">
+                                        分院发起的活动
+                                    </button>
+                                </div>
+                            </div>
+                            <%}%>
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="example" branch="<%=branch%>" class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>封面图</th>
+                                            <th>活动名称</th>
+                                            <th>活动时间</th>
+                                            <th>进行状态</th>
+                                            <th>审核状态</th>
+                                            <th>发起方</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .service('HotelManageService', function ($http) {
+
+                this.city = function () {
+                    return $http({
+                        url: '/city',
+                        method: 'GET'
+                    })
+                };
+
+            })
+            .controller('HotelManageController', function ($scope, $compile, HotelManageService) {
+                //初始化datatables
+                $scope.branch = $('#example').attr('branch');
+                var table = $('#example').DataTable({
+                    "ajax": {
+                        "url": "/admin/hotel/activity/list",
+                        "dataSrc": 'result.list',
+                        "data": function (data) {
+                            data.branch = $scope.branch
+                            data.from_branch = $scope.branch >1 ? 1:0 //1来自分院，0，总院
+                        }
+                    },
+                    "columns": [
+                        {
+                            "data": "cover_picture",
+                            "orderable": false,
+                        },
+                        {"data": "title"},
+                        {"data": "end_time"},
+                        {"data": "start_time"},
+                        {"data": "state"},
+                        {"data": "branch"},
+                        {"data": "id"}
+                    ],
+                    "aaSorting": [
+                        [2, "desc"]
+                    ],
+                    "columnDefs": [
+                        {
+                            "bSortable": false,
+                            "targets": 0,
+                            "render": function (data, type, row) {
+                                return '<div class="media"><div class="media-left">' +
+                                        '<a href="javascript: void 0;"><img class="media-object" style="width: 100px; height: 100px" src="' + data + '" alt="' + row.name + '"></a>' +
+                                        '</div></div>';
+                            }
+                        },
+                        {
+                            "targets": 2,
+                            "render": function (data, type, row) {
+                                if(moment(row.start_time).format('YYYY') === moment(row.end_time).format('YYYY')){
+                                    return moment(row.start_time).format('YYYY-MM-DD')
+                                            + '至' +
+                                            moment(row.end_time).format('MM-DD')
+                                }
+                                return moment(row.start_time).format('YYYY-MM-DD')
+                                        + '至' +
+                                        moment(row.end_time).format('YYYY-MM-DD')
+                            }
+                        },
+                        {
+                            "targets": 3,
+                            "render": function (data, type, row) {
+                                var now = +new Date(), html = '';
+                                if(now > new Date(row.enroll_start_time)){
+                                    html = '<span class="label label-warning">报名开始</span>';
+                                }
+                                if(now > new Date(row.enroll_end_time)){
+                                    html = '<span class="label label-warning">报名结束</span>';
+                                }
+                                if(now > new Date(row.start_time)){
+                                    html = '<span class="label label-warning">活动开始</span>';
+                                }
+                                if(now > new Date(row.end_time)){
+                                    html = '<span class="label label-warning">活动结束</span>';
+                                }
+                                return html || '<span class="label label-info">未开始</span>';
+                            }
+                        },
+                        {
+                            "targets": 4,
+                            "render": function (data, type, row) {
+                                var html = '';
+                                switch (+data){
+                                    case -1:
+                                        html += '<span class="label label-danger">已拒绝</span>';
+                                        break;
+                                    case 0:
+                                        html += '<span class="label label-default">未审核</span>';
+                                        break;
+                                    case 1:
+                                        html += '<span class="label label-success">审核通过</span>';
+                                        break;
+                                }
+                                return html;
+                            }
+                        },
+                        {
+                            "targets": 5,
+                            "render": function (data, type, row) {
+                                return data == 0 ? '总部' :row.Classroom.name;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 6,
+                            "render": function (data, type, row) {
+                                return '<a href="/hotel/activity/create?id=' + row.id + '" class="btn btn-warning">编辑</a>' +
+                                        '<a href="/hotel/activity/apply?id='+ data +'" class="btn btn-info">申请房间</a>' +
+                                    '<a href="/hotel/activity/detail?id=' + row.id + '" class="btn btn-info">查看详细</a>';
+                            }
+                        }
+                    ],
+                    "createdRow": function (row, data, index) {
+                        $compile(angular.element(row).contents())($scope);
+                    },
+                    "oLanguage": {
+                        "sUrl": "/table_language.json"
+                    },
+                    "dom": 'Bfrtip',
+                    "buttons": [
+                        'excel'
+                    ],
+                    "deferRender": true,
+                    "initComplete": function () {
+                        var api = this.api();
+                        api.columns().indexes().flatten().each( function ( i ) {
+                            if(i !== 4){
+                                return false
+                            }
+                            var column = api.column( i );
+                            var select = $('<select class="form-control">' +
+                                    '<option value="">-全部-</option>' +
+                                    '</select>')
+                                    .appendTo( $(column.header()).empty() )
+                                    .on( 'change', function () {
+                                        var val = $.fn.dataTable.util.escapeRegex(
+                                                $(this).val()
+                                        );
+                                        column
+                                                .search( val ? '^'+val+'$' : '', true, false )
+                                                .draw();
+                                    } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                                var html = '';
+                                switch (+d){
+                                    case 0:
+                                        html = '未审核';
+                                        break;
+                                    case -1:
+                                        html = '已拒绝';
+                                        break;
+                                    case 1:
+                                        html = '审核通过';
+                                        break;
+                                }
+                                select.append( '<option value="'+html+'">'+html+'</option>' )
+                            } );
+                        } );
+
+                    }
+                });
+
+                /* 打开模态框 */
+                $scope.create_hotel = function () {
+                    $scope.data = HotelManageService.new_hotel();
+                    $scope.room = HotelManageService.new_room();
+                    $('#myModal').modal();
+                };
+                HotelManageService.city().success(function (result) {
+                    $scope.province = result.result.list;
+                });
+                $scope.$watch('data.province', function (value, o) {
+                    angular.forEach($scope.province, function (v , i) {
+                        if(v.name === value){
+                            $scope.city = v.children
+                        }
+                    });
+                });
+                $scope.add_room = function () {
+                    if($scope.room.bed < 0){
+                        return swal("失败", '床位数量不能小于0', "error");
+                    }
+                    if($scope.room.price < 0){
+                        return swal("失败", '床位数量不能小于0', "error");
+                    }
+                    if($scope.room.count < 0){
+                        return swal("失败", '床位数量不能小于0', "error");
+                    }
+                    if(!/\S/.test($scope.room.name)){
+                        return swal("失败", '房型与床位不能为空', "error");
+                    }
+                    $scope.data.Rooms.push(angular.copy($scope.room));
+                    $scope.room = HotelManageService.new_room();
+                };
+                $scope.remove_room = function (room, index) {
+                    if(room.id){
+                        //TODO
+                    }else {
+                        _.remove($scope.data.Rooms, function (v, i) {
+                            return i === index;
+                        })
+                    }
+                };
+                $scope.submit = function () {
+                    var data = $scope.data;
+                    if (data.id) {
+                        HotelManageService.update(data).success(function () {
+                            table.ajax.reload();
+                            $('#myModal').modal('hide');
+                        })
+                    } else {
+                        HotelManageService.create(data).success(function () {
+                            table.ajax.reload();
+                            $('#myModal').modal('hide');
+                        })
+                    }
+                };
+                $scope.edit_activity = function (event) {
+                    var data = table.row($(event.target).parents('tr')).data();
+                    angular.forEach(data.picture, function (v, i) {
+                        data.picture[i] = v.replace(/http:\/\/.*?\//, '')
+                    });
+
+                    $scope.data = data;
+                    $('#myModal').modal();
+                };
+                $scope.delete_activity = function (event, id, name) {
+                    swal({
+                        title: "确定删除 " + name + " ?",
+                        text: "",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        animation: "slide-from-top",
+                        closeOnConfirm: true,
+                        html: false
+                    }, function () {
+                        HotelManageService.delete_activity(id).success(function () {
+                            table.row($(event.target).parents('tr')).remove().draw(false);
+                        })
+                    });
+                };
+                $("#fresh_top").on("click",function(){
+                    $("#example").attr('branch',0);
+                    $scope.branch = 0;
+                    table.ajax.reload();
+                });
+                $("#fresh_branch").on("click",function(){
+                    $("#example").attr('branch',1);
+                    $scope.branch = 1;
+                    table.ajax.reload();
+                });
+                /* 上传图片逻辑 */
+                newupload($('#upload_image')[0], '', function (err, result) {
+                    if (err) {
+                        swal("上传失败", err, "error");
+                    } else {
+                        $scope.$apply(function () {
+                            $scope.data.cover_photo = result.message.name;
+                        });
+                    }
+                });
+            });
+</script>

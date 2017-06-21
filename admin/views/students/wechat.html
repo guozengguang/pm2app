@@ -1,0 +1,161 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline code-form">
+            <div class="form-group">
+              <input type="text" name="type" placeholder="格式(默认png)" class="input-sm form-control">
+              <input type="hidden" name="url" placeholder="" class="input-sm form-control" value="<%=wechat%>">
+            </div>
+            <div class="input-group">
+              <input type="text" name="size" placeholder="尺寸(默认100)" class="form-control input-sm">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-danger btn-sm qrcode">
+                  生成二维码
+                </button>
+              </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <br>
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">微信支付地址:<%=wechat%></h3>
+          <br>
+          <h3 class="panel-title">打赏大屏幕地址:<a href="<%=wechat_web%>" target="_blank"><%=wechat_web%></a></h3>
+        </div>
+        <div class="panel-body" >
+          <div class="col-sm-6" id = 'setCode' style="overflow: auto;max-height:800px">
+            <img   src="/admin/wechat_qrcode?url=<%=wechat%>" alt="">
+          </div>
+          <div class="col-sm-6">
+            <form id="up_form">
+              <div class="form-group form-group-sm">
+                <label for="m_teacherqrcode" class="control-label">打赏二维码<span><small>建议规格1000*1000</small></span></label>
+                <div class="input-group input-group-sm">
+                  <input value="<%=member.m_teacherqrcode%>" type="text" name="m_teacherqrcode" placeholder="上传打赏二维码" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="m_teacherqrcode" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                </div>
+              </div>
+              <div class="form-group form-group-sm">
+                <div class="thumbnail">
+                  <img src="<%if(member.m_teacherqrcode){
+                    %><%=aly%>/<%=member.m_teacherqrcode%><%
+                  }%>"  id="m_teacherqrcode_img">
+                </div>
+              </div>
+              <div class="form-group form-group-sm">
+                <label for="m_teachertitleimg" class="control-label">打赏标题<span><small>建议规格1500*200</small></span></label>
+                <div class="input-group input-group-sm">
+                  <input value="<%=member.m_teachertitleimg%>" type="text" name="m_teachertitleimg" placeholder="上传打赏标题" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="m_teachertitleimg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                </div>
+              </div>
+              <div class="form-group form-group-sm">
+                <div class="thumbnail">
+                  <img src="<%if(member.m_teachertitleimg){
+                    %><%=aly%>/<%=member.m_teachertitleimg%><%
+                  }%>"  id="m_teachertitleimg_img">
+                </div>
+              </div>
+              <div class="form-group form-group-sm">
+                <label for="m_teacherrightimg" class="control-label">打赏头像<span><small>建议规格800*390</small></span></label>
+                <div class="input-group input-group-sm">
+                  <input value="<%=member.m_teacherrightimg%>" type="text" name="m_teacherrightimg" placeholder="上传打赏头像" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="m_teacherrightimg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                </div>
+              </div>
+              <div class="form-group form-group-sm">
+                <div class="thumbnail">
+                  <img src="<%if(member.m_teacherrightimg){
+                    %><%=aly%>/<%=member.m_teacherrightimg%><%
+                  }%>"  id="m_teacherrightimg_img">
+                </div>
+              </div>
+              <div class="form-group form-group-sm">
+                <div class="">
+                  <button type="button" class="btn btn-danger btn-submit memberupdate">提交</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function(){
+  var mid=location.search.substr(5);
+  $('.qrcode').on('click',function(){
+    var data=$('.code-form').serialize();
+    $('#setCode').html('<img src="/admin/wechat_qrcode?'+data+'" alt="">');
+  });
+  $('.memberupdate').on('click',function(){
+    var data=$('#up_form').serializeArray();
+    data.push({name:'mid',value:mid});
+    console.log(data)
+    $.post("/admin/students_update",data,function(result){
+      if(result.code==200){
+        effect.success(function(){
+          location.href='/admin/students'
+        })
+      }else{
+        effect.error(result.message)
+      }
+    })
+  })
+  newupload('m_teacherqrcode','',function(err,result){
+    if (err){
+      effect.error(err);
+    }else {
+      $('input[name="'+result.id+'"]').val(result.message.name);
+      $("#"+result.id+"_img").attr("src",result.message.url);
+    }
+  }) ;
+  newupload('m_teachertitleimg','',function(err,result){
+    if (err){
+      effect.error(err);
+    }else {
+      $('input[name="'+result.id+'"]').val(result.message.name);
+      $("#"+result.id+"_img").attr("src",result.message.url);
+    }
+  }) ;
+  newupload('m_teacherrightimg','',function(err,result){
+    if (err){
+      effect.error(err);
+    }else {
+      $('input[name="'+result.id+'"]').val(result.message.name);
+      $("#"+result.id+"_img").attr("src",result.message.url);
+    }
+  }) ;
+})
+</script>
+<% include ../inc/footer.html%>

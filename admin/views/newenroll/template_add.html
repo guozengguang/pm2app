@@ -1,0 +1,508 @@
+<% include ../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../inc/editor_mode.html%>
+<div class="container-fluid">
+    <div class="row" ng-app="cms" ng-controller="TemplateAddController">
+        <div class="sidebar">
+            <% include ../inc/left.html %>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-body" style="padding: 15px 0">
+                            <form id="media-form">
+                                <div class="col-md-12 col-sm-12" style="padding: 0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="form-group col-md-12 col-sm-12">
+                                                    <label class="control-label">报名模板名称<span>*</span></label>
+                                                    <input ng-model="data.name" type="text" name="mb_name"
+                                                           placeholder="报名模板名称" class="form-control" required
+                                                           data-bv-trigger="blur" data-bv-notempty-message="必填项目">
+                                                </div>
+                                                <div class="form-group col-md-12 col-sm-12">
+                                                    <div class="">
+                                                        <button ng-click="save(data, 0)" type="submit"
+                                                                class="btn btn-success btn-submit">保存基本信息
+                                                        </button>
+                                                        <span class="help-block pull-right">保存后可添加题目</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-body" style="padding: 15px 0">
+                            <!--二级项目开始-->
+                            <div ng-repeat="level_2 in data.children" class="col-md-12 col-sm-12"
+                                 style="padding: 0 0 0 15px">
+                                <div class="panel panel-danger">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="form-group col-md-10 col-sm-9">
+                                                <label class="control-label">题目名称<span>*</span></label>
+                                                <input ng-model="level_2.name" type="text" name="item_name"
+                                                       placeholder="题目名称"
+                                                       class="form-control" required data-bv-trigger="blur"
+                                                       data-bv-notempty-message="必填项目">
+                                            </div>
+                                            <div class="form-group col-md-2 col-sm-3">
+                                                <label class="control-label">题目排序<span>*</span></label>
+                                                <input ng-model="level_2.sort" type="text" name="item_name"
+                                                       placeholder="题目排序"
+                                                       class="form-control" required data-bv-trigger="blur"
+                                                       data-bv-notempty-message="必填项目">
+                                            </div>
+                                            <div class="form-group col-md-12 col-sm-12">
+                                                <label class="control-label">是否必填<span>*</span></label>
+                                                <div>
+                                                    <form>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.property" type="radio"
+                                                                   name="property" value="required">必填
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.property" type="radio"
+                                                                   name="property" value="">选填
+                                                        </label>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-6 col-sm-12">
+                                                <label class="control-label">报名项类型<span>*</span></label>
+                                                <div>
+                                                    <form>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="1" class="level3_type" checked="checked"
+                                                                   ng-click="changetype($event,level_2.children,data)">
+                                                            单选
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="2" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">
+                                                            多选
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="3" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">
+                                                            文本输入
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="4" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">多行文本输入
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="5" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">视频
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="6" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">
+                                                            评分
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="7" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">省份-城市-分院
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="8" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">省份-城市-详细地址
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input ng-model="level_2.method" type="radio" name="method"
+                                                                   value="9" class="level3_type"
+                                                                   ng-click="changetype($event,level_2.children,data)">图片
+                                                        </label>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div ng-if="level_2.method==6" class="form-group col-md-6 col-sm-12">
+                                                <label class="control-label">设置分级<span>*</span></label>
+                                                <div>
+                                                    <input ng-model="level_2.score" type="text" name="item_name"
+                                                           placeholder="分级"
+                                                           class="form-control" data-bv-trigger="blur"
+                                                           data-bv-notempty-message="必填项目">
+                                                </div>
+                                            </div>
+                                            <div ng-if="level_2.method==9" class="form-group col-md-6 col-sm-12">
+                                                <label class="control-label">图片数量<span>*</span></label>
+                                                <div>
+                                                    <input ng-model="level_2.imgcount" type="text" name="item_name"
+                                                           placeholder="图片数量"
+                                                           class="form-control" data-bv-trigger="blur"
+                                                           data-bv-notempty-message="必填项目">
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-12 col-sm-12">
+                                                <div class="">
+                                                    <button ng-click="save(level_2,data.id)"
+                                                            class="btn btn-success btn-submit">
+                                                        保存题目信息
+                                                    </button>
+                                                    <button ng-click="del_item(data.children,level_2)" type="submit"
+                                                            class="btn btn-danger btn-submit pull-right">
+                                                        删除题目信息
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div ng-if="level_2.method!=3 &&level_2.method!=4 &&level_2.method!=5 && level_2.method!=7 && level_2.method!=8 && level_2.method!=9"
+                                                 class="form-group col-md-12 col-sm-12">
+                                                <label class="control-label">
+                                                    排序
+                                                </label>
+                                                <button ng-disabled="!level_2.id" ng-click="add_level_3(level_2)"
+                                                        class="search_button btn btn-info btn-sm pull-right"
+                                                        type="button">
+                                                    添加
+                                                </button>
+                                            </div>
+                                            <!--三级项目开始-->
+                                            <div class="form-group col-md-12 col-sm-12">
+                                                <div ng-repeat="level_3 in level_2.children" class="input-group row"
+                                                     style="margin-bottom: 10px;width: 100%">
+                                                    <div class="form-group col-md-1 col-sm-2">
+                                                        <input ng-model="level_3.sort" type="text" name="item_name"
+                                                               placeholder="排序"
+                                                               class="form-control"
+                                                               required data-bv-trigger="blur"
+                                                               data-bv-notempty-message="必填项目">
+                                                    </div>
+                                                    <div class="form-group col-md-9 col-sm-7">
+                                                        <input ng-model="level_3.name" name="reference" type="text"
+                                                               class="form-control"
+                                                               placeholder="标题">
+                                                    </div>
+                                                    <div class="form-group col-md-2 col-sm-3">
+                                                            <span class="input-group-btn">
+                                                                <!--<button ng-click="save(level_3,data.id+','+level_2.id)"-->
+                                                                <!--class="search_button btn btn-success"-->
+                                                                <!--type="button">保存</button>-->
+                                                                <button ng-click="del_item(level_2.children,level_3)"
+                                                                        class="search_button btn btn-danger"
+                                                                        type="button">删除</button>
+                                                            </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-md-12 col-sm-12">
+                                                            <span class="input-group-btn">
+                                                                <button ng-if="((level_2.method==1||level_2.method==2)&&(level_2.children&&level_2.id))||isAddLevel_3"
+                                                                        ng-click="save(level3_Dics,data.id+','+level_2.id)"
+                                                                        class="search_button btn btn-success"
+                                                                        type="button">保存</button>
+                                                            </span>
+                                            </div>
+                                            <!--三级项目结束-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--二级项目结束-->
+                            <div class="col-md-12 col-sm-12" style="padding:0 0 0 15px">
+                                <button ng-disabled="!data.id" ng-click="add_level_2(data)" type="button"
+                                        class="btn btn-info btn-submit">
+                                    添加题目
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    angular.module('cms')
+        .service('TemplateAddService', function ($http, $location, $q) {
+            this.source = function () {
+                var _searchStr = location.search;
+                var id = "";
+                if (_searchStr != "") {
+                    id = location.search.split("?")[1].split("=")[1];
+                }
+                if (id != "") {
+                    //编辑
+                    return $http({
+                        url: '/admin/newenroll/find_template',
+                        method: 'GET',
+                        params: {
+                            id: id
+                        }
+                    });
+                } else {
+                    //添加
+                    return {
+                        success: function (fn) {
+                            fn({
+                                result: {
+                                    name: '',
+                                    level: 0,
+                                    children: []
+                                }
+                            })
+                        }
+                    }
+                }
+            };
+            this.save = function (data) {
+                return $http({
+                    url: '/admin/newenroll/save_template',
+                    method: 'POST',
+                    data: data
+                })
+            };
+            this.del = function (id) {
+                return $http({
+                    url: "/admin/newenroll/delete_template_option",
+                    method: "POST",
+                    data: {
+                        id: id
+                    }
+                })
+            }
+        })
+        .controller('TemplateAddController', function ($scope, TemplateAddService) {
+            //初始化模型
+            TemplateAddService.source().success(function (result) {
+                $scope.data = result.result;
+                if ($scope.data.children != undefined && $scope.data.children.length > 0) {
+                    $.each($scope.data.children, function (index, value) {
+                        if (value.children != undefined && value.children.length > 0) {
+                            $.each(value.children, function (index, value) {
+                                level3_Dics.push(value);
+                            })
+                        }
+                    })
+                    $scope.level3_Dics = level3_Dics;
+                }
+
+            });
+
+            //数据模型定义
+            var level3_Dics = [];
+            //第二级
+            var level_2 = {
+                name: '',//题目名称
+                property: "required",//是否必填
+                method: 1,//报名项类型 1.单选 2.多选 3.文本输入 4.评分 5.省份-城市-分院 6.省份-城市-详细地址 7.图片
+                level: 2,
+                type: 0,
+                status: 5,
+                children: []
+            };
+            //第三级
+            var level_3 = {
+                name: '',
+                level: 3
+            }
+
+            //保存方法
+            $scope.save = function (source, id) {
+
+                //如果id==0则为第一级别 模板的名字的保存 source.length == undefined的时候是保存题目信息
+                if (id == 0 || source.length == undefined) {
+                    source.parent = id;
+                    source.operator = $scope.operator;
+
+                    TemplateAddService.save(source).success(function (result) {
+                        swal({
+                            type: 'success',
+                            title: '成功',
+                            text: result.message,
+                            showConfirmButton: true,
+                            timeout: 1000
+                        }, function () {
+                            var data = result.result;
+                            delete data.children;
+                            _.assign(source, data);
+
+                            //保存成功导航到编辑页面
+                            if (data.level == 2) { //添加第二级
+                                location.href = "/newenroll/template_add?id=" + data.parent;
+                            } else {
+                                if (data.id != undefined) {
+                                    //更新的时候
+                                    location.href = "/newenroll/template_add?id=" + data.id;
+                                } else {
+                                    location.reload();
+                                }
+                            }
+                        });
+
+                    });
+                } else {
+                    //此时是保存第三级
+                    $.each(source, function (index, node) {
+
+                        if (source[index].parent == undefined) {
+                            //此时是新加进来的第三级还没有parent 就赋值为参数的值
+                            node.parent = id;
+                        } else {
+                            //此时是原来就有的第三级有parent值
+                            node.parent = source[index].parent;
+                        }
+
+                        node.operator = $scope.operator;
+
+                        TemplateAddService.save(node).success(function (result) {
+                            swal({
+                                type: 'success',
+                                title: '成功',
+                                text: result.message,
+                                showConfirmButton: true,
+                                timeout: 1000
+                            });
+                            var data = result.result;
+                            delete data.children;
+                            _.assign(node, data);
+                        });
+                    });
+                }
+            };
+
+            //添加第二级
+            $scope.add_level_2 = function (data) {
+                if (data.children) {
+                    data.children.push(angular.copy(level_2));
+                } else {
+                    data.children = [angular.copy(level_2)];
+                }
+            };
+            //添加第三级
+            $scope.add_level_3 = function (data) {
+                if (data.children) {
+                    //往数组追加元素
+                    data.children.push(angular.copy(level_3));
+                } else {
+                    //创建数组
+                    data.children = [angular.copy(level_3)]
+                }
+                $scope.isAddLevel_3 = true;
+                //往第三级集合里添加
+                if (data.children != undefined && data.children.length > 0) {
+                    var level3Dic = $scope.level3_Dics;
+                    //过滤重复数据
+                    $scope.level3_Dics = _.union(level3Dic, data.children);
+                }
+            };
+            //删除题目信息
+            $scope.del_item = function (target, current) {
+                var id = current.id;
+                if (id) {
+                    swal({
+                        title: "确定删除 " + name + " ?",
+                        text: "",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        animation: "slide-from-top",
+                        closeOnConfirm: true,
+                        html: false
+                    }, function () {
+                        TemplateAddService.del(id).success(function () {
+                            _.remove(target, function (n) {
+                                return n === current;
+                            })
+                            //更新数据
+                            $scope.level3_Dics = target;
+
+                            if (target.length == 0) {
+                                $scope.isAddLevel_3 = false;
+                            }
+                        });
+                    });
+                } else {
+                    _.remove(target, function (n) {
+                        return n === current;
+                    })
+                    //更新数据
+                    $scope.level3_Dics = target;
+
+                    if (target.length == 0) {
+                        $scope.isAddLevel_3 = false;
+                    }
+                }
+            };
+
+            //切换题目类型
+            $scope.changetype = function (event, this_children, this_data) {
+                var target = event.target;
+                var radios = $("input.level3_type");
+                var $oldCheckedRadio = null;
+                var ids = [];
+                if (this_children != undefined && this_children.length > 0) {
+                    $.each(this_children, function (index, value) {
+                        ids.push(value.id)
+                    })
+                }
+
+                swal({
+                    title: "改变类型会删除该类型下关联的子类内容,你确定要改变吗？",
+                    text: "",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    animation: "slide-from-top",
+                    closeOnConfirm: true,
+                    html: false
+                }, function (res) {
+                    if (res == false) {
+                        //点击了取消 就还原原来的选中项
+//                        $.each(radios,function (index, value) {
+//                            if(value.attributes["checked"]!=undefined && value.attributes["checked"].value == "checked"){
+//                                $oldCheckedRadio = value;
+//                                $oldCheckedRadio.checked = true;
+//                            }
+//                        })
+                        //导航到编辑页面
+                        location.href = "/newenroll/template_add?id=" + this_data.id;
+                    } else {
+                        //点击确定 删除子类关联项目
+                        $.each(ids, function (index, value) {
+                            TemplateAddService.del(value).success(function () {
+                                _.remove(this_children, function (n) {
+                                    return n.id === value;
+                                })
+                                //更新数据
+                                $scope.level3_Dics = this_children;
+                            });
+                        })
+                    }
+                });
+            };
+
+            //当前操作用户
+            $scope.operator = decodeURIComponent("admin");
+        })
+
+</script>
+<% include ../inc/footer.html %>

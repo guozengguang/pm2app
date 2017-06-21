@@ -1,0 +1,209 @@
+<% include ../inc/head.html%>
+<script src="/javascripts/js/clipboard.min.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="row">
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input id="rating_name" name="name" type="text" class="form-control" placeholder="评价表名称">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input id="rating_start" name="start_time" type="text" class="input_date form-control" placeholder="开始时间">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input id="rating_end" name="end_time" type="text" class="input_date form-control" placeholder="结束时间">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <button class="search_button btn btn-default" type="button">查询</button>
+                                    <a href="/admin/rating/edit" class="search_button btn btn-info" type="button">新建</a>
+                                </div>
+                            </div><!-- /.row -->
+                            <hr class="ke-hr">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>评价调查表名称</th>
+                                            <th>发布人</th>
+                                            <th>发布时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                    <div id="page"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${id}</td>
+    <td>${name}</td>
+    <td>${operator}</td>
+    <td>${createdAt}</td>
+    <td>
+        <span class="btn-group">
+            <a href="/admin/rating/edit#?id=${id}" class="edit btn btn-success btn-sm" type="button">编辑</a>
+            <button class="del btn btn-info btn-sm" type="button" data-id="${id}">删除</button>
+            <button data-clipboard-action="copy" data-clipboard-text="http://html.geju.com/html5/v1.3/page/listname/wjdc.html?id=${id}" class="copy btn btn-warning btn-sm" type="button">复制地址</button>
+            <a href="/admin/rating/detaillist#?id=${id}" class="edit btn btn-success btn-sm" type="button">查看明细</a>
+        </span>
+    </td>
+  </tr>
+
+</script>
+
+<% include ../inc/footer.html%>
+<script>
+    /* 复制开始 */
+    new Clipboard('.copy').on('success', function(e) {
+        effect.success('复制成功');
+    }).on('error', function(e) {
+        effect.error('复制失败');
+    });
+    /* 复制出错 */
+
+    //开始时间
+    $(".input_date").datetimepicker({
+        step: 30,
+        lang: 'ch'
+    })
+
+    /* 过滤对象 */
+    var filter_data = {
+        name: '',//名称
+        start_time: '',//开始时间
+        end_time: '', //结束时间
+    };
+    var filter_button = {
+        $buttons: null,
+        init:function ($buttons) {
+            this.$buttons = $buttons;
+            this.Event();
+        },
+        Event: function () {
+            var rating_name = $('#rating_name');
+            var rating_start = $('#rating_start');
+            var rating_end = $('#rating_end');
+            this.$buttons.on('click',function (e) {
+                options.currentPage = 1;
+
+                filter_data.name = rating_name.val();
+                filter_data.start_time = rating_start.val();
+                filter_data.end_time = rating_end.val();
+                writeList({ filter: filter_data });
+            })
+        }
+    };
+    filter_button.init($('.search_button'));
+
+</script>
+<script>
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            writeList({
+                page: page,
+                filter: filter_data
+            })
+        }
+    };
+
+    /* 删除 */
+    $(document).on('click', '.del', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定删除 "+ name +" ?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: false,
+            html: false
+        }, function () {
+            $.post('/admin/rating/delete', {
+                id: id
+            }, function (result) {
+                if (result.code === 200) {
+                    location.reload();
+                } else {
+                    swal("删除失败", result.message, "warning")
+                }
+            })
+        });
+    });
+
+    //默认加载
+    writeList({ filter: filter_data });
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        $.get('/admin/rating/list', data, function (result) {
+            if (result.code == 200) {
+                var list = result.result.rows;
+                var count = result.result.count;
+                $("table tbody").empty('');
+                $.each(list, function (i, v) {
+                    v.createdAt = moment(v.createdAt).format('YYYY年MM月DD日 HH:mm:ss')
+                });
+                $("#inittmpl")
+                        .tmpl(list)
+                        .appendTo("table tbody");
+                options.totalPages = Math.ceil(count / 12);
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    }
+</script>

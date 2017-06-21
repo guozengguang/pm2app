@@ -1,0 +1,97 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+      <div class="panel-heading">
+	      <div class="col-md-4">
+	      	<button class="btn btn-danger btn-sm" id="addoptions">
+	          <span class="glyphicon glyphicon-plus"></span>添加值
+	        </button>
+	        <button class="btn btn-success btn-sm" id="get">
+	          get
+	        </button>
+	        <button class="btn btn-info btn-sm" id="post">
+	          post
+	        </button>
+	      </div>
+				<div class="col-md-8">
+				 <input type="text" class="form-control" id="url" value=<%=info%>>
+				</div>
+      </div>
+        <div class="panel-body" style="margin-top:25px">
+          <form action="" class="form-horizontal">
+	        	<div class="form-group form-group-sm">
+              <div class="col-sm-12" id="add"></div>
+            </div>
+	        </form>
+        </div>     	
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //添加选项
+    $('#addoptions').on('click',function(){
+      var data={};
+      data.id=new Date().getTime();
+      $('#inittmpl')
+          .tmpl(data)
+          .appendTo('#add')
+    });
+    //删除选项
+    $(document).on('click','.deloptions',function(){
+      var id=$(this).attr('data-id');
+      $('#row_'+id).remove()
+    });
+    //get请求
+    $('#get').on('click',function(){
+    	var url=$('#url').val();
+    	var data=getData();
+    	$.get(url,data,function(result){
+    		window.location.href=url
+    	})
+    })
+    //post请求
+    $('#post').on('click',function(){
+    	var url=$('#url').val();
+      var data=getData();
+    	$.post(url,data,function(result){
+    		alert(result.code)
+    		console.log(result);
+    		// window.location.href=url
+    	})
+    })
+  })
+  function getData(){
+  	var arr=[]
+    $('#add').find('.item_op').each(function(i,v){
+      var input=$(v).find('input');
+      var a=input[0].value;
+      var b=input[1].value;
+      if(a!='' && b!=''){
+        arr.push({name:a,value:b});
+      }
+    })
+    return arr
+  }
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <div class="form-group form-group-sm item_op" id="row_${id}">
+    <div class="col-md-4">
+      <div class="input-group input-group-sm">
+        <span class="input-group-btn"><a class="btn btn-danger deloptions" data-id="${id}">删除选项</a></span>
+        <input name='' type="text" class="form-control" placeholder="请输入key"/>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <input name='' type="text" class="form-control" placeholder="请输入val">
+    </div>
+  </div>
+</script>
+<% include ../inc/footer.html%>

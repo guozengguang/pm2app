@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>现场控制</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+
+    <link rel="stylesheet" href="/site/css/bootstrap.min.css">
+    <link href="/site/font/iocns.css" rel="stylesheet">
+    <link rel="stylesheet" href="/site/css/index.css">
+    <link rel='stylesheet' href='http://files.cdn.geju.com/static/css/bootstrapValidator.min.css' />
+
+</head>
+
+
+<body>
+
+<div class="container-fluid con">
+    <!--NAV-->
+    <div class="left-nav h-100">
+        <p><img src="/site/img/logo@2x.png"/></p>
+        <ul>
+            <li class="active">
+                <p class="lw lw-icon-sliders"></p>
+                <p class="nav-text">现场控制</p>
+            </li>
+        </ul>
+    </div>
+    <!--中间内容-->
+    <div class="middle-content">
+        <div class="md-title">
+            <div class="out">
+                <a href="/site/control/all">
+                    <p class="go-home" >
+                        <span class="lw lw-icon-left-open-big"></span>
+                    </p>
+                </a>
+            </div>
+            <div class="jiangshi">
+                <p class="user-img"><img src="<%=item.m_pics%>" ></p>
+            </div>
+            <h3>
+                <strong><%=item.m_name%></strong> 《<%=item.class_name%>》
+            </h3>
+
+            <p class="user-img"><img src="/site/img/2243528274243.jpg"/></p>
+            <p class="user">admin | <a href="javascript:void(0)" id="logout">注销</a></p>
+        </div>
+
+        <div class="alert alert-info" role="alert">
+<!--            <ul class="title-right">
+                <li><a href="#addTopic" data-toggle="modal" ><p><span class="lw lw-icon-plus-1"></span></p></a></li>
+                <li><a href="#"><p><span class="lw lw-icon-left-open-big"></span></p></a></li>
+                <li><p><strong>话题二：</strong> 怎样看待中国经济</p></li>
+                <li><a href="#"><p><span class="lw lw-icon-right-open-big"></span></p></a></li>
+
+            </ul>-->
+
+            <span  class="time"><a href="#newqr" data-toggle="modal" ><span class="lw lw-icon-popup"></span></a></span>
+        </div>
+
+
+        <div class="tab-frame ">
+
+            <!-- tabs导航区 -->
+            <ul class="nav nav-pills" role="tablist" id="myTab">
+                <li class="nav-item ">
+                    <a class="nav-link  active" data-toggle="tab" data-id="1" href="#home" role="tab">提问管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" data-id="2" href="#profile" role="tab">筛选提问</a>
+                </li>
+                <li class="add">
+                    <a href="#" class="btn btn-link btn-sm" data-toggle="modal"
+                       data-target=".bd-example-modal-lg">
+                        <span class="lw lw-icon-plus-circle"></span>
+                        <span class="wz">增加</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="filter" style="display: none">
+                <a href="javascript:void(0)" class="sort" data-sort="1">最新 <span class="lw lw-icon-up-open"> </span></a> <samp> | </samp> <a href="javascript:void(0)" class="sort" data-sort="2">集赞最多 <span
+                    class="lw lw-icon-up-open"> </span></a>
+            </div>
+            <!-- Tab内容区 -->
+
+            <div class="tab-content">
+
+                <!-- 提问管理 -->
+                <div class="tab-pane active" id="home" role="tabpanel">
+                    <ul class="alternate">
+
+                    </ul>
+                </div>
+
+                <!-- 筛选提问 -->
+                <div class="tab-pane" id="profile" role="tabpanel">
+
+                    <ul class="issue">
+
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!--右侧辅助-->
+    <div class="right-aid">
+        <!--
+            作者：liwei601x@qq.com
+            时间：2016-11-08
+            描述：当前此功能还没有开启
+
+        <h4>互动控制台</h4>
+        <div class="chaozhuot ">
+            <div class="col-sm-6">
+                <button type="button" class="  btn btn-info " data-toggle="button" aria-pressed="false" autocomplete="off">
+                  <span class="zh">开启题问</span>
+                  <span class="lw lw-icon-ok-circle"></span>
+                </button>
+            </div>
+            <div class="col-sm-6">
+                <button type="button" class="  btn btn-info " data-toggle="button" aria-pressed="false" autocomplete="off">
+                  <span class="zh">显示题板</span>
+                  <span class="lw lw-icon-ok-circle"></span>
+                </button>
+            </div>
+        </div>
+        -->
+        <h4>查找学员</h4>
+        <div class="chaozhuot search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="姓名/手机号/公司名称" id="searchContent">
+                <span class="input-group-btn">
+			        <button class="btn btn-secondary" type="button" id="searchUser">
+			        	   <span class="lw lw-icon-search"></span>
+			        </button>
+			      </span>
+            </div>
+            <div class="right-user">
+            <ul class="upList">
+
+            </ul>
+            <ul class="userList">
+
+            </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- 增加问题 -->
+<div class="modal fade bd-example-modal-lg" id="modalQ" tabindex="-1" role="dialog" data-backdrop="static"
+     aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">添加提问</h4>
+            </div>
+            <form id="site_form">
+            <div class="modal-body">
+                <div class="row">
+                        <div class=" col-sm-8">
+                            <div class="form-group row">
+                                <label for="example-text-input" class="col-xs-2 col-form-label">提问来源</label>
+                                <div class="col-xs-10">
+                                    <input class="form-control" type="text" placeholder="提问来源" id="example-text-input" name="site_classroom" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="example-text-input2" class="col-xs-2 col-form-label">用户昵称</label>
+                                <div class="col-xs-10">
+                                    <input class="form-control" type="text" placeholder="用户昵称" id="example-text-input2" name="site_name" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="example-text-input3" class="col-xs-2 col-form-label">问题描述</label>
+                                <div class="col-xs-10">
+                                    <input class="form-control" type="hidden" placeholder="问题描述"
+                                           id="example-text-input3" name="site_title">
+                                    <textarea class="form-control" rows="5" type="text" placeholder="请对您的问题详细描述"
+                                              id="example-text-input4" name="site_content" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" col-sm-4">
+                            <div class="mx-auto avatar-ed">
+                                <img src="/site/img/Group.png" id="sitePics">
+                            </div>
+                            <label class="custom-file">
+                                <input type="file" id="file" class="custom-file-input">
+                                <input type="hidden" class="custom-file-input" name="site_pics">
+                                <input type="hidden" class="custom-file-input" name="site_classid" value="<%=item.classid%>">
+                                <span class="custom-file-control lw lw-icon-publish" id="siteSpan"> </span>
+                            </label>
+
+
+                        </div>
+                        <div class=" col-sm-12">
+
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success"><span class="lw lw-icon-ok-3"></span> 保存</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 用户登录 -->
+
+<div class="modal fade bd-example-modal-sm admin-login" tabindex="-1" role="dialog" data-backdrop="static"  aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="top-logo"> <img src="/site/img/login_logo.png"/></p>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="adminuser">管理员用户名</label>
+                        <input type="text" class="form-control" id="adminuser" aria-describedby="userHelp" value="admin" readonly>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword">登录密码</label>
+                        <input type="password" class="form-control" id="exampleInputPassword">
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="enter">登陆</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/site/js/jquery.min.js"></script>
+<script src="/site/js/tether.min.js"></script>
+<script src="/site/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://files.cdn.geju.com/static/js/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="http://files.cdn.geju.com/static/js/bootstrapValidator.min.js"></script>
+<script src="http://cdn.bootcss.com/plupload/2.1.7/plupload.full.min.js"></script>
+<script id="alternatetmpl" type="text/x-jquery-tmpl">
+<li>
+<div class="row">
+    <div class="col-xs-8">
+        <p class="top-left">${site_classroom}</p>
+        <p class="left-neb media-middle">${index}</p>
+        <div class="cucen">
+            <div class="media">
+                <a class="media-left" href="#">
+                    <div class="avatar-ed">
+                        <img src="{{if site_pics}}${site_pics}{{else}}/site/img/Group.png{{/if}}">
+                    </div>
+                </a>
+                <div class="media-body">
+                    <p><span class="tag tag-pill tag-primary">${site_name} {{if site_company}}- ${site_company}{{/if}}</span></p>
+                    <!--<h5 class="media-heading">${site_title}</h5>-->
+                    <p class="wtcon">
+                        ${site_content}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-4  operating">
+
+        <div class="op-top">
+            <div class="col-md-4">
+                <a href="javascript:void(0)" class="upQuestion" data-id="${siteid}"><p><span class="lw lw-icon-up-circled"></span></p>
+                    </a>
+            </div>
+            <div class="col-md-4">
+                <a href="javascript:void(0)" class="downQuestion" data-id="${siteid}"><p><span class="lw lw-icon-down-circled"></span></p>
+                    </a>
+            </div>
+            <div class="col-md-4">
+                <a href="javascript:void(0)" class="unChooseQuestion" data-sid="${siteid}" data-qid="${site_question}"><p><span class="lw lw-icon-cancel-circled-1"></span></p>
+                    </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+</li>
+</script>
+<script id="issuetmpl" type="text/x-jquery-tmpl">
+<li>
+    <div class="media">
+        <a class="media-left" href="#">
+            <div class="avatar-ed">
+                <img src="{{if m_pics}}${m_pics}{{else}}/site/img/Group.png{{/if}}">
+            </div>
+        </a>
+        <div class="media-body">
+
+            <p><span class="tag tag-pill tag-primary">${classroom_name}：${m_name}</span> <span
+                    class=" lw lw-icon-thumbs-up-1"> ${question_votes}</span></p>
+            <!--<h5 class="media-heading">${question_title}</h5>-->
+            <p>
+                ${question_content}
+                <br/>
+
+            </p>
+
+        </div>
+    </div>
+    <div class="issue-ok">
+        <a href="javascript:void(0)" class="chooseQuestion" data-mid="${mid}" data-id="${questionid}" data-room="${classroom_name}" data-name="${m_name}" data-pics="${m_pics}" data-company="${m_company}" data-title="${question_title}" data-content="${question_content}" data-class="<%=item.classid%>"><span class="lw lw-icon-ok-circle"></span></a>
+    </div>
+</li>
+</script>
+<script id="usertmpl" type="text/x-jquery-tmpl">
+<li class="alert alert-warning btn btn-outline-warning upUserList" data-toggle="button" aria-pressed="false"
+    autocomplete="off" role="alert"  data-name="${m_name}" data-company="${m_company}" data-room="${uc_calssroomname}" data-pics="${m_pics}">
+    <p class="user-img"><img src="{{if m_pics}}${m_pics}{{else}}/site/img/Group.png{{/if}}"/></p>
+    <h6>${m_name} <samp>${m_company}</samp></h6>
+    <p class="user-list-fy">${uc_calssroomname}</p>
+    <div class="issue-ok">
+        <a href="#"><span class="lw lw-icon-eye"></span></a>
+    </div>
+</li>
+</script>
+<script>
+    $(function(){
+        //控制登陆
+        <%if(!Validate){%>
+            $('.admin-login').modal('show');
+        <%}%>
+        //显示排序是否显示
+        $('#myTab a').click(function (e) {
+            e.preventDefault()
+            if($(this).data('id')==1){
+                $(".filter").css('display','none');
+            }
+            if($(this).data('id')==2){
+                $(".filter").css('display','block');
+            }
+        })
+        //设置cookie
+        $('#enter').click(function(){
+            loginIn()
+        });
+        $('#exampleInputPassword').on('keydown',function(evt){
+            if(event.keyCode==13){
+                loginIn()
+            }
+        });
+        $('#logout').click(function(){
+            document.cookie="admin='';path=/";
+            $('.admin-login').modal('show');
+        });
+        function loginIn() {
+            var key=$('#adminuser').val()
+            var value=$('#exampleInputPassword').val();
+            document.cookie=key+"="+value+";path=/";
+            $.post('/site/control/login',{key:key,value:value},function(result){
+                if(result.code==200){
+                    $('.admin-login').modal('hide');
+                }
+            })
+        }
+        //提问列表
+        var classid="<%=item.classid%>",
+                sort=2;
+        function alternateList(data){
+            $.get('/site/control/list',data,function(result){
+                console.log(result)
+                if(result.code==200){
+                    $('.alternate').empty();
+                    $('#alternatetmpl')
+                            .tmpl(result.message.list)
+                            .appendTo('.alternate')
+                    var siteInfo=[]
+                    $.each(result.message.list,function(i,node){
+                        siteInfo.push({
+                            name:node.site_name,
+                            branch:node.site_classroom,
+                            company:node.site_company,
+                            pics:node.site_pics,
+                            content:node.site_content
+                        })
+                    })
+                    siteWrite({item:siteInfo})
+                }else{
+                    console.log('错误')
+                }
+            })
+        }
+        //筛选列表
+        function issueList(data){
+            $.get('/site/control/question',data,function(result){
+                if(result.code==200){
+                    $('.issue').empty();
+                    $('#issuetmpl')
+                            .tmpl(result.message.list)
+                            .appendTo('.issue')
+                }else{
+                    console.log('错误')
+                }
+            })
+        }
+        //用户列表
+        function userList(data){
+            $.get('/site/control/user',data,function(result){
+                if(result.code==200){
+                    $('.userList').empty();
+                    $('#usertmpl')
+                            .tmpl(result.message.list)
+                            .appendTo('.userList')
+                }else{
+                    console.log('错误')
+                }
+            })
+        }
+        //写问题数据
+        function siteWrite(data){
+            $.post('/site/control/site',data,function(result){
+                if(result.code==200){
+                    console.log('写成功')
+                }else{
+                    siteWrite(data)
+                    console.log('问题推送失败')
+                }
+            })
+        }
+        //写用户数据
+        function userWrite(data){
+            info={
+                name:data.m_name,
+                company:data.m_company,
+                room:data.uc_calssroomname,
+                pics:data.m_pics
+            }
+            $.post('/site/control/user',info,function(result){
+                if(result.code==200){
+                    console.log('写成功')
+                }else{
+                    userWrite(data)
+                    console.log('用户推送失败')
+                }
+            })
+        }
+        //默认加载
+        setInterval(function(){
+            issueList({classid:classid,pagesize:150,sort:sort});
+        },10*1000)
+        issueList({classid:classid,pagesize:150});
+        alternateList({classid:classid});
+        //控制排序
+        $('.sort').on('click',function(){
+            var data=$(this).data(); //data.sort  1时间 2点赞
+            var sort=data.sort;
+            issueList({classid:classid,pagesize:150,sort:sort});
+        })
+        //添加问题
+        function siteQuestion(data){
+            $.post('/site/control/create',data,function(result){
+                if(result.code==200){
+                    alternateList({classid:classid});
+                }else{
+                    console.log('错误')
+                }
+            })
+        }
+        //添加问题
+        $('#site_form').bootstrapValidator().on('success.form.bv', function(e) {
+            e.preventDefault();
+            var $form = $(e.target),
+                    validator = $form.data('bootstrapValidator');
+            var data=$('#site_form').serializeArray();
+            siteQuestion(data);
+            $('#modalQ').modal('hide')
+        });
+        //会员搜索
+        $('#searchUser').on('click',function(){
+            var content=$('#searchContent').val();
+            if(content){
+                userList({content:content});
+            }
+        });
+        $('#searchContent').on('keydown',function(evt){
+            if(event.keyCode==13){
+                var content=$('#searchContent').val();
+                if(content){
+                    userList({content:content});
+                }
+            }
+        });
+        $(document).on('click','.userList .upUserList',function(){
+            var data=$(this).data()
+            info={
+                m_name:data.name,
+                m_company:data.company,
+                uc_calssroomname:data.room,
+                m_pics:data.pics
+            }
+            $('.userList').empty();
+            $('.upList').empty();
+            $('#usertmpl')
+                    .tmpl(info)
+                    .appendTo('.upList')
+            $('.upList').find('li').addClass('active')
+            userWrite(info)
+        })
+        $(document).on('click','.upList .upUserList',function(){
+            var data=$(this).data()
+            info={
+                m_name:'',
+                m_company:'',
+                uc_calssroomname:'',
+                m_pics:''
+            }
+            userWrite(info)
+            $(this).remove()
+        })
+        //选择问题
+        $(document).on('click','.chooseQuestion',function(){
+            var data=$(this).data()
+            $.post('/site/control/choose',data,function(result){
+                if(result.code==200){
+                    issueList({classid:classid,pagesize:150,sort:sort});
+                    alternateList({classid:classid});
+                }else{
+                    console.log('错误')
+                }
+            })
+        });
+        //取消选择问题
+        $(document).on('click','.unChooseQuestion',function(){
+            var data=$(this).data()
+            $.post('/site/control/unChoose',data,function(result){
+                if(result.code==200){
+                    issueList({classid:classid,pagesize:150,sort:sort});
+                    alternateList({classid:classid});
+                }else{
+                    console.log('错误')
+                }
+            })
+        });
+        //问题完成
+        $(document).on('click','.completeQuestion',function(){
+            var data=$(this).data()
+            $.post('/site/control/complete',data,function(result){
+                if(result.code==200){
+                    alternateList({classid:classid});
+                }else{
+                    console.log('错误')
+                }
+            })
+        });
+        //问题上移
+        $(document).on('click','.upQuestion',function(){
+            var data=$(this).data()
+            $.post('/site/control/up',data,function(result){
+                if(result.code==200){
+                    alternateList({classid:classid});
+                }else{
+                    console.log('错误')
+                }
+            })
+        });
+        //问题下移
+        $(document).on('click','.downQuestion',function(){
+            var data=$(this).data()
+            $.post('/site/control/down',data,function(result){
+                if(result.code==200){
+                    alternateList({classid:classid});
+                }else{
+                    console.log('错误')
+                }
+            })
+        });
+        //图片上传
+        var uploader=new plupload.Uploader({ //实例化一个plupload上传对象
+            runtimes:"html5,flash,silverlight,html4",
+            browse_button : 'file',
+            url : '/site/control/upload',
+            auto_start:true,
+            filters: {
+                mime_types : [ //只允许上传图片和zip文件
+                    { title : "Image files", extensions : "jpg,gif,png" }
+                ],
+                max_file_size:"10mb",
+                prevent_duplicates : false //不允许选取重复文件
+            },
+            multi_selection:false,
+            multipart:true,
+            multipart_params:{},
+            unique_names:true,
+            resize:{
+                width: 400000000,
+                height: 20000000,
+                crop: false,
+                preserve_headers: true
+            }
+        });
+        uploader.init(); //初始化
+        //绑定文件添加进队列事件
+        uploader.bind('FilesAdded',function(uploader,files){
+            for(var i = 0, len = files.length; i<len; i++){
+                var file_name = files[i].name; //文件名
+            }
+            uploader.start(); //开始上传
+        });
+        uploader.bind('BeforeUpload',function(uploader,file){
+            uploader.settings.multipart_params.size = file.size;
+        });
+        uploader.bind('UploadComplete',function(uploader,files){
+            console.log(files);
+        });
+        uploader.bind("FileUploaded",function(uploader,file,responseObject){
+            var result=JSON.parse(responseObject.response);
+            $('input[name="site_pics"]').val(result.message.name);
+            $("#siteSpan").html(result.message.name.substr(0,20)+'......');
+            $("#sitePics").attr("src",result.message.url);
+        })
+        //处理二维码
+        var short='/site/control/qrcode?url=';
+        $.post('http://t.geju.com',{url:encodeURI('<%=url%>/v1.7/page/share/transferpage.html?transfertype=20&id=<%=id%>')},function (result) {
+            if(result.shortCode){
+                short+=result.shortCode
+                $('.short').attr({src:short,href:short})
+            }else {
+                alert('二维码服务异常')
+            }
+        })
+
+    })
+</script>
+<!--生成二维码-->
+<div class="modal fade bs-example-modal-lg" id="newqr" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg  ">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span class="lw lw-icon-cancel-circle-1"></span></button>
+                <h4 class="modal-title">互动链接管理</h4>
+            </div>
+            <div class="modal-body createqr">
+                <div class="row" >
+                    <div class="col-sm-4">
+                        <img class="short" src=""/ >
+                    </div>
+                    <div class="col-sm-8">
+                        <!--<h2>互动标题</h2>-->
+                        <div class="form-group">
+                            <label for="">大屏地址</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="<%=url%>/Interact/question?id=<%=id%>">
+                                <span class="input-group-btn">
+					        <button class="btn btn-success" type="button" ><a href="<%=url%>/Interact/question?id=<%=id%>" target="_blank">跳转</a></button>
+					      </span>
+                            </div>
+                        </div>
+                        <p><a class="short" href=""><button type="button" class="btn btn-default"><span class="lw lw-icon-download-1"> </span> 下载互动二维码</button></a></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

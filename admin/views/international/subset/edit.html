@@ -1,0 +1,126 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>编辑</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="international_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="international_img" class="control-label">展示图<span><small>建议规格423*239</small></span></label>
+                  <div class="input-group input-group-sm">
+                    <input value="<%=item.international_img%>" type="text" name="international_img" placeholder="展示图" class="form-control" readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="progress" style="width: 100%;">
+                    <div class="progress-bar" style="width: 0%;">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <img src="<%=aly%>/<%=item.international_img%>"  id="international_img_img">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="international_title" class="control-label">国际化名称<span>*</span></label>
+                      <input value="<%=item.international_title%>" type="text" name="international_title" placeholder="子专辑标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                      <input value="<%=item.international_id%>" type="hidden" name="international_id">
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="international_summary" class="control-label">描述（分享使用）<span>*</span></label>
+                      <input value="<%=item.international_summary%>" type="text" name="international_summary" placeholder="描述" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+<!--                    <div class="form-group form-group-sm col-md-6">
+                      <label for="international_subtitle" class="control-label">专辑副标题<span>*</span></label>
+                      <input value="<%=item.international_subtitle%>" type="text" name="international_subtitle" placeholder="子专辑副标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="international_count" class="control-label">浏览数<span></span></label>
+                      <input value="<%=item.international_count%>" type="text" name="international_count" placeholder="浏览数" class="form-control">
+                    </div>-->
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="international_content" class="control-label">外链</label>
+                      <input value="<%=item.international_content%>" type="text" name="international_content" placeholder="外链" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //时间
+    $(".input_date").datetimepicker({
+      step:1,
+      lang:'ch',
+    });
+    //验证提交
+    $('#international_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#international_form').serializeArray();
+      effect.show()
+      $.post("/admin/international_update",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/international/subset?id=<%=item.international_parent%>'
+          })
+        }else{
+          effect.error(result.message)
+          effect.hide()
+        }
+      })
+    });
+
+    //上传图片
+    newupload('addImg','international_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+  })
+</script>
+<% include ../../inc/footer.html%>

@@ -1,0 +1,813 @@
+<% include ../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>修改课程班</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <form id="goods_form">
+                <div class="col-md-3" style="padding:0">
+                  <div class="well">
+                    <div class="form-group form-group-sm">
+                      <label for="goods_attr" class="control-label">推荐位 <span> &nbsp;</span></label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_attr" value="0" <%if(item.goods_attr==0){%>checked<%}%> > 不推荐
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_attr" value="1" <%if(item.goods_attr==1){%>checked<%}%>> 推荐
+                      </label>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_ismore" class="control-label">是否完结 <span> &nbsp;</span></label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_ismore" value="0" <%if(item.goods_ismore==0){%>checked<%}%>> 待续
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="goods_ismore" value="1" <%if(item.goods_ismore==1){%>checked<%}%>> 完结
+                      </label>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_start" class="control-label">开始时间<span>*</span></label>
+                      <input type="text" name="goods_start" placeholder="选择开始时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_start%>">
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_end" class="control-label">结束时间<span>*</span></label>
+                      <input type="text" name="goods_end" placeholder="选择结束时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_end%>">
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_img" class="control-label">商品封面照<span><small>建议规格1156*442</small></span></label>
+                      <div class="input-group input-group-sm">
+                        <input type="text" name="goods_img" placeholder="上传课程班封面照" class="form-control" readonly value="<%=item.goods_img%>">
+                        <span class="input-group-btn">
+                          <span class="btn btn-danger fileinput-button btn-sm">
+                              <span>上传</span>
+                              <input id="addImg" type="file" name="files[]" accept="image/*">
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="progress" style="width: 100%;">
+                        <div class="progress-bar" style="width: 0%;">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="thumbnail">
+                        <img src="<%=aly%>/<%=item.goods_img%>"  id="goods_img_img">
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="goods_img_small" class="control-label">通讯录图片<span><small>建议规格200*200</small></span></label>
+                      <input type="hidden" name="goods_img_small" placeholder="上传课程班封面照" value="<%=item.goods_img_small%>" class="form-control" readonly>
+                      <div class="thumbnail">
+                        <img id='goods_img_small_img' class="img-circle" <%if(item.goods_img_small){%>src="<%=aly%>/<%=item.goods_img_small%>"<%}else{%>src="http://files.geju.com/public/groupdefault.png"<%}%> width="135" height="135">
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="" class="control-label">收款码<span></span></label>
+                      <div class="thumbnail">
+                        <div id="payCode"   style="text-align: center"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-9" style="padding:0 0 0 15px">
+                  <div  class="panel panel-danger">
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_name" class="control-label">课程班名称<span>*</span></label>
+                          <input type="text" name="goods_name" placeholder="课程班名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_name%>">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_fee" class="control-label">课程班费用<span></span></label>
+                          <input type="text" name="goods_fee" placeholder="课程班费用" class="form-control" value="<%=item.goods_fee%>">
+                        </div>
+                        <!--<div class="form-group form-group-sm col-md-6">-->
+                          <!--<label for="goods_teacher" class="control-label">主讲讲师<span>*</span></label>-->
+                          <!--<input type="text" name="goods_teacher" placeholder="主讲讲师" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_teacher%>">-->
+                        <!--</div>-->
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_subtitle" class="control-label">课程班简称(群简称字段)<span>*</span></label>
+                          <input type="text" name="goods_subtitle" placeholder="课程班简称(群简称字段)" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_subtitle%>" readonly>
+                        </div>
+                        <!--<div class="form-group form-group-sm col-md-6">-->
+                          <!--<label for="goods_time" class="control-label">上课描述<span></span></label>-->
+                          <!--<input type="text" name="goods_time" placeholder="上课时间(每周一晚上17:30)" class="form-control" value="<%=item.goods_time%>">-->
+                        <!--</div>-->
+                        <!--<div class="form-group form-group-sm col-md-6">-->
+                          <!--<label for="goods_class" class="control-label">课次<span>*</span></label>-->
+                          <!--<input type="text" name="goods_class" placeholder="课次" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_class%>">-->
+                        <!--</div>-->
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="goods_type" class="control-label">课程班类型</label>
+                          <input type="text" class="form-control" value="<%if(item.goods_type==0){%>定制课<%}else if(item.goods_type==1){%>公益课<%}else if(item.goods_type==2){%>公开课<%}%>" readonly>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="goods_summary" class="control-label">课程班描述（分享使用）<span>*</span></label>
+                          <input type="text" name="goods_summary" placeholder="课程班描述" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.goods_summary%>">
+                        </div>
+<!--                        <div class="form-group form-group-sm col-md-12">
+                          <span class="btn btn-danger btn-sm addModel" data-type="1" data-relatedid="0">
+                            <span class="glyphicon glyphicon-plus"></span>新增模块
+                          </span>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <table class="table table-striped table-condensed father">
+                            <thead>
+                            <tr>
+                              <th>模块名称</th>
+                              <th style="width:160px">模块规则</th>
+                              <th style="width:80px">排序</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>-->
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="goods_desc" class="control-label">招生简章描述<span>*</span></label>
+                          <textarea name="goods_desc" class="form-control" style="height: 120px"><%=item.goods_desc%></textarea>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div id="group_editor">
+                            <label for="goods_content" class="control-label">详细介绍</label>
+                            <textarea id="goods_content" name="goods_content" value='' style="width:100%;height:320px;" class="setEditor"><%=item.goods_content%></textarea>
+                          </div>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  //功能
+  $(function(){
+    $('#payCode').qrcode({
+      text:"<%-code%>"
+    })
+    //时间
+    $(".input_date").datetimepicker({
+      lang:'ch',
+      step:30
+    });
+    //验证提交
+    $('#goods_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      $("#goods_content").val(editor[0].html())
+      var data=$('#goods_form').serializeArray();
+      var goodsid=location.search.substr(9)
+      data.push({name:'goodsid',value:goodsid});
+      $.post("/admin/class_update",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/goods'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    newupload('addImg','goods_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    }) ;
+    //通讯录图片
+    newupload('goods_img_small_img','goods_img_small',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //通讯录图片goods_titleimg
+    newupload('goods_titleimg_img','goods_titleimg',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //父模块图片
+    newupload('related_imgurl_img','related_imgurl',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //子模块图片
+    newupload('related_imgurl_img_img','related_imgurl_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //获取存在的模块
+    function getModel(data){
+      $.get('/admin/goodsrelated_ajax',data,function(result){
+        if(result.code==200){
+          $(".father tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo(".father tbody");
+        }
+      })
+    }
+    //获取子模块
+    function getModel1(data){
+      $.get('/admin/goodsrelated_ajax',data,function(result){
+        if(result.code==200){
+          $(".child tbody").empty('');
+          $("#inittmpl1")
+                  .tmpl(result.message.list)
+                  .appendTo(".child tbody");
+        }
+      })
+    }
+    //加载
+    getModel({goodsid:'<%=item.goodsid%>'})
+    //模块
+    $(document).on('click','.addModel', function(event) {
+      var data=$(this).data();
+      switch (data.type){
+        case 1://新增
+          $('#modal_father select[name="related_type"]').val(1)
+          $('#modal_father input[name="related_title"]').val('')
+          $('#modal_father input[name="related_parent"]').val(0)
+          $('#modal_father input[name="relatedid"]').val(0)
+          $('#modal_father input[name="related_subtitle"]').val('')
+          $('#modal_father textarea[name="related_content"]').val('')
+          $('#modal_father input[name="related_order"]').val('')
+          $('#modal_father input[name="related_imgurl"]').val('')
+          $('#related_imgurl_img').attr('src','')
+          $("#modal_father").modal('show');
+          break;
+        case 2://编辑
+          $.get('/admin/goodsrelated_ajax',{relatedid:data.relatedid,goodsid:'<%=item.goodsid%>'},function(result){
+            if(result.code==200){
+              var rel=result.message.list[0]
+              $('#modal_father select[name="related_type"]').val(rel.related_type)
+              $('#modal_father input[name="related_title"]').val(rel.related_title)
+              $('#modal_father input[name="related_parent"]').val(rel.related_parent)
+              $('#modal_father input[name="relatedid"]').val(rel.relatedid)
+              $('#modal_father input[name="related_subtitle"]').val(rel.related_subtitle)
+              $('#modal_father textarea[name="related_content"]').val(rel.related_content)
+              $('#modal_father input[name="related_order"]').val(rel.related_order)
+              $('#modal_father input[name="related_imgurl"]').val(rel.related_imgurl)
+              $('#related_imgurl_img').attr('src','<%=aly%>/'+rel.related_imgurl)
+              $("#modal_father").modal('show');
+            }
+          })
+          break;
+        case 3://添加子栏目
+          //data.status 2讲师 6分院
+          if(data.status==2){
+            $('.addModel1').hide()
+            $('.addTea').show()
+            $('.addArea').hide()
+          }else if(data.status==6){
+            $('.addModel1').hide()
+            $('.addTea').hide()
+            $('.addArea').show()
+          }else {
+            $('.addModel1').show()
+            $('.addTea').hide()
+            $('.addArea').hide()
+          }
+          $("#modal_child").modal('show');
+          getModel1({goodsid:'<%=item.goodsid%>',related_parent:data.relatedid});
+          $('#modal_child_add input[name="related_parent"]').val(data.relatedid);
+          break;
+      }
+    });
+    //子模块
+    $(document).on('click','.addModel1', function(event) {
+      var data=$(this).data();
+      var related_parent=$('#modal_child_add input[name="related_parent"]').val();
+      switch (data.type){
+        case 1://新增
+          $('#modal_child_add input[name="related_title"]').val('')
+//          $('#modal_child_add input[name="related_parent"]').val(related_parent)
+          $('#modal_child_add input[name="related_subtitle"]').val('')
+          $('#modal_child_add input[name="relatedid"]').val(0)
+          $('#modal_child_add textarea[name="related_content"]').val('')
+          $('#modal_child_add input[name="related_order"]').val('')
+          $('#modal_child_add input[name="related_imgurl_img"]').val('')
+          $('#related_imgurl_img_img').attr('src','')
+          $("#modal_child_add").modal('show');
+          break;
+        case 2://编辑
+          $.get('/admin/goodsrelated_ajax',{relatedid:data.relatedid,related_parent:related_parent,goodsid:'<%=item.goodsid%>'},function(result){
+            console.log(result)
+            if(result.code==200){
+              var rel=result.message.list[0]
+              $('#modal_child_add input[name="related_title"]').val(rel.related_title)
+              $('#modal_child_add input[name="related_parent"]').val(rel.related_parent)
+              $('#modal_child_add input[name="relatedid"]').val(rel.relatedid)
+              $('#modal_child_add input[name="related_subtitle"]').val(rel.related_subtitle)
+              $('#modal_child_add textarea[name="related_content"]').val(rel.related_content)
+              $('#modal_child_add input[name="related_order"]').val(rel.related_order)
+              $('#modal_child_add input[name="related_imgurl_img"]').val(rel.related_imgurl)
+              $('#modal_child_add input[name="related_fkey"]').val(rel.related_fkey)
+              $('#related_imgurl_img_img').attr('src','<%=aly%>/'+rel.related_imgurl)
+              $("#modal_child_add").modal('show');
+            }
+          })
+          break;
+        case 3://添加子栏目
+          break;
+      }
+    });
+    //删除
+    $(document).on('click','.delModel',function(){
+      var relatedid=$(this).data('relatedid');
+      var related_parent=$(this).data('parent');
+      $.post('/admin/goodsrelated_del',{relatedid:relatedid},function(result){
+        if(result.code==200){
+          effect.success()
+          getModel({goodsid:'<%=item.goodsid%>'});
+          if(related_parent){
+            getModel1({goodsid:'<%=item.goodsid%>',related_parent:related_parent})
+          }
+        }else {
+          effect.error(result.message)
+        }
+      })
+    })
+    //添加父模块
+    $('#father_add').on('click',function(e) {
+      var data=$('#model_form').serializeArray();
+      $.post("/admin/goodsrelated_add",data,function(result){
+        if(result.code==200){
+          $("#modal_father").modal("hide");
+          //请求列表
+          getModel({goodsid:'<%=item.goodsid%>'})
+        }else{
+          effect.error();
+        }
+      })
+    });
+    //添加子模块
+    $('#child_add').on('click',function(e) {
+      var data=$('#child_form').serializeArray();
+      data.push({name:"related_imgurl",value:$('#modal_child_add input[name="related_imgurl_img"]').val()})
+      $.post("/admin/goodsrelated_add",data,function(result){
+        if(result.code==200){
+          $("#modal_child_add").modal("hide");
+          var related_parent=$('#modal_child_add input[name="related_parent"]').val();
+          //请求列表
+          getModel1({goodsid:'<%=item.goodsid%>',related_parent:related_parent})
+        }else{
+          effect.error();
+        }
+      })
+    });
+    //添加讲师
+    $('.addTea').on('click',function(e) {
+      $("#modal_tea").modal('show');
+      options.currentPage=1;
+      writeList({type:1,goods:'<%=item.goodsid%>'});
+    });
+    $('#tea_find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      data.push({name:'type',value:1});
+      data.push({name:'goods',value:'<%=item.goodsid%>'});
+      options.currentPage=1;
+      writeList(data);
+    })
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.select_form').serializeArray();
+        data.push({name:'type',value:1});
+        data.push({name:'page',value:page});
+        data.push({name:'goods',value:'<%=item.goodsid%>'});
+        writeList(data)
+      }
+    };
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/students_ajax',data,function(result){
+        if(result.code==200){
+          $(".tea tbody").empty('');
+          $("#inittmpl2")
+                  .tmpl(result.message.list)
+                  .appendTo(".tea tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //添加讲师
+    $(document).on('click', '.addTea_child', function(event) {
+      var name=$(this).data('name');
+      var id=$(this).data('id');
+      $('#modal_child_add input[name="related_title"]').val('')
+      $('#modal_child_add input[name="related_subtitle"]').val('')
+      $('#modal_child_add input[name="relatedid"]').val(0)
+      $('#modal_child_add textarea[name="related_content"]').val('')
+      $('#modal_child_add input[name="related_order"]').val('')
+      $('#modal_child_add input[name="related_imgurl_img"]').val('')
+      $('#related_imgurl_img_img').attr('src','')
+
+      $('#modal_child_add input[name="related_title"]').val(name)
+      $('#modal_child_add input[name="related_fkey"]').val(id)
+      $("#modal_tea").modal('hide');
+      $("#modal_child_add").modal('show');
+    });
+
+    //添加学区
+    $('.addArea').on('click',function(e) {
+      $("#modal_area").modal('show');
+      writeListArea({type:1});
+    });
+    $('#area_find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      data.push({name:'type',value:1});
+      writeListArea(data);
+    })
+    //写列表ajax
+    function writeListArea(data){
+      effect.show();
+      $.get('/admin/area_list',data,function(result){
+        if(result.code==200){
+          $(".area tbody").empty('');
+          $("#inittmpl3")
+                  .tmpl(result.message.list)
+                  .appendTo(".area tbody");
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //添加学区
+    $(document).on('click', '.addArea_child', function(event) {
+      var name=$(this).data('name');
+      var id=$(this).data('id');
+      $('#modal_child_add input[name="related_title"]').val('')
+      $('#modal_child_add input[name="related_subtitle"]').val('')
+      $('#modal_child_add input[name="relatedid"]').val(0)
+      $('#modal_child_add textarea[name="related_content"]').val('')
+      $('#modal_child_add input[name="related_order"]').val('')
+      $('#modal_child_add input[name="related_imgurl_img"]').val('')
+      $('#related_imgurl_img_img').attr('src','')
+
+      $('#modal_child_add input[name="related_title"]').val(name)
+      $('#modal_child_add input[name="related_fkey"]').val(id)
+      $("#modal_area").modal('hide');
+      $("#modal_child_add").modal('show');
+    });
+  })
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${related_title}
+      <a href="javascript:void(0)" class="addModel" data-type="2" data-relatedid="${relatedid}"> <span class="label label-info">编辑</span></a>
+      <a href="javascript:void(0)" class="delModel" data-relatedid="${relatedid}"> <span class="label label-danger">删除</span></a>
+      <a href="javascript:void(0)" class="addModel" data-type="3" data-relatedid="${relatedid}" data-status="${related_type}"> <span class="label label-primary">查看子模块</span></a></td>
+    <td>
+    {{if related_type==1}}
+    上图下文
+    {{else related_type==2}}
+    讲师列表
+    {{else related_type==3}}
+    标题副标题正文列表
+    {{else related_type==4}}
+    纯单图
+    {{else related_type==5}}
+    标题正文列表
+    {{else related_type==6}}
+    分院图标题列表
+    {{else related_type==7}}
+    标题文字
+    {{/if}}
+    </td>
+    <td>${related_order}</td>
+  </tr>
+</script>
+<script id="inittmpl1" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${related_title}
+      <a href="javascript:void(0)" class="addModel1" data-type="2" data-relatedid="${relatedid}"> <span class="label label-info">编辑</span></a>
+      <a href="javascript:void(0)" class="delModel" data-relatedid="${relatedid}"  data-parent="${related_parent}"> <span class="label label-danger">删除</span></a>
+    <td>${related_order}</td>
+  </tr>
+</script>
+<script id="inittmpl2" type="text/x-jquery-tmpl">
+  <tr>
+    <td><img class="img-circle" {{if m_pics}}src="<%=aly%>/${m_pics}"{{/if}} width="45" height="45" ></td>
+    <td>${m_name}</td>
+    <td>${m_desc}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs addTea_child" data-name='${m_name}' data-id="${mid}" data-pics={{if m_pics}}'<%=aly%>/${m_pics}'{{/if}}> 添加</a>
+    </div>
+    </td>
+  </tr>
+</script>
+<script id="inittmpl3" type="text/x-jquery-tmpl">
+  <tr>
+    <td>
+    <img class="img-circle" src="<%=aly%>/${classroom_pics}" width="45" height="45">
+    </td>
+    <td>${classroom_name}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs addArea_child" data-name='${classroom_name}' data-id="${classroom}"> 添加</a>
+    </div>
+    </td>
+  </tr>
+</script>
+<!-- 父模块 -->
+<div class="modal fade" id="modal_father" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">父模块</h4>
+      </div>
+      <form id="model_form" class="form-horizontal" method="post">
+        <div class="modal-body">
+          <div class="form-group form-group-sm">
+            <label for="related_type" class="col-xs-3 control-label"><span>*</span> 模块类型</label>
+            <div class="col-xs-9">
+              <select name="related_type" class="form-control">
+                <option value="1">上图下文</option>
+                <option value="2">讲师列表</option>
+                <option value="3">标题副标题正文列表</option>
+                <option value="4">纯单图</option>
+                <option value="5">标题正文列表</option>
+                <option value="6">分院图标题列表</option>
+                <option value="7">标题文字</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_title" class="col-xs-3 control-label"><span></span> 模块标题</label>
+            <div class="col-xs-9">
+              <input type="text" name="related_title" placeholder="模块标题" class="form-control">
+              <input type="hidden" name="related_goodid" value="<%=item.goodsid%>" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" name="related_parent" value="0" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" name="relatedid" value="0" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_subtitle" class="col-xs-3 control-label"><span></span> 模块副标题</label>
+            <div class="col-xs-9">
+              <input type="text" name="related_subtitle" placeholder="模块副标题" class="form-control">
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_order" class="col-xs-3 control-label"><span></span> 排序</label>
+            <div class="col-xs-9">
+              <input type="text" name="related_order" placeholder="排序" class="form-control">
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_content" class="col-xs-3 control-label"><span></span> 内容</label>
+            <div class="col-xs-9">
+              <textarea name="related_content" cols="30" rows="10" class="form-control"></textarea>
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_imgurl" class="col-xs-3 control-label"><span></span> 图片</label>
+            <div class="col-xs-9">
+              <a href="#">
+                <img class="media-object img-thumbnail" src="" id="related_imgurl_img" width="100%" height="100%">
+                <input type="hidden" name="related_imgurl" value="">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="father_add">确认</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- 子模块列表 -->
+<div class="modal fade" id="modal_child" tabindex="-100" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">子模块列表</h4>
+      </div>
+      <div class="modal-body">
+        <span class="btn btn-danger btn-sm addModel1" data-type="1" data-relatedid="0">
+          <span class="glyphicon glyphicon-plus"></span>新增子模块
+        </span>
+        <span class="btn btn-danger btn-sm addTea">
+          <span class="glyphicon glyphicon-plus"></span>新增讲师
+        </span>
+        <span class="btn btn-danger btn-sm addArea">
+          <span class="glyphicon glyphicon-plus"></span>新增学区
+        </span>
+        <div style="overflow-y: scroll;height: 500px">
+        <table class="table table-striped table-condensed child">
+          <thead>
+          <tr>
+            <th>模块名称</th>
+            <th style="width:80px">排序</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--子模块-->
+<div class="modal fade" id="modal_child_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">子模块</h4>
+      </div>
+      <form id="child_form" class="form-horizontal" method="post">
+        <div class="modal-body">
+          <div class="form-group form-group-sm">
+            <label for="related_title" class="col-xs-3 control-label"><span></span> 模块标题</label>
+            <div class="col-xs-9">
+              <input type="text" name="related_title" placeholder="模块标题" class="form-control">
+              <input type="hidden" name="related_goodid" value="<%=item.goodsid%>" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" name="related_parent" value="0" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" name="relatedid" value="0" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" name="related_type" value="10000" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" name="related_fkey" value="0" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_subtitle" class="col-xs-3 control-label"><span></span> 模块副标题</label>
+            <div class="col-xs-9">
+              <input type="text" name="related_subtitle" placeholder="模块副标题" class="form-control">
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_order" class="col-xs-3 control-label"><span></span> 排序</label>
+            <div class="col-xs-9">
+              <input type="text" name="related_order" placeholder="排序" class="form-control">
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_content" class="col-xs-3 control-label"><span></span> 内容</label>
+            <div class="col-xs-9">
+              <textarea name="related_content" class="form-control" style="min-height:150px"></textarea>
+            </div>
+          </div>
+          <div class="form-group form-group-sm">
+            <label for="related_imgurl" class="col-xs-3 control-label"><span></span> 图片</label>
+            <div class="col-xs-9">
+              <a href="#" style="min-height:50px">
+                <img class="media-object img-thumbnail" src="" id="related_imgurl_img_img" width="100%" height="100%">
+                <input type="hidden" name="related_imgurl_img" value="">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="child_add">确认</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- 讲师模块 -->
+<div class="modal fade" id="modal_tea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择讲师
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <input type="text" name="m_name" class="form-control input-sm" placeholder="讲师姓名" />
+                <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="tea_find">查询</span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed tea">
+          <thead>
+          <tr>
+            <th style="width:80px">头像</th>
+            <th style="width:80px">讲师姓名</th>
+            <th style="width:180px">讲师简介</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="page"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 学区模块 -->
+<div class="modal fade" id="modal_area" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择学区
+        </h5>
+      </div>
+      <div class="modal-body">
+        <!--<form class="form-inline select_form" style="margin-bottom:15px;">-->
+          <!--<div class="form-group form-group-sm">-->
+            <!--<div class="input-group input-group-sm">-->
+              <!--<input type="text" name="m_name" class="form-control input-sm" placeholder="讲师姓名" />-->
+                <!--<span class="input-group-btn">-->
+                <!--<span type="button" class="btn btn-danger" id="area_find">查询</span>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</form>-->
+        <table class="table table-striped table-condensed area">
+          <thead>
+          <tr>
+            <th style="width:80px">图标</th>
+            <th style="width:100px">学区名称</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

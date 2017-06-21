@@ -1,0 +1,128 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <div class="input-group">
+              <input type="text" name="name" placeholder="企业名称" class="form-control input-sm">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-danger btn-sm search">
+                  <span class="glyphicon glyphicon-search"></span>
+                </button>
+              </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:50px">#</th>
+          <th>企业名称</th>
+          <th style="width:80px">身份类型</th>
+          <th style="width:80px">创建者</th>
+          <th style="width:180px">创建时间</th>
+          <th style="width:80px">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.search-form').serializeArray();
+        data.push({name:'page',value:page})
+        writeList(data)
+      }
+    };
+    writeList()
+    $('.search').on('click',function(){
+      var data=$('.search-form').serializeArray();
+      options.currentPage = 1
+      writeList(data);
+    });
+    //更新
+    $(document).on('click','.update',function () {
+      var data=$(this).data()
+      $.post('/admin/enterprise/update',data,function (result) {
+        if(result.code==200){
+          var data=$('.search-form').serializeArray();
+          options.currentPage = 1
+          writeList(data);
+        }
+      })
+    })
+    //请求用户
+    function writeList(data){
+      effect.show();
+      $.get('/admin/enterprise_list',data,function(result){
+        if(result.code==200){
+          $('table tbody').empty();
+          $('#inittmpl')
+                  .tmpl(result.message.list)
+                  .appendTo('table tbody')
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    }
+  })
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+  <td>${index}</td>
+  <td>
+  <a href="/admin/enterprise/detail?id=${id}">${name}</a>
+  </td>
+  <td>
+  {{if m_type==0}}
+  学员
+  {{else}}
+  非学员
+  {{/if}}
+  </td>
+  <td>${m_name}</td>
+  <td>${createdAt}</td>
+  <td>
+      {{if status==0}}
+      <a class="btn btn-info btn btn-xs update" data-status="1" data-id="${id}"> 上墙</a>
+      {{else status==1}}
+      <a class="btn btn-danger btn btn-xs update" data-status="0" data-id="${id}"> 下墙</a>
+      {{/if}}
+  </td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>

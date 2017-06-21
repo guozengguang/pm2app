@@ -1,0 +1,109 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>企业详情</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="activity_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="" class="control-label">logo<span></span></label>
+                  <div class="thumbnail">
+                    <img src="<%=item.logo%>">
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="" class="control-label">照片<span></span></label>
+                  <div class="thumbnail">
+                    <img src="<%=item.pics%>">
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="" class="control-label">产品图片<span></span></label>
+                  <div class="thumbnail">
+                    <img src="<%=item.productPics%>">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">企业名称<span></span></label>
+                      <input value="<%=item.name%>" type="text" name="" placeholder="企业名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                    <label for="" class="control-label">省<span></span></label>
+                    <input value="<%=item.province%>" type="text" name="" placeholder="省" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">市<span></span></label>
+                      <input value="<%=item.city%>" type="text" name="" placeholder="市" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">地址<span></span></label>
+                      <input value="<%=item.address%>" type="text" name="" placeholder="地址" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                    <label for="" class="control-label">电话<span></span></label>
+                    <input value="<%=item.phone%>" type="text" name="" placeholder="电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">行业<span></span></label>
+                      <input value="<%=item.trade%>" type="text" name="" placeholder="行业" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">网站<span></span></label>
+                      <input value="<%=item.website%>" type="text" name="" placeholder="网站" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">规模<span></span></label>
+                      <input value="<%=item.scale%>" type="text" name="" placeholder="规模" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">营业额<span></span></label>
+                      <input value="<%=item.turnover%>" type="text" name="" placeholder="营业额" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="" class="control-label">公司介绍<span></span></label>
+                      <textarea class="form-control" style="height: 60px"><%=item.desc%></textarea>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="" class="control-label">产品介绍<span></span></label>
+                      <textarea class="form-control" style="height: 60px"><%=item.productDesc%></textarea>
+                    </div>
+<!--                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+</script>
+<% include ../inc/footer.html%>

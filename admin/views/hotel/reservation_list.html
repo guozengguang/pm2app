@@ -1,0 +1,718 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<div ng-controller="HotelReservationListController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+
+                            <form name="search_activity">
+                                <div class="row">
+                                    <div class="col-xs-4 col-md-4 col-lg-4 col-md-4">
+                                        <div ng-class="search_activity.current_activity.$error.required ?
+                                        'form-group has-error' : 'form-group'"
+                                             class="form-group has-error">
+                                            <div class="input-group">
+                                                <span class="input-group-btn">
+                                                    <label for="current_activity" class="btn btn-default">请选择活动</label>
+                                                </span>
+                                                <select
+                                                        ng-model="current.activity"
+                                                        ng-change="current_activity_change(current.activity)"
+                                                        ng-options="v as v.title for v in activity"
+                                                        name="current_activity" id="current_activity"
+                                                        class="form-control" required>
+                                                </select>
+                                            </div><!-- /input-group -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div ng-show="search_activity.$valid">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>活动报名人数</th>
+                                        <th>预定房型及数量</th>
+                                        <th>床位数</th>
+                                        <th>预算费用</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>合计</td>
+                                        <td>{{ statistics.human }}</td>
+                                        <td>
+                                            <p ng-repeat="room in statistics.room">{{ room.name + '/' + room.count }}</p>
+                                        </td>
+                                        <td>
+                                            <p ng-repeat="bed in statistics.bed">{{ bed.name + '/' + bed.bed }}</p>
+                                        </td>
+                                        <td>{{ statistics.price }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table id="example" class="table table-striped table-bordered" cellspacing="0"
+                                               width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>性别</th>
+                                                <th>单位</th>
+                                                <th>职务</th>
+                                                <th>身份证号</th>
+                                                <th>电话号码</th>
+                                                <th>酒店名称</th>
+                                                <th>房间名称</th>
+                                                <th>价格</th>
+                                                <th>入住时间</th>
+                                                <th>退房时间</th>
+                                                <th>床位数</th>
+                                                <th>是否用餐</th>
+                                                <th>发票</th>
+                                                <th>发票抬头</th>
+                                                <th>发票用途</th>
+                                                <th>操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="recode in data.students">
+                                                <td>{{ recode.HotelHuman.name }}</td>
+                                                <td>{{ recode.HotelHuman.sex ? '男': '女' }}</td>
+                                                <td>{{ recode.HotelHuman.company }}</td>
+                                                <td>{{ recode.HotelHuman.position }}</td>
+                                                <td>{{ recode.HotelHuman.card }}</td>
+                                                <td>{{ recode.HotelHuman.phone }}</td>
+                                                <td>{{ recode.HotelDetail.name }}</td>
+                                                <td>{{ recode.HotelRoom.name }}</td>
+                                                <td>{{ recode.HotelRoom.price }}</td>
+                                                <td>{{ recode.in_time | date : 'y-MM-dd' }}</td>
+                                                <td>{{ recode.out_time | date : 'y-MM-dd' }}</td>
+                                                <td>{{ recode.HotelRoom.bed }}</td>
+                                                <td>{{ recode.food ? '是': '否' }}</td>
+                                                <td>{{ recode.invoice ? '是': '否' }}</td>
+                                                <td>{{ recode.invoice_title }}</td>
+                                                <td>{{ recode.invoice_use }}</td>
+                                                <td>
+                                                    <a href="javascript: void 0;" class="btn btn-warning">
+                                                        编辑
+                                                    </a>
+                                                    <a ng-click="cancel(recode.id)" href="javascript: void 0;" class="btn btn-danger">
+                                                        删除
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <button ng-click="add_order()" id="create_hotel" type="button"
+                                            class="btn btn-sm btn-info">
+                                        添加学员
+                                    </button>
+
+                                    <button ng-click="submit()" type="button"
+                                            class="btn btn-sm btn-info">
+                                        提交订单
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">添加酒店</h4>
+                </div>
+                <div class="modal-body">
+                    <form name="reservation_form">
+                        <div class="row">
+                            <!-- 单人需要字段 -->
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div ng-class="{
+                                    'has-error': reservation_form.phone.$error.required || reservation_form.phone.$error.pattern
+                                }" class="form-group">
+                                    <label for="phone">手机号</label>
+                                    <input ng-model="human.phone" type="text" class="form-control" name="phone"
+                                           id="phone"
+                                           placeholder="请输入手机号" maxlength="11" pattern="^1[35789]\d{9}$" required>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.name.$error.required || reservation_form.name.$error.maxlength
+                                }" class="form-group">
+                                    <label for="name">姓名</label>
+                                    <input ng-model="human.name" name="name" type="text" class="form-control" id="name"
+                                           placeholder="请输入姓名" required maxlength="8">
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.sex.$error.required
+                                }" class="form-group">
+                                    <label for="sex">性别</label>
+                                    <select ng-model="human.sex" id="sex" name="sex" class="form-control" required>
+                                        <option value="true">男</option>
+                                        <option value="false">女</option>
+                                    </select>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.id_card.$error.required || reservation_form.id_card.$error.pattern
+                                }" class="form-group">
+                                    <label for="id_card">身份证号/护照号</label>
+                                    <input ng-model="human.card" type="text" class="form-control" name="id_card"
+                                           id="id_card"
+                                           placeholder="请输入身份证号/护照号" maxlength="18" required>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.company.$error.required || reservation_form.company.$error.maxlength
+                                }" class="form-group">
+                                    <label for="company">公司</label>
+                                    <input ng-model="human.company" type="text" class="form-control" name="company"
+                                           id="company"
+                                           placeholder="请输入公司名称" maxlength="50" required>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.position.$error.required || reservation_form.position.$error.maxlength
+                                }" class="form-group">
+                                    <label for="position">职位</label>
+                                    <input ng-model="human.position" type="text" class="form-control" name="position"
+                                           id="position"
+                                           placeholder="请输入职位" maxlength="20" required>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.in_time.$error.required || reservation_form.in_time.$error.date
+                                }" class="form-group">
+                                    <label for="in_time">入住时间</label>
+                                    <input ng-model="reservation.in_time" type="date" class="form-control"
+                                           name="in_time" id="in_time"
+                                           placeholder="入住时间" required>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.out_time.$error.required || reservation_form.out_time.$error.date
+                                }" class="form-group">
+                                    <label for="out_time">退房时间</label>
+                                    <input ng-model="reservation.out_time" type="date" class="form-control"
+                                           name="out_time"
+                                           id="out_time"
+                                           placeholder="退房时间" required>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.food.$error.required
+                                }" class="form-group">
+                                    <label for="food">是否用餐</label>
+                                    <select ng-model="reservation.food" id="food" name="food" class="form-control"
+                                            required>
+                                        <option value="true">是</option>
+                                        <option value="false">否</option>
+                                    </select>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.invoice.$error.required
+                                }" class="form-group">
+                                    <label for="invoice">需要发票</label>
+                                    <select ng-model="reservation.invoice" id="invoice" name="invoice"
+                                            class="form-control" required>
+                                        <option value="true">是</option>
+                                        <option value="false">否</option>
+                                    </select>
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.invoice_title.$error.required || reservation_form.position.$error.maxlength
+                                }" ng-if="reservation.invoice === 'true'" class="form-group">
+
+                                    <label for="invoice_title">发票抬头</label>
+                                    <input ng-model="reservation.invoice_title" type="text" class="form-control"
+                                           name="invoice_title" id="invoice_title"
+                                           maxlength="50" required placeholder="发票抬头">
+                                </div>
+                                <div ng-class="{
+                                    'has-error': reservation_form.invoice_used.$error.required || reservation_form.position.$error.maxlength
+                                }" ng-if="reservation.invoice === 'true'" class="form-group">
+                                    <label for="invoice_used">发票用途</label>
+                                    <select ng-model="reservation.invoice_used" type="text" class="form-control"
+                                            name="invoice_used" id="invoice_used"
+                                            required>
+                                        <option value="1" selected>住宿费</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- 单人需要字段 -->
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table ng-hide="reservation_form.in_time.$error.required
+                                    || reservation_form.out_time.$error.required"
+                                       ng-show="refresh" id="hotel" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>酒店名称</th>
+                                        <th>房间类型</th>
+                                        <th>用餐费用</th>
+                                        <th>床位数量</th>
+                                        <th>床位选择</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button ng-disabled="reservation_form.in_time.$error.required
+                    || reservation_form.out_time.$error.required"
+                            ng-click="get_hotel()"
+                            type="button" class="btn btn-info pull-left">
+                        {{ refresh ? '刷新酒店数据' : '显示酒店数据' }}
+                    </button>
+                    <button id="create" ng-disabled="reservation_form.$invalid" ng-click="submit()" type="button"
+                            class="btn btn-success">保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .service('HotelReservationListService', function ($http) {
+                this.new_student = function () {
+                    return {
+                        name: '',
+                        sex: '', // 默认true 男 false 女
+                        card: '',
+                        company: '',
+                        position: '',
+                        phone: '',
+                        branch_name: '',
+                        branch: '',
+                        user: ''
+                    }
+                };
+                this.new_reservation = function () {
+                    return {
+                        in_time: '',
+                        out_time: '',
+                        duration: '',
+                        food: false,
+                        concat: false,
+                        invoice: false,
+                        invoice_title: '',
+                        invoice_used: '1',
+                        hotel: '',
+                        room: '',
+                        activity: '',
+                        human: '',
+                        order: '',
+                        order_state: 0,
+                        operator: '' //操作人
+                    }
+                };
+                this.get_student = function () {
+                    return $http({
+                        url: '/admin/hotel/activity/list',
+                        method: 'GET',
+                        params: {
+                            type: 1
+                        }
+                    })
+                };
+                this.activity = function () {
+                    return $http({
+                        url: '/admin/hotel/activity/list',
+                        method: 'GET',
+                        params: {
+                            type: 1
+                        }
+                    })
+                };
+                this.human = function (phone) {
+                    return $http({
+                        url: '/admin/hotel/human',
+                        method: 'GET',
+                        params: {
+                            phone: phone
+                        }
+                    })
+                };
+                this.hotel = function (id) {
+                    return $http({
+                        url: '/admin/hotel/activity/hotel',
+                        method: 'GET',
+                        params: {
+                            id: id
+                        }
+                    })
+                };
+                this.submit = function (reservation, human) {
+                    return $http({
+                        url: '/admin/hotel/check',
+                        method: 'POST',
+                        data: {
+                            reservation: reservation,
+                            human: human
+                        }
+                    })
+                };
+                this.history = function (activity) {
+                    return $http({
+                        url: '/admin/hotel/check/history',
+                        method: 'GET',
+                        params: {
+                            id: activity
+                        }
+                    })
+                };
+                this.cancel = function (id) {
+                    return $http({
+                        url: '/admin/hotel/check/cancel',
+                        method: 'POST',
+                        data: {
+                            id: id
+                        }
+                    })
+                };
+                this.create_order = function (activity, statistics) {
+                    return $http({
+                        url: '/admin/hotel/order/create',
+                        method: 'POST',
+                        data: {
+                            activity: activity,
+                            human_count: statistics.human,
+                            room_count: statistics.room,
+                            room_bed: statistics.bed,
+                            price: statistics.price
+                        }
+                    });
+                }
+            })
+            .controller('HotelReservationListController', function ($scope, $compile, HotelReservationListService) {
+                $scope.refresh = false;// 是否显示过酒店数据
+                $scope.reservation = {};//关联数据
+                $scope.human = {};//学员数据
+                $scope.data = {
+                    activity: 0, //当前活动ID
+                    students: [] //当前已经报名人
+                };
+                $scope.statistics = {}; //统计数据
+                function get_history(id) {
+                    HotelReservationListService.history(id).success(function (result) {
+                        $scope.data.students = result.result;
+                    });
+                }
+                $scope.submit = function () {
+                    var id = $scope.data.activity;
+                    $scope.reservation.activity = id;
+                    HotelReservationListService.submit($scope.reservation, $scope.human).success(function (result) {
+                        get_history(id);
+                        $('#myModal').modal('hide');
+                    })
+                };
+                $scope.$watch('data.students', function (new_value, o) {
+                    var price = 0;
+                    /* 房间数量计算 开始 */
+                    var rooms_count = [];
+                    var rooms = _.groupBy(new_value, function (value) {
+                        if(value.food){
+                            price += value.HotelDetail.meals;//计算餐费
+                        }
+                        return value.HotelRoom.name + '-_-' +
+                                value.HotelRoom.price + '-_-' +
+                                value.HotelRoom.bed
+                    });
+                    _.forIn(rooms, function (v, k) {
+                        var arr = k.split('-_-');
+                        /* 总价计算 开始 */
+                        price += +arr[1]; //房间费用
+                        /* 总价计算 结束 */
+                        rooms_count.push({
+                            name: arr[0],
+                            price: +arr[1],
+                            count: _.keys(_.groupBy(v, function (n) {
+                                return n.HotelRoom.id;
+                            })).length
+                        });
+                    });
+                    /* 房间 床位数量计算 开始 */
+                    var obj = {}, bed = [];
+                    _.forIn(rooms, function (v, k) {
+                        _.forEach(v, function (w) {
+                            var key = k.split('-_-')[0] + '-_-' +  w.HotelRoom.id;
+                            obj[key] ? obj[key]++ : obj[key] = 1
+                        });
+                    });
+                    _.forIn(obj, function (v, k) {
+                        bed.push({
+                            name: k.split('-_-')[0],
+                            bed: v
+                        })
+                    });
+                    $scope.statistics.bed = bed;
+                    /* 房间 床位数量计算 结束 */
+                    $scope.statistics.room = rooms_count;
+                    $scope.statistics.price = price;
+                    /* 房间数量计算 结束 */
+                    /* 报名人数计算 开始 */
+                    $scope.statistics.human = _.keys(_.groupBy(new_value, function (value) {
+                        return value.phone;
+                    })).length;
+                    /* 报名人数计算 结束 */
+                });
+                //初始化datatables
+                var table = $('#hotel').DataTable({
+                    "ajax": {
+                        "url": "/admin/hotel/activity/hotel",
+                        "dataSrc": 'result',
+                        "data": function (data) {
+                            data.id = $scope.data.activity;
+                            data.in_time = moment($scope.reservation.in_time).format('YYYY-MM-DD');
+                            data.out_time = moment($scope.reservation.out_time).format('YYYY-MM-DD');
+                        }
+                    },
+                    "columns": [
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"}
+                    ],
+                    "columnDefs": [
+                        {
+                            "bSortable": false,
+                            "targets": 0,
+                            "render": function (data, type, row) {
+                                return row.HotelDetail.name;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 1,
+                            "render": function (data, type, row) {
+                                return row.Rooms.name;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 2,
+                            "render": function (data, type, row) {
+                                return row.HotelDetail.meals;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 3,
+                            "render": function (data, type, row) {
+                                return row.Rooms.bed;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 4,
+                            "render": function (data, type, row) {
+                                var html = '',
+                                        bed = +row.Rooms.bed,
+                                        length = row.Rooms.HotelReservations.length,
+                                        humans,
+                                        difference = bed - length;
+                                console.log('difference', bed, length, difference);
+                                if (difference > 0) {
+                                    html += '<a href="javascript: void 0;" ' +
+                                            'ng-class="reservation.room == ' + row.Rooms.id + ' ? \'btn-warning\' : \'btn-info\'" ' +
+                                            'data-ng-click="stay($event)" class="btn">' +
+                                            '{{ reservation.room == ' + row.Rooms.id + '? \'选择\' : \'选择\' }}' +
+                                            '</a>';
+                                }
+                                while (length--) {
+                                    humans = row.Rooms.HotelReservations[length].HotelHuman;
+                                    html += '<a href="javascript: void 0;"  class="btn ' + (humans.sex ? 'btn-success' : 'btn-danger') + '">'
+                                            + humans.name + '' + '<span class="badge">' + (humans.sex ? '男' : '女') + '</span></a>';
+                                }
+                                return html;
+
+                            }
+                        }
+                    ],
+                    "buttons": [],
+                    "createdRow": function (row, data, index) {
+                        $compile(angular.element(row).contents())($scope);
+                    },
+                    "oLanguage": {
+                        "sUrl": "/table_language.json"
+                    },
+                    "dom": 'Bfrtip',
+                    "deferRender": true
+                });
+                /* 获取酒店列表 */
+                $scope.get_hotel = function () {
+                    table.ajax.reload();
+                    $scope.refresh = true;
+                };
+                /* 选择房间之后  */
+                $scope.stay = function (e) {
+                    var data = table.row($(e.currentTarget).closest('tr')).data();
+                    $scope.reservation.hotel = data.HotelDetail.id; // 酒店ID
+                    $scope.reservation.room = data.Rooms.id; // 房间ID
+                    $scope.reservation.activity = $scope.data.id;
+                };
+                /* 手机号码变化 */
+                $scope.$watch('human.phone', function (n, o) {
+                    if (/^1[356789]\d{9}$/.test(n)) {
+                        HotelReservationListService.human(n).success(function (result) {
+                            if (result.result && result.result.phone) {
+                                $scope.human = result.result
+                            }
+                        })
+                    }
+                });
+                /* 添加学院 */
+                $scope.add_order = function () {
+                    // 重构学员数据
+                    $scope.human = HotelReservationListService.new_student();
+                    // 重构关联数据
+                    $scope.reservation = HotelReservationListService.new_reservation();
+                    // 打开模态框
+                    $('#myModal').modal();
+                };
+                /* 当前活动变化 */
+                $scope.current_activity_change = function (data) {
+                    $scope.data.activity = data.id;
+                    get_history(data.id);
+                };
+                /* 删除 */
+                $scope.cancel = function (id) {
+                    swal({
+                        title: "确定删除?",
+                        text: "",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        animation: "slide-from-top",
+                        closeOnConfirm: true,
+                        html: false
+                    }, function () {
+                        HotelReservationListService.cancel(id).success(function () {
+                            get_history($scope.data.activity);
+                        })
+                    });
+                };
+                /* 提交 */
+                $scope.submit = function () {
+                    swal({
+                        title: "确定生成订单？",
+                        text: "",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        animation: "slide-from-top",
+                        closeOnConfirm: true,
+                        html: false
+                    }, function () {
+                        HotelReservationListService.create_order(
+                                $scope.data.activity,
+                                $scope.statistics
+                        ).success(function () {
+                            get_history($scope.data.activity);
+                            $('#myModal').modal('hide');
+                        })
+                    });
+                };
+                /* 获取活动列表 */
+                HotelReservationListService.activity().success(function (result) {
+                    $scope.activity = result.result.list;
+                });
+                /* 上传图片逻辑 */
+                newupload($('#upload_image')[0], '', function (err, result) {
+                    if (err) {
+                        swal("上传失败", err, "error");
+                    } else {
+                        $scope.$apply(function () {
+                            $scope.data.cover_photo = result.message.name;
+                        });
+                    }
+                });
+            });
+</script>

@@ -1,0 +1,203 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <form id="notifics_form" action="/admin/um" method="post">
+                                <div class="col-md-12" style="padding:0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="form-group form-group-sm col-md-12 clearfix">
+                                                    <div class="btn-group" data-toggle="buttons">
+
+                                                        <select id="province" name="group" class="btn">
+                                                            <option value="-1" selected>
+                                                                --- 请选择省份 ---
+                                                            </option>
+                                                        </select>
+                                                        <select id="city" name="group" class="btn">
+                                                            <option value="-1" selected>
+                                                                ---- 请选择市区 ---
+                                                            </option>
+                                                        </select>
+                                                        <label class="btn btn-success" id="search">
+                                                            <input type="radio" name="options"
+                                                                   autocomplete="off" value="2">
+                                                            查询
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>序号</th>
+                                                                <th>分院名称</th>
+                                                                <th>地区(市)</th>
+                                                                <th>地址</th>
+                                                                <th>咨询电话</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        </tbody>
+                                                    </table>
+                                                    <div id="page"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${classroom}</td>
+    <td>${classroom_name}</td>
+    <td>${classroom_area_city}</td>
+    <td>${classroom_address}</td>
+    <td>${classroom_phone}</td>
+    </td>
+  </tr>
+</script>
+<script id="inittmp2" type="text/x-jquery-tmpl">
+    <li class="list-group-item clearfix">
+        <input type="hidden" name="students" value="${phone}">${name}
+        <button class="btn btn-danger pull-right delete_button" type="button">删除</button>
+    </li>
+</script>
+<script>
+    var city = {
+        cache:[],
+        $firstDom:null,
+        $secondDom:null,
+        init: function (firstId, secondId) {
+            this.$firstDom = $('#'+firstId);
+            this.$secondDom = $('#'+secondId);
+            this.getCity();//获取数据
+            this.Event();//绑定相关事件
+        },
+        getCity:function () {
+            var self = this;
+            $.get('/city',function (result) {
+                self.cache = result.result.list;
+                self.insertDom(self.$firstDom ,true);
+            })
+        },
+        insertDom:function ($dom, bol, index) {
+            var html;
+            var data = bol ? this.cache : this.cache[index].children;
+            if(bol){
+                html = '<option value="-1" selected>--- 请选择省份 ---</option>';
+                $.each(data,function (i,v) {
+                    html += '<option value="'+ i+'"> '+ v.name +' </option>'
+                });
+            }else {
+                html = '<option value="-1" selected>--- 请选择市区 ---</option>';
+                $.each(data,function (i,v) {
+                    html += '<option value="'+ v.name+'"> '+ v.name +' </option>'
+                });
+            }
+            $dom.html(html)
+        },
+        Event:function () {
+            var self = this;
+            this.$firstDom.on('change',function (e) {
+                var number = +self.$firstDom.val();
+                if(number != -1){
+                    self.insertDom(self.$secondDom , false ,number);
+                }
+            })
+        }
+    };
+    city.init('province','city');
+    var main = {
+        ajax_url: {},
+        bind_event: function () {
+            var city = $('#city');
+            $('#search').on('click',function () {
+                $('tbody tr').hide().find(":contains("+ city.val() +")").parent().show();
+            })
+        },
+        init: function () {
+            this.bind_event();
+        }
+    };
+    main.init();
+</script>
+<script>
+    $(".input_date").datetimepicker({
+        lang:'ch',
+        step:30
+    });
+    var effect = {
+        error:function () {},
+        show:function () {},
+        hide:function () {}
+    };
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            var data = $('.search-form').serializeArray();
+            data.push({name: 'page', value: page});
+            writeList(data)
+        }
+    };
+    //默认加载
+    writeList();
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        $.get('/branch/list/all', data, function (result) {
+            if (result.code == 200) {
+                $("table tbody").empty('');
+                $("#inittmpl")
+                        .tmpl(result.result.list)
+                        .appendTo("table tbody");
+                options.totalPages = result.message.pagecount;
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    };
+</script>
+
+<% include ../inc/footer.html%>

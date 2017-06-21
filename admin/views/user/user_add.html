@@ -1,0 +1,106 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>创建角色</b></div>
+        <div class="panel-body" style="margin-left: -60px">
+          <form class="form-horizontal">
+            <div class="form-group form-group-sm">
+              <label for="RoleRid" class="control-label col-md-2">角色分配<span>*</span></label>
+              <div class="col-md-5">
+                <select name="RoleRid" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                  <%list.forEach(function(item){if(item.r_permission!=''){%>
+                  <option value="<%=item.rid%>"><%=item.r_name%></option>
+                  <%}})%>
+                </select>
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="user_login" class="control-label col-md-2">登陆账号<span>*</span></label>
+              <div class="col-md-9">
+                <input type="text" name="user_login" placeholder="请输入登陆账号" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="user_nicename" class="control-label col-md-2">用户昵称<span>*</span></label>
+              <div class="col-md-9">
+                <input type="text" name="user_nicename" placeholder="请输入用户昵称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="user_pass" class="control-label col-md-2">登陆密码<span>*</span></label>
+              <div class="col-md-9">
+                <input type="text" name="user_pass" placeholder="请输入登陆密码" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' pattern="(?=^.{6,18}$)(?=(?:.*?\d){1})(?=.*[a-z])(?=(?:.*?[A-Z]){1})(?!.*\s)[0-9a-zA-Z!@#$%*()_+^&]*$" data-bv-regexp-message='强度不符合'>
+                <span>(6-18位，必须包含一个大写字母，一个小写字母,一个数字)</span>
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="user_email" class="control-label col-md-2">用户邮箱<span>*</span></label>
+              <div class="col-md-9">
+                <input type="email" name="user_email" placeholder="请输入用户邮箱" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' data-bv-emailaddress-message="请输入正确的邮箱格式">
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="user_phone" class="control-label col-md-2">用户手机<span>*</span></label>
+              <div class="col-md-9">
+                <input type="text" name="user_phone" placeholder="用户手机" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' data-bv-emailaddress-message="请输入正确的邮箱格式">
+                <span>(用来找回密码使用)</span>
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="user_branch" class="control-label col-md-2">所属学院<span>*</span></label>
+              <div class="col-md-9">
+                <select name="user_branch" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                  <%branch.forEach(function(item){%>
+                  <option value="<%=item.classroom%>"><%=item.classroom_name%></option>
+                  <%})%>
+                </select>
+              </div>
+            </div>
+            <div class="form-group form-group-sm">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-danger btn-submit">提交</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    $('.form-horizontal').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      effect.show()
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      var data=$('.form-horizontal').serializeArray();
+      $.post("/admin/user_create",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='user'
+          })
+        }else{
+          effect.error()
+          effect.hide()
+        }
+      })
+    });
+  })
+</script>
+<% include ../inc/footer.html%>

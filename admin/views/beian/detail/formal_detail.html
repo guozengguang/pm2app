@@ -1,0 +1,553 @@
+<% include ../../inc/head.html%>
+<style>
+    .btn-my{color:#fff;background-color:#9d9d9d;border-color:#d43f3a}
+    .change_button{
+        margin-right: 30px;margin-left: 30px;border: none;
+    }
+    .active{
+        background-color: #d9534f;
+    }
+    .hide{
+        display: none;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%=title%></b></div>
+                        <div class="panel-body" style="padding:15px 0" ng-controller="formalControl">
+                            <ul class="list-inline" style="text-align: center">
+                                <li ng-click="click(1)" ng-class="{'active':active==1}" class="change_button btn btn-my">自身信息</li>
+                                <li ng-click="click(2)" ng-class="{'active':active==2}" class="change_button btn btn-my">家庭信息</li>
+                                <li ng-click="click(3)" ng-class="{'active':active==3}" class="change_button btn btn-my">企业信息</li>
+                            </ul>
+                            <hr/>
+                            <!--自身信息-->
+                            <form ng-show="formFlag == 1" class="form-horizontal" role="form">
+                                <fieldset disabled>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_name">学员姓名 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_name" class="form-control" id="m_name" name="m_name" placeholder="学员姓名"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_phone">学员电话 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_phone" class="form-control" id="m_phone" name="m_phone" placeholder="学员电话" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="goods_name">所报课程 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.goods_name" class="form-control" id="goods_name" name="goods_name" placeholder="所报课程" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="classroom_name">所属分院 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.classroom_name" class="form-control" id="classroom_name" style="width:80%;" name="classroom_name" placeholder="所属分院" disabled/>
+                                                    <a ng-show="flag==1" href="javascript:void(0)" data-id="{{item.en_uid}}" class="setClassRoom"> <span class="label label-danger" style="float: right;margin-top: -32px;line-height: 24px;font-size:12px;"><%=branchName%></span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="goods_name">时间 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.time" class="form-control" id="en_time" name="en_time" placeholder="时间" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_company">公司名称 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_company" class="form-control" id="m_company" name="m_company" placeholder="公司名称"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="payTime">缴费时间 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.payTime" class="form-control" id="payTime" name="payTime" placeholder="缴费时间" pattern="YYYY-MM-DD  HH:mm:ss"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="arrvalTime">到账时间 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.arrvalTime" class="form-control" id="arrvalTime" name="arrvalTime" placeholder="到账时间"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_card">身份证号 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_card" class="form-control" id="m_card" name="m_card" placeholder="身份证号" maxlength="18"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_position">公司职务 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_position" class="form-control" id="m_position" name="m_position" placeholder="公司职务"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="statusDesc">学员状态 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.statusDesc" class="form-control" id="statusDesc" name="statusDesc" placeholder="学员状态" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="en_reference">推荐人姓名 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.en_reference" class="form-control" id="en_reference" name="en_reference" placeholder="推荐人姓名"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="clerk">招生老师归属 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.clerk" class="form-control" id="clerk" name="clerk" placeholder="招生老师归属" disabled style="width:80%"/>
+                                                    <a ng-show="flag==1" href="javascript:void(0)" data-id="{{item.en_uid}}" data-clerk="{{item.clerk_phone}}" data-name="{{item.m_name}}" data-phone="{{item.m_phone}}" class="setClerk">
+                                                        <span class="label label-success" style="float:right;margin-top:-32px;line-height: 24px;font-size: 12px;">修改归属</span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="en_channel">渠道来源 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.en_channel" class="form-control" id="en_channel" name="en_channel" placeholder="渠道来源" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="en_desc">备注说明 :</label>
+                                                <div class="col-sm-10" style="margin-left: -20px;">
+                                                    <textarea type="text" ng-model="item.en_desc" class="form-control" id="en_desc" name="en_desc" placeholder="备注说明" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="en_desc">操作详情 :</label>
+                                                <div class="col-sm-10" style="margin-left: -20px;">
+                                                    <div id="remarkDesc"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            <!--家庭信息-->
+                            <form ng-show="formFlag == 2" class="form-horizontal" role="form">
+                                <fieldset ng-disabled="{{btnEnabled}}">
+                                    <div class="row family-info">
+                                        <input type="hidden" ng-model="item.family.family_id"/>
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="emergency_contact_name">紧急联系人姓名 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.emergency_contact_name" class="form-control" id="emergency_contact_name" name="emergency_contact_name" placeholder="紧急联系人姓名"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="emergency_contact_phone">紧急联系人电话:</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.emergency_contact_phone" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" maxlength="11" placeholder="紧急联系人电话"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="son_name">儿子姓名 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.son_name" class="form-control" id="son_name" name="son_name" placeholder="儿子姓名"/>-->
+                                                <!--</div>-->
+                                             <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="son_age">儿子岁数 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.son_age" class="form-control" id="son_age" name="son_age" placeholder="儿子岁数"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="daughter_name">女儿姓名 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.daughter_name" class="form-control" id="daughter_name" name="daughter_name" placeholder="女儿姓名"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="daughter_age">女儿岁数 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.daughter_age" class="form-control" id="daughter_age" name="daughter_age" placeholder="女儿岁数"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="father_name">学员父亲 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.father_name" class="form-control" id="father_name" name="father_name" placeholder="学员父亲"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="father_phone">学员父亲联系电话 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.father_phone" class="form-control" id="father_phone" name="father_phone" maxlength="11" placeholder="学员父亲联系电话"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="mother_name">学员母亲 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.mother_name" class="form-control" id="mother_name" name="mother_name" placeholder="学员母亲"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="mother_phone">学员母亲联系电话 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.mother_phone" class="form-control" maxlength="11" id="mother_phone" name="mother_phone" placeholder="学员母亲联系电话"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-6">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<label class="col-sm-4 control-label" for="family_desc">备注 :</label>-->
+                                                <!--<div class="col-sm-8" style="margin-left: -20px;">-->
+                                                    <!--<input type="text" ng-model="item.family.family_desc" class="form-control" id="family_desc" name="family_desc" placeholder="备注"/>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!-- 添加自定义元素 -->
+                                        <div ng-repeat="field in newFieldList">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <div class="col-sm-4">
+                                                        <input ng-model="field.key" type="text" class="form-control" ng-disabled="{{enabled}}">
+                                                    </div>
+                                                    <div class="col-sm-6" style="margin-left: -20px;">
+                                                        <input ng-model="field.value" type="text" class="form-control">
+                                                    </div>
+                                                    <div class="col-sm-2" style="margin-left: -20px;line-height: 29px;" ng-show="flag==1 && branch == 0">
+                                                        <a href='javascript:void(0)' ng-click='deleteField($index);' class='btn btn-info btn-sm'><span class='glyphicon glyphicon-minus'></span></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="row" ng-show="flag==1 && branch == 0">
+                                    <div class="col-sm-6">
+                                        <div class="form-group" ng-click="addField();">
+                                            <label class="col-sm-4 control-label" for="add_field">
+                                                <button class="btn btn-sm btn-success">添加字段 <span
+                                                        class="glyphicon glyphicon-plus"></span></button>
+                                            </label>
+                                            <div class="col-sm-8">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" ng-show="flag==1">
+                                    <div class="form-group" align="center">
+                                        <button class="btn btn-sm btn-danger" style="display: block;width: 35%;" ng-click="updateFamilyInfo();">立即提交</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <!--企业信息-->
+                            <form ng-show="formFlag == 3" class="form-horizontal" role="form">
+                                <fieldset disabled>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_name">学员姓名 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_name" class="form-control" id="m_name" name="m_name" placeholder="学员姓名"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="statusDesc">学员状态 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.statusDesc" class="form-control" id="statusDesc" name="statusDesc" placeholder="学员状态" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_company">公司名称 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_company" class="form-control" id="m_company" name="m_company" placeholder="公司名称"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_position">公司职务 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_position" class="form-control" id="m_position" name="m_position" placeholder="公司职务"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="enterprise_phone">联系电话 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_phone" class="form-control" id="enterprise_phone" name="enterprise_phone" placeholder="联系电话" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_email">联系邮箱 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_email" class="form-control" id="m_email" name="m_email" placeholder="联系邮箱" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="classroom_name">所属分院 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.classroom_name" class="form-control" id="classroom_name" name="classroom_name" placeholder="所属分院" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="goods_name">所报课程 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.goods_name" class="form-control" id="goods_name" name="goods_name" placeholder="所报课程" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //报备转院
+    $(document).on('click',".setClassRoom",function () {
+        var data=$(this).data()
+        swal({
+            title: "选择变更的分院",
+            text: '<select class="form-control" id="reportRoom">\
+            <%calssRoom.forEach(function(node,index){%>\
+              <option value="<%=node.classroom_name%>,<%=node.classroom%>"><%=node.classroom_name%></option>\
+                      <%})%>\
+            </select>',
+            html: true,
+            showCancelButton: true,
+            cancelButtonText: "取消",
+            confirmButtonText: "确认!",
+            animation: "slide-from-top",
+        },function(){
+            var info=$("#reportRoom").val().split(',')
+            $.post('/admin/beian/set_check_transfer',{name:info[0],classroom:info[1],uid:data.id},function(result){
+                if(result.code==200){
+                    effect.success(function(){
+                        window.location.reload();
+                    })
+//                    swal({   title: "成功",   text: result.message.message,   timer: 5000,   showConfirmButton: false });
+//                    window.location.reload();
+                }else {
+                    swal({   title: "失败",   text: result.message,   timer: 5000,   showConfirmButton: false });
+                }
+            })
+        });
+    });
+    //修改归属
+    $(document).on('click',".setClerk",function () {
+        var data=$(this).data()
+        swal({
+            title: "选择指派的招生老师",
+            text: '<select class="form-control" id="reportRoom">\
+            <%list.forEach(function(node,index){%>\
+              <option value="<%=node.mid%>,<%=node.classroom%>,<%=node.m_name%>"><%=node.m_name%>(<%=node.classroom_name%>)</option>\
+                      <%})%>\
+            </select>',
+            html: true,
+            showCancelButton: true,
+            cancelButtonText: "取消",
+            confirmButtonText: "确认!",
+            animation: "slide-from-top",
+        },function(){
+            var info=$("#reportRoom").val().split(',')
+            $.post('/admin/beian/set_clerk',{mid:info[0],classroom:info[1],name:info[2],uid:data.id,clerk:data.clerk,phone:data.phone,mname:data.name},function(result){
+                if(result.code==200){
+                    effect.success(function(){
+                        window.location.reload();
+                    })
+//                    swal({   title: "成功",   text: "修改归属： "+$("#reportRoom").find("option:selected").html(),   timer: 5000,   showConfirmButton: false });
+//                    window.location.reload();
+                }else {
+                    swal({   title: "失败",   text: "修改失败",   timer: 5000,   showConfirmButton: false });
+                }
+            })
+        });
+    });
+</script>
+<script>
+    angular.module("cms")
+        .service('formalService',function ($http) {
+            this.dataFormat=function (data) {
+                return JSON.parse(data.replace(/&#34;/ig,'"').replace(/\s+/g, "").replace(/<\/?.+?>/g,"").replace(/[\r\n]/g, ""))
+            },
+                this.push=function (data) {
+                    return $http({
+                        url: '/admin/beian/detail/updateFamilyInfo',
+                        method: 'POST',
+                        data: data
+                    })
+                }
+        })
+        .controller('formalControl',function ($scope,formalService,$log,$compile) {
+            $scope.remarkList=formalService.dataFormat('<%=remarkList%>')
+            $scope.remarkDesc = "";
+            angular.forEach($scope.remarkList, function (v, i, list) {
+                $scope.remarkDesc += "提交者:"+v.create+" 内容:"+v.content+"<br/>";
+            });
+            $("#remarkDesc").html($scope.remarkDesc)
+
+            $scope.active = 1;
+            $scope.formFlag = 1;
+            $scope.click = function (type) {
+                $scope.active = type;
+                $scope.formFlag = type;
+            };
+
+            $scope.item=formalService.dataFormat('<%=item%>')//学员详情
+            $scope.item.time=$scope.item.time.substr(0,10) + " " +  $scope.item.time.substr(10);
+            $scope.item.payTime=$scope.item.payTime.substr(0,10) + " " +  $scope.item.payTime.substr(10);
+            $scope.item.arrvalTime=$scope.item.arrvalTime.substr(0,10) + " " +  $scope.item.arrvalTime.substr(10);
+            $scope.flag = $scope.item.flag;
+            $scope.branch = $scope.item.branch;
+            if($scope.flag == 2){
+                $scope.btnEnabled=true;
+            }else {
+                $scope.btnEnabled=false;
+            }
+            if($scope.branch == 0){
+                $scope.enabled=false;
+            }else {
+                $scope.enabled=true;
+            }
+
+            $scope.newFieldList = angular.copy($scope.item.family.newFieldList)?angular.copy($scope.item.family.newFieldList):[];
+            //添加字段
+            $scope.addField = function () {
+                $scope.newFieldList.push({
+                    key: '',
+                    value: ''
+                })
+            }
+            //删除元素
+            $scope.deleteField = function (index) {
+                $scope.newFieldList.splice(index, 1);
+                $scope.deleteFlag = 1;
+                console.log($scope.newFieldList)
+            };
+
+            //更新
+            $scope.updateFamilyInfo = function () {
+                //校验手机号
+//                var phoneRegex = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+//                if($scope.item.family.emergency_contact_phone && !phoneRegex.test(angular.copy($scope.item.family.emergency_contact_phone)))
+//                {
+//                    swal("提示","请输入有效的手机号码！","warning")
+//                    return false;
+//                }
+//                if($scope.item.family.father_phone && !phoneRegex.test(angular.copy($scope.item.family.father_phone)))
+//                {
+//                    swal("提示","请输入有效的手机号码！","warning")
+//                    return false;
+//                }
+//                if($scope.item.family.mother_phone && !phoneRegex.test(angular.copy($scope.item.family.mother_phone)))
+//                {
+//                    swal("提示","请输入有效的手机号码！","warning")
+//                    return false;
+//                }
+//                $scope.pushData = angular.copy($scope.item.family);
+
+                $scope.pushData = {};
+                $scope.pushData["family_id"]=$scope.item.family.family_id?$scope.item.family.family_id:'';
+                if($scope.pushData["family_id"] != '' && $scope.newFieldList.length == 0 && $scope.deleteFlag != 1){
+                    swal("提示","至少添加一个字段！","warning")
+                    return false;
+                }
+//                $scope.pushData=[]
+//                $scope.pushData.push({family_id:$scope.item.family.family_id})
+//                $scope.pushData.push({mid:$scope.item.en_mid})
+//                $scope.pushData.push({newFieldList:angular.copy($scope.newFieldList)})
+//                $scope.pushData.family_id = $scope.item.family.family_id;
+                $scope.pushData["mid"]=$scope.item.en_mid;
+                $scope.pushData["newFieldList"]=angular.copy($scope.newFieldList);
+                console.log($scope.pushData)
+                formalService.push($scope.pushData).success(function (result) {
+                    if(result.code==200){
+                        swal({
+                            title: "操作成功",
+                            text: "修改成功",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        window.location.href="/admin/beian/list";
+                    }
+                })
+            }
+        });
+</script>
+<% include ../../inc/footer.html%>

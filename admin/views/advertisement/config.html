@@ -1,0 +1,219 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div>
+                <div class="pull-left">
+                </div>
+                <div class="pull-right">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <ul class="nav nav-tabs" role="tablist">
+                <!--<li class="active"><a href="#init" aria-controls="init" data-toggle="tab">APP参数</a></li>-->
+            </ul>
+            <div class="tab-content" style="margin-top:15px;">
+                <div class="tab-pane active" id="init">
+                    <button class="btn btn-danger btn-sm creatInit" type="button">添加</button>
+                    <table class="table table-hover table-striped table-condensed" id="initTable">
+                        <thead>
+                        <tr>
+                            <th style="min-width:100px;">名称</th>
+                            <th style="min-width:60px;">key值</th>
+                            <th style="min-width:60px;">val值</th>
+                            <th style="min-width:120px;">参数描述</th>
+                            <th style="width: 240px;min-width: 240px;" class="text-center">操作</th>
+                        <tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="other">待定</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        initList();
+        $('.creatInit').on('click', function () {
+            var btn = $(this);
+            var data = {};
+            data.id = new Date().getTime();
+            btn.hide();
+            $('#inittmpl')
+                    .tmpl(data)
+                    .prependTo("#initTable tbody")
+            newupload('addImg','', function (err, result) {
+                if (err) {
+                    sweetAlert("上传失败", err, "error");
+                } else {
+                    var preview = $('#view');
+                    preview[0].dataset.url = result.message.name;
+                    preview.data('url', result.message.name);
+                    $('#input').val(result.message.name)
+                }
+            });
+
+        });
+        $(document).on('click', '.initDel', function () {
+            var id = $(this).attr('data-id');
+            var uid = $(this).attr('data-uid');
+            if (uid) {
+                $('#row_' + uid).remove();
+                $('.creatInit').show();
+            }
+            if (id) {
+                $('#row_' + id).remove();
+                initDel(id);
+            }
+        });
+        $(document).on('click', '.initSave', function () {
+            var id = $(this).attr('data-id');
+            var uid = $(this).attr('data-uid');
+            var data = {};
+            if (uid) {
+                var input = $('#row_' + uid).find('input');
+                data.name = input[0].value;
+                data.key = input[1].value;
+                data.val = input[2].value;
+                data.desc = input[3].value;
+                initSave(data);
+            }
+            if (id) {
+                var input = $('#row_' + id).find('input');
+                data.id = id;
+                data.name = input[0].value;
+                data.key = input[1].value;
+                data.val = input[2].value;
+                data.desc = input[3].value;
+                initSave(data);
+            }
+        });
+    });
+    function initSave(data) {
+        $.post('/admin/advertisement/save', data, function (result) {
+            if (result.code == 200) {
+                sweetAlert({
+                    title: "保存成功",
+                    text: result.message,
+                    showConfirmButton: false,
+                    type: "success",
+                    timer: 800
+                });
+                $('.creatInit').show();
+                initList();
+            } else {
+                sweetAlert("保存失败", result.message, "error");
+            }
+        })
+    }
+    ;
+    function initDel(id) {
+        $.post('/admin/advertisement/delete', {id: id}, function (result) {
+            if (result.code == 200) {
+                sweetAlert({
+                    title: "删除成功",
+                    text: result.message,
+                    showConfirmButton: false,
+                    type: "success",
+                    timer: 800
+                });
+                $('.creatInit').show();
+                initList();
+            } else {
+                sweetAlert("删除失败", result.message, "error");
+            }
+        })
+    }
+    var base = '';
+    function initList() {
+        $.get('/admin/advertisement/list', function (result) {
+            if (result.code == 200) {
+                base = result.message.base;
+                $("#initTable tbody").empty();
+                $('#listtmpl')
+                        .tmpl(result.message.list)
+                        .appendTo("#initTable tbody");
+                upload_bind('addImg');
+            }
+        })
+    }
+
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="name"  placeholder="名称" value="${name}"></td>
+    <td><input type="text" class="form-control input-sm" name="key"  placeholder="key值" value="${key}"></td>
+    <td><input id="input" type="text" class="form-control input-sm" name="val"  placeholder="val值" value="${val}"></td>
+    <td><input type="text" class="form-control input-sm" name="desc"  placeholder="参数描述" value="${desc}"></td>
+    <td class="text-center">
+      <span class="btn-group">
+        <button class="btn btn-success btn-sm initSave" type="button" data-uid="${id}">保存</button>
+        <button class="btn btn-danger btn-sm initDel" type="button" data-uid="${id}">取消</button>
+        <button id="view" class="preview btn btn-info btn-sm" type="button" data-id="${id}">预览</button>
+        <button id="addImg" class=" btn btn-warning btn-sm" type="button" data-id="${id}">上传</button>
+      </span>
+    </td>
+  </tr>
+
+
+</script>
+<script id="listtmpl" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="name"  placeholder="名称" value="${name}"></td>
+    <td><input type="text" class="form-control input-sm" name="key"  placeholder="key值" value="${key}"></td>
+    <td><input type="text" class="form-control input-sm" name="val"  placeholder="val值" value="${val}"></td>
+    <td><input type="text" class="form-control input-sm" name="desc"  placeholder="参数描述" value="${desc}"></td>
+    <td class="text-center">
+      <span class="btn-group">
+
+        <button class="btn btn-success btn-sm initSave" type="button" data-id="${id}">保存</button>
+        <button class="btn btn-danger btn-sm initDel" type="button" data-id="${id}">删除</button>
+        <button class="preview btn btn-info btn-sm" ${/\.(jpg|png|gif)$/.test(this.data.val) ? "data-url=" + this.data.val : ""}
+         type="button" data-id="${id}">预览</button>
+        <button class="addImg btn btn-warning btn-sm" type="button" data-id="${id}">上传</button>
+
+      </span>
+    </td>
+  </tr>
+
+
+</script>
+<% include ../inc/footer.html%>
+
+<script>
+    /* 上传逻辑 开始 */
+    function upload_bind(className) {
+        $('.' + className).each(function (i, v) {
+            var id = this.dataset.id || this.dataset.uid;
+            var row = $('#row_' + id);
+            var value_input = row.find('input[name="val"]');
+            var preview = row.find('.preview');
+            newupload(this, '', function (err, result) {
+                if (err) {
+                    sweetAlert("上传失败", err, "error");
+                } else {
+                    preview[0].dataset.url = result.message.name;
+                    preview.data('url', result.message.name);
+                    value_input.val(result.message.name)
+                }
+            });
+        })
+    }
+    /* 上传逻辑 结束 */
+    $(document).on('click', '.preview', function () {
+        var url = $(this).data('url');
+        if (url) {
+            swal({
+                title: '预览',
+                text: '<img style="max-height: 300px;max-width: 100%;" src="'+ base + '/' + url +'">',
+                html: true
+            });
+        }
+    })
+</script>

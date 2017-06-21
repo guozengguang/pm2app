@@ -1,0 +1,31 @@
+
+<div class="modal fade" id="modal_editor" tabindex="-1" role="dialog" aria-labelledby="deitorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="deitorModalLabel"></h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="input-group">
+                <span class="input-group-btn">
+                    <span class="btn btn-danger fileinput-button">
+                        <span>上传</span>
+                        <input id="editor_upload" type="file" name="files[]" multiple="multiple">
+                    </span>
+                </span>
+                <input type="text" name="deitor_img" id="deitor_img" class="form-control" placeholder="文件名">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary" id="deitor_pass">确定</button>
+                </span>
+                </div>
+            </div>
+            <div class="row" id="modalbody_post_editor">
+                <img src="" height="100%" width="100%" id="editor_view">
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<canvas id="canvas" class="hidden"></canvas>

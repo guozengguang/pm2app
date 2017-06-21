@@ -1,0 +1,236 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>创建角色</b></div>
+                        <div class="panel-body">
+                            <form class="form-horizontal">
+                                <div class="form-group form-group-sm">
+                                    <label for="r_name" class="control-label col-md-2">角色名称<span>*</span></label>
+                                    <div class="col-md-9">
+                                        <input type="text" name="r_name" placeholder="请输入角色名称" class="form-control"
+                                               required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                    </div>
+                                </div>
+
+                                <div class="form-group form-group-sm">
+
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">菜单权限</a></li>
+                                        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">管理权限</a></li>
+                                    </ul>
+
+                                    <!-- Tab panes -->
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="home">
+                                            <div class="form-group form-group-sm">
+                                                <label for="r_permission" class="control-label col-md-2">菜单权限<span>*</span></label>
+                                                <div class="col-md-9">
+                                                    <div class="panel panel-danger">
+                                                        <div class="panel-body">
+                                                            <%locals.menuAction.forEach(function(item){%>
+                                                            <blockquote
+                                                                    class="clearfix <%= item.code%1000 == 0 ? 'bg-info': 'bg-success'%> h5"
+                                                            >
+                                                                <%if(item.path===''){%>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" name="r_permission"
+                                                                           value="<%=item.code%>">
+                                                                    <b><%=item.title%></b>
+                                                                </label>
+                                                                <%}else{%>
+                                                                <div class="col-xs-2">
+                                                                    <label class="checkbox-inline">
+                                                                        <input type="checkbox" name="r_permission"
+                                                                               value="<%=item.code%>">
+                                                                        <%=item.title%>
+                                                                    </label>
+                                                                </div>
+                                                                <%}%>
+
+                                                                <!---->
+
+                                                                <%if(item.buttons){%>
+                                                                <%item.buttons.forEach(function(button){%>
+                                                                <div class="col-xs-2">
+
+                                                                    <%- +button.operation== 5 ? '<span class="label label-success">全</span>':''%>
+                                                                    <%- +button.operation== 4 ? '<span class="label label-info">增</span>':''%>
+                                                                    <%- +button.operation== 3 ? '<span class="label label-danger">删</span>':''%>
+                                                                    <%- +button.operation== 2 ? '<span class="label label-primary">改</span>':''%>
+                                                                    <%- +button.operation== 1 ? '<span class="label label-warning">查</span>':''%>
+
+                                                                    <label class="checkbox-inline">
+                                                                        <input type="checkbox" name="r_permission" value="<%=button.code%>">
+                                                                        <%= button.title %>
+                                                                    </label>
+
+                                                                </div>
+                                                                <%})%>
+                                                                <%}%>
+
+                                                                <!---->
+
+                                                            </blockquote>
+                                                            <%})%>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="profile">
+                                            <div class="form-group form-group-sm">
+                                                <label for="r_permission_menu" class="control-label col-md-2">管理权限<span>*</span></label>
+                                                <div class="col-md-9">
+                                                    <div class="panel panel-danger">
+                                                        <div class="panel-body">
+                                                            <%locals.menuAction.forEach(function(item){%>
+                                                            <blockquote
+                                                                    class="clearfix <%= item.code%1000 == 0 ? 'bg-info': 'bg-success'%> h5"
+                                                            >
+                                                                <%if(item.path===''){%>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" name="r_permission_menu"
+                                                                           value="<%=item.code%>">
+                                                                    <b><%=item.title%></b>
+                                                                </label>
+                                                                <%}else{%>
+                                                                <div class="col-xs-2">
+                                                                    <label class="checkbox-inline">
+                                                                        <input type="checkbox" name="r_permission_menu"
+                                                                               value="<%=item.code%>">
+                                                                        <%=item.title%>
+                                                                    </label>
+                                                                </div>
+                                                                <%}%>
+
+                                                                <!---->
+
+                                                                <%if(item.buttons){%>
+                                                                <%item.buttons.forEach(function(button){%>
+                                                                <div class="col-xs-2">
+
+                                                                    <%- +button.operation== 5 ? '<span class="label label-success">全</span>':''%>
+                                                                    <%- +button.operation== 4 ? '<span class="label label-info">增</span>':''%>
+                                                                    <%- +button.operation== 3 ? '<span class="label label-danger">删</span>':''%>
+                                                                    <%- +button.operation== 2 ? '<span class="label label-primary">改</span>':''%>
+                                                                    <%- +button.operation== 1 ? '<span class="label label-warning">查</span>':''%>
+
+                                                                    <label class="checkbox-inline">
+                                                                        <input type="checkbox" name="r_permission_menu" value="<%=button.code%>">
+                                                                        <%= button.title %>
+                                                                    </label>
+
+                                                                </div>
+                                                                <%})%>
+                                                                <%}%>
+
+                                                                <!---->
+
+                                                            </blockquote>
+                                                            <%})%>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+                                <div class="form-group form-group-sm">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('.form-horizontal').bootstrapValidator().on('success.form.bv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target),
+                    validator = $form.data('bootstrapValidator');
+            var r_permission = permission('r_permission');
+            var r_permission_menu = permission('r_permission_menu');
+            var r_area = area();
+            var r_name = $('input[name="r_name"]').val();
+            var data = {
+                r_name: r_name,
+                r_permission: r_permission,
+                r_permission_menu: r_permission_menu,
+                r_area: r_area
+            };
+            if (!r_permission) {
+                return effect.error('请勾选菜单权限')
+            }
+            $.post("/admin/role_create", data, function (result) {
+                if (result.code = 200) {
+                    effect.success(function () {
+                        location.href = 'role'
+                    })
+                } else {
+
+                }
+            })
+        });
+        permission('r_permission')
+        permission('r_permission_menu')
+    })
+    //权限分配
+    function permission(r_permission) {
+        var arr = []
+        $('input[name='+r_permission+']').each(function (i, v) {
+            if ($(v).is(":checked")) {
+                arr.push(v.value)
+            }
+        })
+        return arr.join(',')
+    }
+    //区域
+    function area() {
+        var arr = []
+        $('input[name="r_area"]').each(function (i, v) {
+            if ($(v).is(":checked")) {
+                arr.push(v.value)
+            }
+        })
+        return arr.join(',')
+    }
+    $('input[type=checkbox]').on('change',function(){
+        var parents = $(this).parents('blockquote');
+        if(parents.hasClass('bg-info')){
+            parents.nextUntil('.bg-info')
+                    .find('input[type=checkbox]')
+                    .attr('checked',this.checked)
+                    .prop('checked',this.checked);
+        }else {
+            /*parents.prev('.bg-info')
+                    .find('input[type=checkbox]')
+                    .attr('checked',this.checked)
+                    .prop('checked',this.checked);*/
+        }
+    })
+</script>
+<% include ../inc/footer.html%>

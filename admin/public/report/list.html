@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>格局商学学员录入管理系统</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!--为了防止手机号被iOS屏蔽-->
+    <meta name="format-detection" content="telephone=no">
+
+    <link type="text/css" href="css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" href="font/iocns.css" rel="stylesheet">
+    <link type="text/css" href="css/style.css" rel="stylesheet">
+    <link type="text/css" href="css/paging.css" rel="stylesheet">
+
+
+    <script type="text/javascript" src="js/comm.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/query.js"></script>
+    <script type="text/javascript" src="js/paging.js"></script>
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <!--隐藏域-->
+    <input type="hidden" id="hidden_list" value="value">
+
+
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a href="#" class="btn goHome"><span class="lw lw-icon-left-open-big"> </span></a>
+            <button type="button" class="navbar-toggle btn-link collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="lw lw-icon-menu-1"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!--li><a href="#"><span class="lw lw-icon-user-1"></span> 个人中心</a></li-->
+                <li id="studentInfo_li" class="active"><a href="list.html"><span class="lw lw-icon-vcard"></span>
+                    学员信息</a></li>
+                <li><a href="student_ownership_transfer.html"><span class="lw lw-icon-shuffle-1"></span> 学员归属转移</a></li>
+                <!--<li><a href="list.html"><span class="lw lw-icon-archive"></span> 报备中心</a></li>-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="lw lw-icon-user-1"></span><span id="phoneSpan"></span><span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="update_pwd.html"><span class="lw lw-icon-key"></span> 密码修改</a></a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="quit()"><span class="lw lw-icon-logout-1"></span> 退出系统</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container con-list">
+    <div class="panel panel-default" style="overflow:scroll;width: 100%">
+        <!--<div class="panel-heading" style="min-width: 800px">-->
+        <!--<a href="input.html" type="button" class="btn btn-info"><span-->
+        <!--class="lw lw-icon-plus-1"></span>-->
+        <!--添加学员报备</a></td>-->
+        <!--<label id="initLbl"></label>-->
+        <!--<input type="button" class="btn btn-info" id="searchAction" style="float: right" value="查询"/>-->
+        <!--<input type="text" placeholder="输入姓名或手机号查询" id="search_name"-->
+        <!--style="float: right;margin-right: 10px;margin-top: 3px;"/>-->
+        <!--<div class="input-group" id="status_select_div" style="float: right;margin-right: 10px;">-->
+        <!--<select class="form-control" id="status_select">-->
+        <!--<option value="全部学员" id="">全部学员</option>-->
+        <!--<option value="正式" id="1">正式学员</option>-->
+        <!--<option value="正常的" id="3">报备学员</option>-->
+        <!--<option value="即将过期" id="4">即将过期</option>-->
+        <!--</select>-->
+        <!--</div>-->
+        <!--<div class="input-group" id="pay_status_select_div" style="float: right;margin-right: 10px;">-->
+        <!--<select class="form-control" id="pay_status_select">-->
+        <!--<option value="全部学员" key="">全部学员</option>-->
+        <!--<option value="全部学员" key="1">已缴费</option>-->
+        <!--<option value="正式" key="0">未缴费</option>-->
+        <!--</select>-->
+        <!--</div>-->
+        <!--</div>-->
+        <div class="panel-body">
+            <div class="bodyTable" style="overflow: scroll;width: 100%">
+                <table class="table table-hover" style="min-width: 1000px">
+                    <thead>
+                    <tr>
+                        <div class="panel-heading" style="min-width: 1000px">
+                        <a href="input.html" type="button" class="btn btn-info"><span
+                        class="lw lw-icon-plus-1"></span>
+                        添加学员报备</a>
+                        <label id="initLbl"></label>
+                        <input type="button" class="btn btn-info" id="searchAction" style="float: right" value="查询"/>
+                        <input type="text" placeholder="输入姓名或手机号查询" id="search_name"
+                        style="float: right;margin-right: 10px;margin-top: 3px;"/>
+                        <div class="input-group" id="status_select_div" style="float: right;margin-right: 10px;">
+                        <select class="form-control" id="status_select">
+                        <option value="全部学员" id="">全部学员</option>
+                        <option value="正式" id="1">正式学员</option>
+                        <option value="正常的" id="3">报备学员</option>
+                        <option value="即将过期" id="4">即将过期</option>
+                        </select>
+                        </div>
+                        <div class="input-group" id="pay_status_select_div" style="float: right;margin-right: 10px;">
+                        <select class="form-control" id="pay_status_select">
+                        <option value="全部学员" key="">全部学员</option>
+                        <option value="全部学员" key="1">已缴费</option>
+                        <option value="正式" key="0">未缴费</option>
+                        </select>
+                        </div>
+                        </div>
+                    </tr>
+                    <tr>
+                        <th style="width:90px">学员编号</th>
+                        <th style="width:90px">学员姓名</th>
+                        <th style="width:90px">学员电话</th>
+                        <th style="width:120px">时间</th>
+                        <th style="width:90px">缴费状态</th>
+                        <th style="width:90px">学员状态</th>
+                        <!--<th style="width:90px">推荐人</th>-->
+                        <th style="width:120px">身份证号</th>
+                        <th style="width:120px">所报课程</th>
+                        <th style="width:90px">所属分院</th>
+                        <th style="width:90px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="mainTbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div id="pageTool" class="btn-group" role="group" aria-label="...">
+                <!--<button type="button" class="btn btn-default"><span class="lw lw-icon-angle-double-left"></span>-->
+                <!--</button>-->
+                <!--<button type="button" class="btn btn-default">1</button>-->
+                <!--<button type="button" class="btn btn-default">2</button>-->
+                <!--<button type="button" class="btn btn-default">3</button>-->
+                <!--<button type="button" class="btn btn-default">4</button>-->
+                <!--<button type="button" class="btn btn-default">5</button>-->
+                <!--<button type="button" class="btn btn-default"><span class="lw lw-icon-angle-double-right"></span>-->
+                <!--</button>-->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+
+        //给当前用户赋电话号码值
+        $("#phoneSpan").html($.cookie("currentUserPhone"));
+
+        var url = 'http://api.geju.com/business/report/list/' + $.cookie("currentUserPhone");
+
+        var totalCount = getListCount();
+
+        if (totalCount == 0) {
+            $(".panel-footer").html("");
+            return;
+        }
+
+        loadList(url, 0, 10);
+
+        //分页初始化
+        $('#pageTool').Paging({
+            pagesize: 10, count: totalCount, callback: function (page, pagesize, pagecount) {
+//                alert('当前第 ' + page + '页,每页 ' + pagesize + '条,总页数：' + pagecount + '页');
+                $("#mainTbody").html("");
+                loadList(url, page - 1, pagesize);
+            }
+        });
+
+        $("#searchAction").click(function () {
+            var statusId = $("#status_select option:selected").attr("id");
+            var name = $("#search_name").val();
+            var payStatusId = $("#pay_status_select option:selected").attr("key");
+            var url = 'http://api.geju.com/business/report/list/' + $.cookie("currentUserPhone") + "?status=" + statusId + "&name=" + name + "&myPayStatus=" + payStatusId;
+            var thisPageCount = loadList(url, 0, 10);
+            if (thisPageCount == 0) {
+                $(".panel-footer").html("");
+                return;
+            }
+            //配置分页插件
+            //首先去掉原来的分页插件
+            $(".panel-footer").html("");
+
+            $(".panel-footer").html("<div id='pageTool' class='btn-group' role='group' aria-label='...'></div>");
+
+            $("#pageTool").Paging({
+                pagesize: 10, count: thisPageCount, callback: function (page, pagesize, pagecount) {
+                    $("#mainTbody").html("");
+                    loadList(url, page - 1, pagesize);
+                }
+            });
+        });
+    })
+    //获取列表总数
+    function getListCount() {
+        var totalCount = 0;
+        var url = 'http://api.geju.com/business/report/list/' + $.cookie("currentUserPhone");
+        $.ajax({
+            url: url,
+            dataType: "json",
+            async: false,
+            data: "",
+            type: "GET",
+            success: function (res) {
+                if (res.code == '200') {
+                    totalCount = res.result.count;
+                    var officialCount = res.result.officialCount;//正式学员
+                    var reportCount = res.result.reportCount;//报备学员
+                    $("#initLbl").html("正式学员:" + officialCount + "人" + "  报备学员:" + reportCount + "人");
+                } else if (res.code == '401') {
+                    window.location.href = "./login.html";
+                }
+            }
+        });
+        return totalCount;
+    }
+    //加载列表
+    function loadList(url, page, pagesize) {
+        var pageCount = 0;
+        //如果当前用户未曾登录 就跳转到登录页面
+        if ($.cookie("isLogin") != "true") {
+            window.location.href = "./login.html";
+        } else {
+            //加载报备列表
+            $("#mainTbody").html("");
+            var thisurl = "";
+            if (url.indexOf("?") > 0) {
+                thisurl = url + "&page=" + page + "&pagesize=" + pagesize;
+            } else {
+                thisurl = url + "?page=" + page + "&pagesize=" + pagesize;
+            }
+            $.ajax({
+                url: thisurl,
+                dataType: "json",
+                async: false,
+                data: "",
+                type: "GET",
+                success: function (res) {
+                    if (res.code == '200') {
+                        pageCount = res.result.count;//总数
+                        var list = res.result.list;
+                        //隐藏域赋值
+                        $("#hidden_list").val(list);
+                        for (i = 0; i < list.length; i++) {
+
+                            var mainHtml = $("#mainTbody").html();
+
+                            var en_uid = list[i]["en_uid"];//学员编号
+                            var m_name = list[i]["m_name"];//学员姓名
+                            var m_phone = list[i]["m_phone"];//学员电话
+                            var cardId = list[i]["m_card"];//身份证号
+                            var time = list[i]["time"];//时间
+
+                            var paystaus = list[i]["en_pay_status"] == "0" ? "未缴费" : "已缴费";//缴费状态
+                            var status = list[i]["statusDesc"];//学员状态
+                            var referrerName = list[i]["en_reference"];//推荐人姓名
+                            var position = list[i]["m_position"];//学员职位
+                            var goods_name = list[i]["goods_name"];//所报课程
+                            var en_classroom = list[i]["classroom_name"];//所属分院
+                            var applyStatus = list[i]["applyStatus"];//报备状态
+
+                            var mid = list[i]["mid"];
+                            var thisHtml = "";
+                            if (applyStatus == 0) {
+                                thisHtml = "<tr>" +
+                                    "<td style='width:90px'>" + en_uid + "</td>" +
+                                    "<td style='width:90px'><a href='#' style='color: blue' onclick='showDetails(" + en_uid + ");'>" + m_name + "</a></td>" +
+                                    "<td style='width:90px'>" + m_phone + "</td>" +
+                                    "<td style='width:120px'>" + time + "</td>" +
+                                    "<td style='width:90px'>" + paystaus + "</td>" +
+                                    "<td style='width:90px'>" + status + "</td>" +
+//                                    "<td style='width:90px'>" + referrerName + "</td>" +
+                                    "<td style='width:120px'>" + cardId + "</td>" +
+                                    "<td style='width:120px'>" + goods_name + "</td>" +
+                                    "<td style='width:90px'>" + en_classroom + "</td>" +
+                                    "<td style='width:90px'><a href='#' style='color:blue' onclick='applyModify(" + en_uid + "," + mid + ")'>申请修改</a></td>" +
+                                    "</tr >";
+                            } else {
+                                thisHtml = "<tr>" +
+                                    "<td style='width:90px'>" + en_uid + "</td>" +
+                                    "<td style='width:90px'><a href='#' style='color: blue' onclick='showDetails(" + en_uid + ");'>" + m_name + "</a></td>" +
+                                    "<td style='width:90px'>" + m_phone + "</td>" +
+                                    "<td style='width:120px'>" + time + "</td>" +
+                                    "<td style='width:90px'>" + paystaus + "</td>" +
+                                    "<td style='width:90px'>" + status + "</td>" +
+//                                    "<td style='width:90px'>" + referrerName + "</td>" +
+                                    "<td style='width:120px'>" + cardId + "</td>" +
+                                    "<td style='width:120px'>" + goods_name + "</td>" +
+                                    "<td style='width:90px'>" + en_classroom + "</td>" +
+                                    "<td style='width:90px'>属性修改审核中</td>" +
+                                    "</tr >";
+                            }
+                            mainHtml += thisHtml;
+
+                            $("#mainTbody").html(mainHtml);
+                        }
+                    } else if (res.code == '401') {
+                        window.location.href = "./login.html";
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+        return pageCount;
+    }
+    //展示个人详情
+    function showDetails(en_uid) {
+        //page为当前页面的索引值
+        $("#studentInfo_li").removeClass("active");
+        window.location.href = "./memberDetails.html?uid=" + en_uid;
+    }
+    //修改页面
+    function applyModify(en_uid, mid) {
+        //page为当前页面的索引值
+        $("#studentInfo_li").removeClass("active");
+        window.location.href = "./input.html?uid=" + en_uid + "&operation=" + "modify" + "&mid=" + mid;
+    }
+    //退出系统
+    function quit() {
+        $.ajax({
+            url: 'http://api.geju.com/business/login/quit',
+            dataType: "json",
+            async: true,
+            data: "",
+            type: "POST",
+            success: function (res) {
+                if (res.code == '200') {
+                    //清空相关的cookie
+                    //当前登录手机号和用户名
+                    $.cookie("currentUserPhone", "", {expires: 7});
+                    $.cookie("currentUserName", "", {expires: 7});
+
+                    //确定是否已经登录
+                    $.cookie("isLogin", "false", {expires: 7});
+
+                    window.location.href = "./login.html";
+                } else if (res.code == '401') {
+                    window.location.href = "./login.html";
+                }
+                else {
+                    alert(res.message);
+                }
+            }
+        });
+
+    }
+</script>
+</body>
+</html>

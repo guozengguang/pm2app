@@ -1,0 +1,399 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>创建订单</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <div class="col-md-12 col-sm-12" style="padding:0 0 0 15px">
+                  <div class="panel panel-danger">
+                    <div class="panel-body">
+                      <div class="row">
+                        <form id="pay_form">
+                          <div class="form-group form-group-sm col-md-6">
+                            <label for="stime" class="control-label">缴费时间<span>*</span></label>
+                            <input type="text" name="stime" placeholder="缴费时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                          </div>
+                          <div class="form-group form-group-sm col-md-6">
+                            <label for="fee" class="control-label">订单金额<span>*</span></label>
+                            <input type="text" name="fee" placeholder="订单金额" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' pattern="^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$" data-bv-regexp-message='金额错误' disabled>
+                          </div>
+                          <div class="form-group form-group-sm col-md-6">
+                            <label for="order" class="order">流水号<span>*</span></label>
+                            <input type="text" name="order" placeholder="流水号" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                          </div>
+                          <div class="form-group form-group-sm col-md-6">
+                            <label for="method" class="order">缴费方式<span>*</span></label>
+                            <select name="method" class="form-control">
+                              <option value="刷pos机">刷pos机</option>
+                              <option value="学员转账">学员转账</option>
+                              <option value="分院转账">分院转账</option>
+                              <option value="扫码支付">扫码支付</option>
+                            </select>
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                            <label for="user_branch" class="control-label">所属分院<span>*</span></label>
+                              <select name="user_branch" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                <%branch.forEach(function(item){%>
+                                <option value="<%=item.classroom%>"><%=item.classroom_name%></option>
+                                <%})%>
+                              </select>
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                            <label for="desc" class="control-label">备注说明<span>*</span></label>
+                            <input type="text" name="desc" placeholder="付款说明" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                          <span class="btn btn-danger btn-sm" id="addImg">
+                            <span class="glyphicon glyphicon-plus"></span>添加凭证
+                          </span>
+                            <span style="color: red">*双击凭证删除</span>
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                            <div id="addPics" style="display: inline-block">
+                            </div>
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                          <span class="btn btn-danger btn-sm addShow">
+                            <span class="glyphicon glyphicon-plus"></span>关联学员
+                          </span>
+                            <!--<span style="color: red">*至少关联一位学员</span>-->
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                            <ul class="list-group" id="options">
+
+                            </ul>
+                          </div>
+                          <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function () {
+  //时间
+  $(".input_date").datetimepicker({
+    step:15,
+    lang:'ch',
+  });
+
+    function checkPayMoney(){
+        var flag = true;
+        angular.forEach(uidAndFeeArr, function (data, i, source) {
+            if(!data.en_fee){
+                swal("提示","请填写缴费金额!","warning")
+                flag = false;
+            }else{
+                flag = true;
+            }
+        });
+        return flag;
+    }
+  $('#pay_form').bootstrapValidator().on('success.form.bv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target),
+            validator = $form.data('bootstrapValidator');
+    var data=$('#pay_form').serializeArray();
+    var img=[]//图片凭证验证
+    $("#addPics").find('img').each(function(i,v){
+      img.push($(v).data('src'))
+    })
+    if(img.length==0){
+      return swal({
+        title: "创建失败",
+        text: "请上传凭证",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+    var members=option();//学员验证
+    if(!members){
+      return swal({
+        title: "创建失败",
+        text: "请至少关联一位学员",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+
+      if(!checkPayMoney()){
+          swal("提示","请填写缴费金额!","warning")
+          return;
+      }
+
+    data.push({name:'pics',value:img.join()})
+    data.push({name:'members',value:members})
+    data.push({name:'uidAndFeeArr',value:JSON.stringify(uidAndFeeArr)})
+    data.push({name:'fee',value:$("input[name=fee]").val()})
+      _.remove(data , function(n) {//返回被删除的元素
+          return n.name == "en_fee";//删除name为en_fee的元素
+      });
+    console.log(data,'data')
+    effect.show()
+    $.post("/admin/beian/pay/create",data,function(result){
+      if(result.code==200){
+        effect.success(function(){
+          location.href="/admin/beian/pay/list"
+        })
+      }else{
+        effect.hide()
+        effect.error(result.message)
+      }
+    })
+  });
+
+  $(document).on('blur','.en_fee:last',function () {
+      var fee = 0;
+      $('#options').find('.list-group-item').each(function(i,v){
+          var en_fee = $(v).find('.en_fee').val();
+          fee += parseInt(en_fee);
+      });
+      if(fee){
+          $("input[name=fee]").val(fee);
+      }
+  })
+  //双击删除
+  $(document).on('dblclick',".delPics",function(){
+    $(this).remove()
+  })
+  //添加图片
+  newupload('addImg','en_pics',function(err,result){
+    console.log(result)
+    if (err){
+      effect.error(err);
+    }else {
+      $('<img src="'+result.message.url+'" data-src="'+result.message.name+'" height="150px" width="150px" class="img-thumbnail delPics">').appendTo('#addPics')
+    }
+  });
+  //关联学员
+  $('.addShow').on('click', function(event) {
+    $("#modal_add").modal('show');
+    var data=$('.select_form').serializeArray();
+    var user_branch = $("select[name=user_branch] option:selected").val();
+    data.push({name:"user_branch",value:user_branch});
+    writeList(data);
+  });
+  //判断是否为同一个学生报的同一个课程
+  function checkTheSamePersonAndClass(phone,goods) {
+      var flag = true;
+      $("#options .list-group-item").each(function () {
+          console.log($(this).find("#studentPhone").text(),$(this).find("#studentGoods").text())
+          if($(this).find("#studentPhone").text() == phone && $(this).find("#studentGoods").text() == goods){
+              flag = false;
+              return false;
+          }else {
+              flag = true;
+          }
+      })
+      return flag;
+  }
+  //添加讲师
+  $(document).on('click', '.add', function(event) {
+    var students = $("#options").html().trim();
+    var phone=$(this).data('phone') + "";
+    var goods=$(this).data('goods') + "";
+    if(students != "" && !checkTheSamePersonAndClass(phone,goods)){
+        swal("提示", "不能重复关联", "warning")
+        $("#modal_add").modal('hide');
+        return;
+    }else{
+        var name=$(this).data('name');
+        var phone=$(this).data('phone');
+        var goods=$(this).data('goods');
+        var card=$(this).data('pics');
+        var id=$(this).data('id');
+        var row=new Date().getTime();
+        var data={name:name,phone:phone,row:row,id:id,card:card,goods:goods};
+        $("#addtmpl")
+            .tmpl(data)
+            .appendTo("#options");
+    }
+      $("#modal_add").modal('hide');
+  });
+  //搜索
+  $('#add_find').on('click',function(){
+    var data=$('.select_form').serializeArray();
+    options.currentPage=1;
+    var user_branch = $("select[name=user_branch] option:selected").val();
+    data.push({name:"user_branch",value:user_branch});
+    writeList(data);
+  })
+  //所属分院下拉框
+    var userBranch = $("select[name=user_branch]");
+    userBranch.data("last", userBranch.val()).change(function () {
+        //var mysel = $(this);
+        var oldvalue = userBranch.data("last");//这次改变之前的值
+        userBranch.data("last", userBranch.val()); //每次改变都附加上去，以便下次变化时获取
+        var newvalue = userBranch.val(); //当前选中值
+        var students = $("#options").html().trim();
+        if (students != ""){
+            swal("友情提醒","您之前选择的分院已经关联学员,请先删除后再进行选择,谢谢!","warning");
+            userBranch.val(oldvalue);
+            userBranch.data("last", userBranch.val());
+        }
+    })
+  //删除选项
+  $('body').on('click','.del',function(){
+    event.preventDefault();
+    var id=$(this).attr('data-id');
+    $('#row_'+id).remove()
+  });
+  //分页初始值
+  var options = {
+    currentPage: 1,//当前页数
+    totalPages: 0,//总页数
+    numberOfPages: 12,//做多显示page页
+    bootstrapMajorVersion: 1,//版本
+    alignment: "center",
+    onPageClicked: function (e, originalEvent, type, page) {
+      if (page > options.totalPages) {
+        options.currentPage = options.totalPages;
+      } else {
+        options.currentPage = page;
+      }
+      var data=$('.select_form').serializeArray();
+      data.push({name:'page',value:page});
+      writeList(data)
+    }
+  };
+  //写列表ajax
+  function writeList(data){
+    effect.show();
+    $.get('/admin/beian/branch_list',data,function(result){
+      if(result.code==200){
+        $("table tbody").empty('');
+        $("#inittmpl")
+                .tmpl(result.message.list)
+                .appendTo("table tbody");
+        options.totalPages=result.message.pagecount;
+        if (options.totalPages > 0) {
+          $('#page').bootstrapPaginator(options);
+        } else {
+          $('#page').empty();
+        }
+        effect.hide();
+      }else{
+        effect.hide();
+        effect.error('请求失败')
+      }
+    })
+  };
+  //获取学员id
+  var uidAndFeeArr = [];
+  function option(){
+    var arr=[];
+    var json={};
+    var res=[];
+    $('#options').find('.list-group-item').each(function(i,v){
+      var id=$(v).data('id');
+      var en_fee = $(v).find('.en_fee').val();
+      uidAndFeeArr.push({en_uid:id,en_fee:en_fee});
+      arr.push(id);
+    });
+//      数组去重复
+    for(var i = 0; i < arr.length; i++){
+      if(!json[arr[i]]){
+        res.push(arr[i]);
+        json[arr[i]] = 1;
+      }
+    }
+    return res.join(',')
+  }
+})
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+  <td>${index}</td>
+    <td><img class="img-circle" {{if m_pics}}src="<%=aly%>/${m_pics}"{{/if}} width="45" height="45" ></td>
+    <td>${m_name}</td>
+    <td>${m_phone}</td>
+    <td>${m_card}</td>
+    <td>${goods_name}</td>
+    <td>${clerk}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs add" data-name='${m_name}' data-id="${en_uid}" data-goods="${goods_name}" data-card="${m_card}" data-phone="${m_phone}"> 添加</a>
+    </div>
+    </td>
+  </tr>
+</script>
+<script id="addtmpl" type="text/x-jquery-tmpl">
+  <li class="list-group-item" id="row_${row}" data-id="${id}">
+    学员姓名：【<span id='studentName'><b>${name}</b></span>】  电话: 【<span id="studentPhone"><b>${phone}</b></span>】  身份证 ： 【<b>${card}</b>】  报备课程 ：【<span id="studentGoods"><b>${goods}</b></span>】  缴费金额:<input type="text" class="en_fee" name="en_fee" style="border-radius:2px;margin-left:3px;"/>
+    <span class="badge danger del" data-id="${row}" style="cursor:pointer">删除</span>
+  </li>
+</script>
+<!-- 学员model -->
+<div class="modal fade" id="modal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择学员
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <select  class="form-control input-sm" name="status">
+                <option value="1,3,4">全部学员</option>
+                <option value="1">正式学员</option>
+                <option value="3">报备学员</option>
+                <option value="4">报备即将失效</option>
+              </select>
+            </div>
+            <div class="input-group input-group-sm">
+              <input type="hidden" name="payStatus" value="0" />
+              <input type="text" name="phone" class="form-control input-sm" placeholder="学员手机号或姓名" />
+              <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="add_find">查询</span>
+              </span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed">
+          <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th style="width:80px">头像</th>
+            <th style="width:80px">姓名</th>
+            <th style="width:180px">电话</th>
+            <th style="width:180px">身份证</th>
+            <th style="width:180px">报备课程</th>
+            <th style="width:180px">所属招生老师</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="page"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../../inc/footer.html%>

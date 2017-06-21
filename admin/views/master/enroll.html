@@ -1,0 +1,615 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    #goTop{
+        display: none!important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="col-md-12">
+                                <button id="create_data" type="button" class="btn btn-sm btn-info">
+                                    新建
+                                </button>
+                            </div>
+                            <hr class="ke-hr">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="example" class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>姓名</th>
+                                            <th>课程</th>
+                                            <th>分院</th>
+                                            <th>公司</th>
+                                            <th>投票数</th>
+                                            <th>推荐理由</th>
+                                            <th>创建时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">添加学员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="create_form" role="form">
+                    <div class="form-group">
+                        <input type="hidden" name="id" class="form-control" id="id" placeholder="ID">
+                        <label for="name">姓名</label>
+                        <input type="text" name="name" class="form-control" id="name" placeholder="姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="branch">分院</label>
+
+                        <select name="branch" class="form-control" id="branch"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lesson">课程</label>
+
+                        <select name="lesson" class="form-control" id="lesson"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">公司</label>
+                        <input type="text" name="company" class="form-control" id="company" placeholder="公司">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="video">视频</label>
+                        <input type="text" name="video" class="form-control" id="video" placeholder="视频" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">图片</label>
+                        <input type="text" name="image" class="form-control" id="image" placeholder="图片" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="describe">推荐理由</label>
+                        <textarea class="form-control" name="describe" id="describe" placeholder="推荐理由,尽量不超过100字"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <label for="upload_video">上传视频</label>
+                                <div>
+                                    <span class="btn btn-sm btn-warning file_container">选择文件
+                                        <input id="upload_video" style="height: 29px; " name="upload_video" type="file"
+                                               value="">
+                                    </span>
+                                    <button id="upload" class="btn btn-sm btn-info" type="button">上传视频</button>
+                                </div>
+                                <div class="help-block progress form-group">
+                                    <div id="progress"
+                                         class="progress-bar progress-bar-info progress-bar-striped active"
+                                         role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                                         style="width: 0%;">
+                                        <span class="sr-only"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <label for="upload_image">上传图片</label>
+                                <div>
+                                    <button id="upload_image" class="btn btn-sm btn-warning" type="button">上传图片</button>
+                                    <button id="preview_image" class="btn btn-sm btn-info" type="button">预览图片</button>
+                                </div>
+                                <p class="help-block">
+                                    <small>上传图片后请预览</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" id="create">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    var update = {
+        source: {
+            id:'',
+            name: '',
+            branch: '',
+            company: '',
+            video: '',
+            image: '',
+            describe: '',
+            type: 1
+        },
+        dom: {
+            id: $('#id'),
+            name: $('#name'),
+            lesson: $('#lesson'),
+            branch: $('#branch'),
+            company: $('#company'),
+            video: $('#video'),
+            image: $('#image'),
+            describe: $('#describe'),
+        },
+        params: function () {
+            var obj = {type: 1};
+            for (var k in this.dom) {
+                var value = this.dom[k].val();
+                if (k !== 'id' && k !=='video' && !/\S/.test(value)) {
+                    error_toaster(k + ': 不能为空');
+                    return false;
+                }
+                obj[k] = this.dom[k].val()
+            }
+            return obj;
+        },
+        insertValue: function (obj) {
+            obj = obj || this.source;
+            for (var k in obj) {
+                this.dom[k] && this.dom[k].val(obj[k]);
+            }
+            $('#progress').css('width', 0);
+            var preview = $('#preview_image');
+            preview[0].dataset.url = obj.image;
+            preview.data('url', obj.image);
+        },
+        submit: function () {
+            var data = this.params();
+            if (data) {
+                $.ajax({
+                    url: '/admin/master/save',
+                    data: data,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function () {
+                        success_toaster('操作成功');
+                        $('#myModal').modal('hide');
+                        table.$('tr.selected').removeClass('selected');
+                        table.ajax.reload()
+                    },
+                    error: function () {
+                        error_toaster('失败', '操作失败');
+                    }
+                })
+            }
+        }
+    };
+    $(function () {
+        $('#create').click(function () {
+            update.submit();
+        })
+        $('#create_data').click(function () {
+            update.insertValue();
+            $('#myModal').modal('show');
+        })
+    });
+    $(document).on('click', '.edit', function () {
+        var parent = $(this).parents('tr');
+        if (! parent.hasClass('selected') ) {
+            table.$('tr.selected').removeClass('selected');
+            parent.addClass('selected');
+        }
+        var data = (table.rows('.selected').data()[0]);
+        var copy = _.cloneDeep(data);
+        copy.image = copy.image.split('.com/')[1];
+        copy.video = copy.video.split('.com/')[1];
+        var preview = $('#preview_image');
+        preview[0].dataset.url = data.image;
+        preview.data('url', data.image);
+        update.insertValue(copy);
+        $('#myModal').modal('show');
+    });
+    /* 删除 */
+    $(document).on('click', '.del', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定删除 " + name + " ?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: true,
+            html: false
+        }, function () {
+            $.post('/admin/master/delete', {id: id}, function (result) {
+                if (result.code === 200) {
+                    table.ajax.reload()
+                } else {
+                    swal("删除失败", result.message, "warning")
+                }
+            })
+        });
+    });
+    /* 上架 */
+    $(document).on('click', '.online', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定上架?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: true,
+            html: false
+        }, function () {
+            $.post('/admin/master/online', {id: id}, function (result) {
+                if (result.code === 200) {
+                    table.ajax.reload()
+                } else {
+                    swal("上架失败", result.message, "warning")
+                }
+            })
+        });
+    });
+    /* 下架 */
+    $(document).on('click', '.offline', function () {
+        var id = $(this).data('id');
+        swal({
+            title: "确定下架?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            animation: "slide-from-top",
+            closeOnConfirm: true,
+            html: false
+        }, function () {
+            $.post('/admin/master/offline', {id: id}, function (result) {
+                if (result.code === 200) {
+                    table.ajax.reload()
+                } else {
+                    swal("下架失败", result.message, "warning")
+                }
+            })
+        });
+    });
+
+
+    $(document).on('click','.sweet-overlay',function(){
+        $('.sweet-alert').hide();
+        $(this).hide()
+    });
+</script>
+<script>
+    /* 获取分院列表 */
+    var branch = {
+        init: function (id) {
+            this.branch = $('#' + id);
+            this.getDate();
+        },
+        getDate: function () {
+            $.get('/branch/list/all', function (result) {
+                branch.insertDom(result.result.list);
+            })
+        },
+        insertDom: function (data) {
+            var html = '';
+            $.each(data, function (i, v) {
+                html += '<option value="' + v.classroom_name + '">' + v.classroom_name + '</option>'
+            });
+            this.branch.html(html);
+        }
+    };
+    branch.init('branch');
+
+    /* 获取课程列表 */
+    var lesson = {
+        init: function (id) {
+            this.lesson = $('#' + id);
+            this.getDate();
+        },
+        getDate: function () {
+            $.get('/admin/good/list', function (result) {
+                lesson.insertDom(result.result);
+            })
+        },
+        insertDom: function (data) {
+            var html = '';
+            $.each(data, function (i, v) {
+                html += '<option value="' + v.goods_name + '">' + v.goods_name + '</option>'
+            });
+            this.lesson.html(html);
+        }
+    };
+    lesson.init('lesson');
+
+
+    /* 上传视频开始 */
+    function upload(file) {
+        var prefix = 'inputfile/' + moment().format('YYYY-MM-DD') + '/';
+        /* 上传视频 */
+        var uploader = new VODUpload({
+            // 文件上传失败
+            'onUploadFailed': function (fileName, code, message) {
+                uploading = false;
+                console.log("onUploadFailed: " + fileName + code + "," + message);
+            },
+            // 文件上传完成
+            'onUploadSucceed': function (fileName) {
+                $.post('/upload_video', {path: prefix + fileName}, function (result) {
+                    if (result.code == 200) {
+                        swal({
+                            title: "成功",
+                            text: "上传成功",
+                            type: 'success',
+                            showConfirmButton: true
+                        });
+                        uploading = false;
+                        $('#video').val(result.message.path);
+                    }
+                });
+            },
+            // 文件上传进度
+            'onUploadProgress': function (fileName, totalSize, uploadedSize) {
+                $("#progress").css("width", Math.ceil(uploadedSize * 100 / totalSize) + '%');
+            },
+            // token超时
+            'onUploadTokenExpired': function (callback) {
+                uploading = false;
+                console.log("onUploadTokenExpired");
+            }
+        });
+        uploader.init("LTAIaXMja3oR8aOV", "uadOQf55ZeZjQe98eyp98Wfu8rkO4P");
+        uploader.addFile(
+                file,
+                'http://oss-cn-beijing.aliyuncs.com',
+                'gejumedia',
+                prefix + $.trim(file.name)
+        );
+        uploader.startUpload();
+    }
+    $('#file').on('change', function () {
+        $("#progress").css("width", '0');
+    });
+    var uploading = false;
+    $('#upload').click(function () {
+        if (uploading) {
+            return false;
+        }
+        uploading = true;
+        var file = $('#upload_video')[0].files[0];
+        if (file) {
+            upload(file)
+        } else {
+            uploading = false;
+            error_toaster("文件为空", "请添加文件");
+        }
+    });
+    $(document).on('click', '.video', function () {
+        $("#modal").modal('show');
+        var source = $(this).data('path');
+        //播放器设置
+        var player = new prismplayer({
+            id: "J_prismPlayer", // 容器id
+            source: source,  // 视频url 支持互联网可直接访问的视频地址
+            autoplay: true,      // 自动播放
+            width: "100%",       // 播放器宽度
+            height: "400px"      // 播放器高度
+        });
+    });
+
+    /* 上传图片 开始 */
+    var preview = $('#preview_image');
+    newupload($('#upload_image')[0], '', function (err, result) {
+        if (err) {
+            sweetAlert("上传失败", err, "error");
+        } else {
+            preview[0].dataset.url = result.message.url;
+            preview.data('url', result.message.url);
+            $('#image').val(result.message.name);
+        }
+    });
+    $(document).on('click', '.preview,#preview_image', function () {
+        var url = $(this).data('url');
+        if (url) {
+            swal({
+                title: '预览',
+                text: '<img style="max-height: 300px;max-width: 100%;" src="' + url + '">',
+                html: true
+            });
+        }
+    });
+    /* 上传图片 结束 */
+
+    //初始化datatables
+    var table = $('#example').DataTable({
+        "ajax": {
+            "url": "/admin/master/list?type=1",
+            "dataSrc": 'result',
+        },
+        "columns": [
+            {"data": "id"},
+            {"data": "name"},
+            {"data": "lesson"},
+            {"data": "branch"},
+            {"data": "company"},
+            {"data": "vote"},
+            {"data": "describe"},
+            {"data": "createdAt"},
+            {"data": "updatedAt"}
+        ],
+        "aaSorting": [
+            [7, "desc"]
+        ],
+        "columnDefs": [
+            {
+                "targets": -1,
+                "render": function (data, type, row) {
+                    var html = '<span class="btn-group">';
+                    if (row.status == 0) {
+                        html += '<button class="online btn btn-sm btn-primary" type="button" data-id="' + row.id + '">上架</button>';
+                    } else {
+                        html += '<button class="offline btn btn-sm btn-default" type="button" data-id="' + row.id + '">下架</button>';
+                    }
+                    if (row.image) {
+                        html += '<button class="preview btn btn-success btn-sm" type="button" data-url="' + row.image + '">封面</button>';
+                    }
+                    if (row.video) {
+                        html += '<button class="video btn btn-info btn-sm" type="button" data-path="' + row.video + '">视频</button>';
+                    }
+                    html += '<button class="edit btn btn-sm btn-warning" type="button">编辑</button>' +
+                            '<button class="del btn btn-sm btn-danger" type="button" data-id="' + row.id + '">删除</button>' +
+                            '</span>';
+                    return html;
+                }
+            },
+            {
+                "targets": -2,
+                "render": function (data, type, row) {
+                    return moment(data).format('YYYY-MM-DD HH:mm:ss');
+                }
+            }
+        ],
+        "oLanguage": {
+            "sUrl": "/table_language.json"
+        },
+        initComplete: function () {//搜索下拉框
+            var api = this.api();
+            api.columns().indexes().flatten().each(function (i) {
+                var column = api.column(i);
+                var select = $('<select><option value=""></option></select>')
+                        .appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                            );
+                            column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                        });
+                column.data().unique().sort().each(function (d, j) {
+                    select.append('<option value="' + d + '">' + d + '</option>')
+                });
+            });
+        },
+        "dom": 'Bfrtip',
+        "buttons": [
+            'excel'
+        ],
+        "deferRender": true,
+        "fnDrawCallback": function () {
+        }
+    });
+</script>
+<!-- 视频model -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title">
+                    视频预览
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="prism-player" id="J_prismPlayer"></div>
+            </div>
+        </div>
+    </div>
+</div>

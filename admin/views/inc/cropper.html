@@ -1,0 +1,220 @@
+<script type="text/javascript" src="/javascripts/js/cropper.min.js"></script>
+<div class="modal fade" id="modal_croppe" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">图片处理</h4>
+      </div>
+      <div class="model-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="img-container">
+              <img src="" >
+            </div>
+          </div>
+          <div class="col-md-12 docs-buttons text-center">
+            <!-- <h3 class="page-header">Toolbar:</h3> -->
+            <div class="btn-group">
+              <label class="btn btn-primary btn-upload" for="inputImage" title="Upload image file">
+                <input class="sr-only" id="inputImage" name="file" type="file" accept="image/*">
+                <span class="docs-tooltip" data-toggle="tooltip" title="Import image with Blob URLs">
+                  <span class="icon icon-upload"></span>
+                </span>
+              </label>
+              <button class="btn btn-primary" data-method="getCroppedCanvas" type="button">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;getCroppedCanvas&quot;)">
+                 <span class="icon icon-crop"></span>
+                </span>
+              </button>
+              <button class="btn btn-primary" data-method="zoom" data-option="0.1" type="button" title="Zoom In">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;zoom&quot;, 0.1)">
+                  <span class="icon icon-zoom-in"></span>
+                </span>
+              </button>
+              <button class="btn btn-primary" data-method="zoom" data-option="-0.1" type="button" title="Zoom Out">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;zoom&quot;, -0.1)">
+                  <span class="icon icon-zoom-out"></span>
+                </span>
+              </button>
+              <button class="btn btn-primary" data-method="rotate" data-option="-45" type="button" title="Rotate Left">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;rotate&quot;, -45)">
+                  <span class="icon icon-rotate-left"></span>
+                </span>
+              </button>
+              <button class="btn btn-primary" data-method="rotate" data-option="45" type="button" title="Rotate Right">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;rotate&quot;, 45)">
+                  <span class="icon icon-rotate-right"></span>
+                </span>
+              </button>
+            </div>
+
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-primary active" data-method="setAspectRatio" data-option="1.7777777777777777" title="Set Aspect Ratio">
+                <input class="sr-only" id="aspestRatio1" name="aspestRatio" value="1.7777777777777777" type="radio">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, 16 / 9)">
+                  16:9
+                </span>
+              </label>
+              <label class="btn btn-primary" data-method="setAspectRatio" data-option="1.3333333333333333" title="Set Aspect Ratio">
+                <input class="sr-only" id="aspestRatio2" name="aspestRatio" value="1.3333333333333333" type="radio">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, 4 / 3)">
+                  4:3
+                </span>
+              </label>
+              <!--<label class="btn btn-primary" data-method="setAspectRatio" data-option="1" title="Set Aspect Ratio">-->
+                <!--<input class="sr-only" id="aspestRatio3" name="aspestRatio" value="1" type="radio">-->
+                <!--<span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, 1 / 1)">-->
+                  <!--1:1-->
+                <!--</span>-->
+              <!--</label>-->
+              <!--<label class="btn btn-primary" data-method="setAspectRatio" data-option="0.6666666666666666" title="Set Aspect Ratio">-->
+                <!--<input class="sr-only" id="aspestRatio4" name="aspestRatio" value="0.6666666666666666" type="radio">-->
+                <!--<span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, 2 / 3)">-->
+                  <!--2:3-->
+                <!--</span>-->
+              <!--</label>-->
+              <label class="btn btn-primary" data-method="setAspectRatio" data-option="NaN" title="Set Aspect Ratio">
+                <input class="sr-only" id="aspestRatio5" name="aspestRatio" value="NaN" type="radio">
+                <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, NaN)">
+                  Free
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function () {
+  $('.cropper-gml').on('click',function(){
+    $('#modal_croppe').modal('show');
+    var $image = $('.img-container > img'),
+        $dataX = $('#dataX'),
+        $dataY = $('#dataY'),
+        $dataHeight = $('#dataHeight'),
+        $dataWidth = $('#dataWidth'),
+        $dataRotate = $('#dataRotate'),
+        options = {
+          aspectRatio: 16 / 9,
+          preview: '.img-preview',
+          crop: function (data) {
+            $dataX.val(Math.round(data.x));
+            $dataY.val(Math.round(data.y));
+            $dataHeight.val(Math.round(data.height));
+            $dataWidth.val(Math.round(data.width));
+            $dataRotate.val(Math.round(data.rotate));
+          }
+        };
+
+    $image.on({
+      'build.cropper': function (e) {
+        console.log(e.type);
+      },
+      'built.cropper': function (e) {
+        console.log(e.type);
+      },
+      'dragstart.cropper': function (e) {
+        console.log(e.type, e.dragType);
+      },
+      'dragmove.cropper': function (e) {
+        console.log(e.type, e.dragType);
+      },
+      'dragend.cropper': function (e) {
+        console.log(e.type, e.dragType);
+      },
+      'zoomin.cropper': function (e) {
+        console.log(e.type);
+      },
+      'zoomout.cropper': function (e) {
+        console.log(e.type);
+      }
+    }).cropper(options);
+    // Methods
+    $(document).off('click').on('click', '[data-method]', function () {
+      var data = $(this).data(),
+          $target,
+          result;
+
+      if (data.method) {
+        data = $.extend({}, data); // Clone a new one
+
+        if (typeof data.target !== 'undefined') {
+          $target = $(data.target);
+
+          if (typeof data.option === 'undefined') {
+            try {
+              data.option = JSON.parse($target.val());
+            } catch (e) {
+              console.log(e.message);
+            }
+          }
+        }
+
+        result = $image.cropper(data.method, data.option);
+        if (data.method === 'getCroppedCanvas') {
+          if(result){
+            var url=$(result)[0].toDataURL();
+            url=url.substr(22);
+            $.post("/upload_base64_img",{base64:url},function(result){
+              if(result.code==200){
+                console.log(result.message.name)
+                $('input[name="m_pics"]').val(result.message.name);
+                $("#m_pics_img").attr("src",result.message.url);
+                $('#modal_croppe').modal('hide');
+              }else{
+                $('#modal_croppe').modal('hide');
+                effect.error()
+              }
+            })
+          }else{
+            $('#modal_croppe').hide();
+            effect.error('请选择图片')
+          }
+
+        }
+
+        if ($.isPlainObject(result) && $target) {
+          try {
+            $target.val(JSON.stringify(result));
+          } catch (e) {
+            console.log(e.message);
+          }
+        }
+
+      }
+    })
+    // Import image
+    var $inputImage = $('#inputImage'),
+        URL = window.URL || window.webkitURL,
+        blobURL;
+
+    if (URL) {
+      $inputImage.change(function () {
+        var files = this.files,
+            file;
+
+        if (files && files.length) {
+          file = files[0];
+
+          if (/^image\/\w+$/.test(file.type)) {
+            blobURL = URL.createObjectURL(file);
+            $image.one('built.cropper', function () {
+              URL.revokeObjectURL(blobURL); // Revoke when load complete
+            }).cropper('reset', true).cropper('replace', blobURL);
+            $inputImage.val('');
+          } else {
+            showMessage('Please choose an image file.');
+          }
+        }
+      });
+    } else {
+      $inputImage.parent().remove();
+    }
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+});
+</script>

@@ -1,0 +1,226 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            <li><small style="color: red"></small></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-hover table-striped table-condensed" id="initTable">
+        <form id='lecturer_form' class="form-horizontal" method="post">
+          <thead>
+          <tr>
+            <!--<input type="text" class="form-control input-sm" name="lecturer_key"  placeholder="选择讲师" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>-->
+
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="hidden" name="lecturer_key">
+                <input type="text" name="lecturer_name" placeholder="讲师" class="form-control input-sm"  readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                <span class="input-group-btn">
+                  <span class="btn btn-danger fileinput-button btn-sm addTea">
+                      <span>选择</span>
+                  </span>
+                </span>
+              </div>
+            </td>
+            <td style="width: 180px">
+              <input type="text" class="form-control input-sm" name="lecturer_sort"  placeholder="排序" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </td>
+            <td class="text-center" style="width: 180px">
+              <span class="btn-group"><button class="btn btn-success btn-sm" type="submit">保存</button></span>
+            </td>
+          </tr>
+          </thead>
+        </form>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- 讲师模块 -->
+<div class="modal fade" id="modal_tea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择讲师
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <input type="text" name="m_name" class="form-control input-sm" placeholder="讲师姓名" />
+              <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="tea_find">查询</span>
+              </span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed tea">
+          <thead>
+          <tr>
+            <th style="width:80px">头像</th>
+            <th style="width:80px">讲师姓名</th>
+            <th style="width:180px">讲师简介</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="page"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //验证提交
+    $('#lecturer_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#lecturer_form').serializeArray();
+      $.post("/admin/lecturerWall_create",data,function(result){
+        if(result.code==200){
+          effect.success(result.message.message,function(){
+            location.reload()
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    //默认加载
+    writeList({});
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/lecturerWall_list',data,function(result){
+        console.log(result)
+        if(result.code==200){
+          $("#initTable tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#initTable tbody");
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //删除
+    $(document).on('click','.lecturerDel',function(){
+      var data=$(this).data();
+      $.post('/admin/lecturerWall_update',{id:data.id},function(result){
+        if(result.code==200){
+          effect.success(function(){
+            writeList({});
+          });
+        }else{
+          effect.error();
+        }
+      })
+    })
+
+
+    //添加讲师
+    $('.addTea').on('click',function(e) {
+      $("#modal_tea").modal('show');
+      lecturerList({type:1})
+    });
+    $('#tea_find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      data.push({name:'type',value:1});
+      options.currentPage=1;
+      lecturerList(data);
+    })
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.select_form').serializeArray();
+        data.push({name:'type',value:1});
+        data.push({name:'page',value:page});
+        lecturerList(data)
+      }
+    };
+    //写列表ajax
+    function lecturerList(data){
+      effect.show();
+      $.get('/admin/students_ajax',data,function(result){
+        if(result.code==200){
+          $(".tea tbody").empty('');
+          $("#inittmpl2")
+                  .tmpl(result.message.list)
+                  .appendTo(".tea tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //添加讲师
+    $(document).on('click', '.addTea_child', function(event) {
+      var data=$(this).data()
+      $('input[name="lecturer_name"]').val(data.name)
+      $('input[name="lecturer_key"]').val(data.id)
+      $("#modal_tea").modal('hide');
+    });
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<tr>
+  <td>${m_name}</td>
+  <td>${lecturer_sort}</td>
+  <td class="text-center">
+  <span class="btn-group">
+    <button class="btn btn-success btn-xs lecturerDel" data-id='${lecturer_id}'>删除</button>
+  </span>
+  </td>
+</tr>
+</script>
+<script id="inittmpl2" type="text/x-jquery-tmpl">
+  <tr>
+    <td><img class="img-circle" {{if m_pics}}src="<%=aly%>/${m_pics}"{{/if}} width="45" height="45" ></td>
+    <td>${m_name}</td>
+    <td>${m_desc}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs addTea_child" data-name='${m_name}' data-id="${mid}"> 添加</a>
+    </div>
+    </td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>

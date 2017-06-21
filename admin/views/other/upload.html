@@ -1,0 +1,68 @@
+<% include ../inc/head.html%>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script src="/javascripts/js/month.js"></script>
+<script src="/javascripts/js/clipboard.min.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div>
+                <div class="pull-left">
+                    <ul class="list-inline">
+                        <li>
+                            <input id="files" type="file" style="display:none" accept="*">
+                            <div class="input-append">
+                                <a class="btn btn-danger btn-sm" onclick="$('input[id=files]').click();">上传文件</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="progress" style="width: 100%;margin:0 auto";>
+                <div class="progress-bar" style="width: 0%;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function(){
+        var m=moment().format('YYYY-MM-DD')
+        var uploader = new VODUpload({
+            // 文件上传失败
+            'onUploadFailed': function (fileName, code, message) {
+                console.log("onUploadFailed: " + fileName + code + "," + message);
+            },
+            // 文件上传完成
+            'onUploadSucceed': function (fileName) {
+                console.log("onUploadSucceed: " + fileName);
+            },
+            // 文件上传进度
+            'onUploadProgress': function (fileName, totalSize, uploadedSize) {
+                $(".progress-bar").html(Math.ceil(uploadedSize * 100 / totalSize) + '%').css("width",Math.ceil(uploadedSize * 100 / totalSize) + '%');
+                console.log("file:" + fileName + ", " + totalSize, uploadedSize, "percent:", Math.ceil(uploadedSize * 100 / totalSize));
+            },
+            // token超时
+            'onUploadTokenExpired': function (callback) {
+                console.log("onUploadTokenExpired");
+            }
+        });
+
+        uploader.init("LTAIaXMja3oR8aOV", "uadOQf55ZeZjQe98eyp98Wfu8rkO4P");
+        document.getElementById("files")
+                .addEventListener('change', function (event) {
+                    for(var i=0; i<event.target.files.length; i++) {
+                        uploader.addFile(event.target.files[i], 'http://oss-cn-beijing.aliyuncs.com', 'gejubusinessbucket', 'external/'+m+'/'+event.target.files[i].name);
+                    }
+
+                    uploader.startUpload();
+                });
+
+    })
+</script>
+<% include ../inc/footer.html%>
+

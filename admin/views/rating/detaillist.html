@@ -1,0 +1,174 @@
+<% include ../inc/head.html%>
+<script src="/javascripts/js/clipboard.min.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                                <li><a id="excel_export" href="javascript:void 0;"><span class="glyphicon glyphicon-download"></span> 导出Excel </a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="row">
+                                
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input id="rating_start" name="start_time" type="text" class="input_date form-control" placeholder="开始时间">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input id="rating_end" name="end_time" type="text" class="input_date form-control" placeholder="结束时间">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <button class="search_button btn btn-default" type="button">查询</button>
+                                  
+                                </div>
+                            </div><!-- /.row -->
+                            <hr class="ke-hr">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table">
+                                        <thead>
+                                        <tr id="ratingitem">
+
+                                        </tr>
+                                        </thead>
+                                        <tbody id="tbodycontent">
+
+                                        </tbody>
+                                    </table>
+                                    <div id="page"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="inittmpl" type="text/x-jquery-tmpl">
+ 
+
+</script>
+
+<% include ../inc/footer.html%>
+<script>
+
+    //开始时间
+    $(".input_date").datetimepicker({
+        step: 30,
+        lang: 'ch'
+    })
+
+    var id = location.hash.substring(5);
+    
+    /* 过滤对象 */
+    var filter_data = {
+        start_time: '',//开始时间
+        end_time: '', //结束时间
+        id:id
+    };
+    var filter_button = {
+        $buttons: null,
+        init:function ($buttons) {
+            this.$buttons = $buttons;
+            this.Event();
+        },
+        Event: function () {
+            var rating_start = $('#rating_start');
+            var rating_end = $('#rating_end');
+            this.$buttons.on('click',function (e) {
+                options.currentPage = 1;
+                filter_data.start_time = rating_start.val();
+                filter_data.end_time = rating_end.val();
+                writeList({ filter: filter_data });
+            })
+        }
+    };
+    filter_button.init($('.search_button'));
+
+</script>
+<script>
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            writeList({
+                page: page,
+                filter: filter_data
+            })
+        }
+    };
+
+   //默认加载
+    writeList({ filter: filter_data });
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        $.get('/admin/rating/finddetail', data, function (result) {
+            if (result.code == 200) {
+                var list = result.result.list;
+                var listname = result.result.listname;
+                var count = 0;
+                $("#ratingitem").html('');
+                 $("#inittmpl").html('');
+                 $.each(listname, function (i, v) {
+                    {
+                        $("#ratingitem").append("<th>"+v+"</th>");
+                    }
+                 })
+                 $("#ratingitem").append("<th>时间</th>");
+
+                $.each(list, function (i, v) {
+                    v.createdAt = moment(v.createdAt).format('YYYY年MM月DD日 HH:mm:ss')
+                    var html ='<tr>'
+                   
+                    for(var key in v)
+                    {
+                         html += '<td>'+v[key]+'</td>';
+                    }
+                    html += '</tr>'
+                    $("#inittmpl").append(html);
+                });
+                 $("table tbody").html($("#inittmpl").html());
+                options.totalPages = Math.ceil(count / 12);
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    }
+
+     /* 导出EXCEL */
+    $('#excel_export').on('click',function () {
+        window.open('/enroll/branch/info/excelrating?' + $.param({filter: filter_data}))
+    })
+</script>

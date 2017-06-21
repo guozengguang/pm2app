@@ -1,0 +1,365 @@
+<% include ../inc/head.html%>
+<style>
+    .panel-body .row {
+        min-height: 50px;
+        line-height: 50px;
+        border-bottom: 1px solid gray;
+    }
+</style>
+<div ng-controller="HotelActivityController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        申请分院
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.branch == 0 ? '总部' :data.Classroom.name }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动名称
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.title }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动所在城市
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.province + ' ' + data.city }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动地点
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.address }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        地理位置
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        <div id="map_container" style="width: 300px; height: 300px"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动时间
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.start_time | date:'y-M-d' }} 至 {{ data.end_time | date:'y-M-d' }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动报名时间
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.enroll_start_time | date:'y-M-d' }} 至 {{ data.enroll_end_time |
+                                        date:'y-M-d' }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动人数上限
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.human_upper }}
+                                    </div>
+                                </div>
+                                <div ng-if="data.enough_human" class="row">
+                                    <div style="text-indent: 20%" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        活动人数达到{{ data.enough_human }}人，人均参考费用:{{ data.enough_price }}元
+                                    </div>
+                                </div>
+                                <div ng-if="data.not_enough_human" class="row">
+                                    <div style="text-indent: 20%" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        活动人数不足{{ data.not_enough_human }}人，人均参考费用:{{ data.not_enough_price }}元
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动人数下限
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.human_lower }}人
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动参与人群
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.partake_type | partake_type }} {{ data.lessons }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动参与分院
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.branches }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动负责人
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.manager }}，联系电话:{{ data.manager_phone }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动宣传图片
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        <img style="width: 200px; height: 200px;"
+                                             ng-src="{{'//files.geju.com/' + data.cover_picture}}" alt="">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动介绍内容
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        {{ data.describe }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        活动介绍图片
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        <a ng-repeat="pic in data.picture" href="javascript: void 0;">
+                                            <img ng-src="{{pic}}" alt="">
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="row" ng-if="!data.is_stay">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        申请酒店房间合计
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>酒店名称</th>
+                                                <th>类型/数量</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="selected in applies">
+                                                <td> {{ selected.name }}</td>
+                                                <td>
+                                                    <p ng-repeat="room in selected.Rooms">
+                                                        {{ room.name }} / {{ room.applied }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <%if (branch==0){%>
+                        <div ng-if="data.state==0 " class="panel-footer">
+                            <button ng-click="resolve()" class="btn btn-success">通过</button>
+                            <button ng-click="reject()" class="btn btn-danger">拒绝</button>
+                        </div>
+                        <%}%>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .filter('partake_type', function () {
+                return function (data) {
+                    var html = '';
+                    switch (+data) {
+                        case 0:
+                            html = '不限';
+                            break;
+                        case 1:
+                            html = '学员';
+                            break;
+                        case 2:
+                            html = '非学员';
+                            break;
+                        case 3:
+                            html = '课程班:';
+                            break;
+                    }
+                    return html;
+                }
+            })
+            .service('HotelActivityService', function ($http, staticService) {
+                this.branch = function (id) {
+                    return $http({
+                        url: '/admin/hotel/in/branch',
+                        method: 'GET',
+                        params: {
+                            id: id
+                        }
+                    })
+                };
+                this.lesson = function (id) {
+                    return $http({
+                        url: '/admin/hotel/in/lesson',
+                        method: 'GET',
+                        params: {
+                            id: id
+                        }
+                    })
+                };
+                this.update = function (state, cause) {
+                    return $http({
+                        url: '/admin/hotel/activity/state',
+                        method: 'POST',
+                        data: {
+                            id: staticService.query.id,
+                            state: state,
+                            cause: cause
+                        }
+                    })
+                };
+                this.detail = function (id) {
+                    return $http({
+                        url: '/admin/hotel/activity/detail',
+                        method: 'GET',
+                        params: {
+                            id: staticService.query.id
+                        }
+                    })
+                };
+                this.applies = function () {
+                    return $http({
+                        url: '/admin/hotel/activity/applies',
+                        method: 'GET',
+                        params: {
+                            id: staticService.query.id
+                        }
+                    })
+                }
+            })
+            .controller('HotelActivityController', function ($scope, $compile, HotelActivityService) {
+                HotelActivityService.applies().success(function (result) {
+                    $scope.applies = result.result;
+                });
+                HotelActivityService.detail().success(function (result) {
+                    var data = result.result;
+                    data.cover_picture = data.cover_picture.split('.com/')[1];
+                    data.start_time = moment(data.start_time).format('YYYY-MM-DD');
+                    data.end_time = moment(data.end_time).format('YYYY-MM-DD');
+                    data.enroll_start_time = moment(data.enroll_start_time).format('YYYY-MM-DD');
+                    data.enroll_end_time = moment(data.enroll_end_time).format('YYYY-MM-DD');
+                    data.is_stay = data.is_stay ? '1' : '0';
+                    data.partake_type = data.partake_type.toString();
+                    $scope.data = data;
+                    HotelActivityService.branch(data.branches).success(function (result) {
+                        var arr = [];
+                        angular.forEach(result.result, function (v, i) {
+                            arr.push(v.classroom_name)
+                        });
+                        data.branches = arr.join(' ');
+                    });
+                    if(data.lessons[0]){
+                        HotelActivityService.lesson(data.lessons).success(function (result) {
+                            var arr = [];
+                            angular.forEach(result.result, function (v, i) {
+                                arr.push(v.goods_name)
+                            });
+                            data.lessons = arr.join(' ');
+                        });
+                    }else {
+                        data.lessons = ''
+                    }
+                    var center = new qq.maps.LatLng(data.latitude, data.longitude);
+                    var map = new qq.maps.Map(document.getElementById('map_container'),{
+                        center: center,
+                        disableDefaultUI: true,
+                        zoom: 13
+                    });
+                    var marker = new qq.maps.Marker({
+                        position: center,
+                        map: map
+                    });
+                    console.info(data)
+                });
+                $scope.resolve = function () {
+                    HotelActivityService.update(1).success(function (result) {
+                        $scope.data.state = 1;
+                        swal("成功!", "", "success");
+                        location.replace('/hotel/activity/manage');
+                    });
+                };
+                $scope.reject = function () {
+                    swal({
+                        title: "拒绝!",
+                        text: "请输入拒绝原因",
+                        type: "input",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        animation: "slide-from-top",
+                        inputPlaceholder: "请输入拒绝原因"
+                    },function (inputValue) {
+                        if (!/\S/.test(inputValue)){
+                            return false;
+                        }
+                        HotelActivityService.update(-1, inputValue).success(function (result) {
+                            swal("拒绝成功!", "", "success");
+                            $scope.data.state = -1;
+                            location.replace('/hotel/activity/manage');
+                        });
+                    });
+
+                };
+
+            });
+</script>
+<script>
+    /* 这里开始是 时间选择器 */
+    //开始时间
+    function dataPicker($dom) {
+        $dom.datetimepicker({
+            format: 'Y-m-d',
+            timepicker: false
+        });
+    }
+    dataPicker($('#start_time'));
+    dataPicker($('#end_time'));
+    dataPicker($('#enroll_start_time'));
+    dataPicker($('#enroll_end_time'));
+</script>

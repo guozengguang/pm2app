@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html style="font-size: 50px;" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<meta name="viewport"-->
+    <!--content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>-->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <title>课程购买</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        *, *:before, *:after {
+            /*-webkit-tap-highlight-color: rgba(0, 0, 0, 0);*/
+        }
+
+        /*html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {*/
+        * {
+            border: 0 none;
+            font-size: inherit;
+            color: inherit;
+            margin: 0;
+            padding: 0;
+            vertical-align: baseline;
+
+            /* 在X5新内核Blink中，在排版页面的时候，会主动对字体进行放大，会检测页面中的主字体，当某一块字体在我们的判定规则中，认为字号较小，并且是页面中的主要字体，就会采取主动放大的操作。然而这不是我们想要的，可以采取给最大高度解决 */
+            max-height: 100000px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: normal;
+        }
+
+        em, strong {
+            font-style: normal;
+        }
+
+        ul, ol, li {
+            list-style: none;
+        }
+
+        body {
+            line-height: 1.5;
+            color: #212121;
+            background-color: #f2f2f2;
+            font-weight: 100;
+            height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .margin_line_top {
+            border-top: 0.15rem solid #F5F5F5;
+        }
+
+        .margin_line_bottom {
+            border-bottom: 0.15rem solid #F5F5F5;
+        }
+
+        .main {
+            max-width: 10rem;
+            background: white;
+            min-height: 100vh;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .fp {
+            display: -webkit-box; /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */ /* 老版本语法: Firefox (buggy) */
+            display: -ms-flexbox; /* 混合版本语法: IE 10 */ /* 新版本语法: Chrome 21+ */
+            display: flex; /* 新版本语法: Opera 12.1, Firefox 22+ */
+            display: -ms-box;
+        }
+
+        /*flex 1*/
+        .fi1 {
+            /*自由伸缩的item,自动撑满*/
+            -webkit-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+
+        .fi3 {
+            /*自由伸缩的item,自动撑满*/
+            -webkit-box-flex: 3;
+            -ms-flex: 3;
+            flex: 3;
+        }
+
+        /*flex column*/
+        .fc {
+            /*flex旧版垂直居中*/
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-box-orient: vertical;
+
+            -ms-flex-direction: column;
+
+            flex-direction: column;
+        }
+
+        /*flex column center*/
+        .fcc {
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+
+        /*flex row*/
+        .fr {
+            -webkit-box-orient: horizontal;
+            -ms-box-orient: horizontal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+        }
+
+        /*flex row center*/
+        .frc {
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+        }
+
+        /*flex align-self flex-start*/
+        .fiass {
+            -ms-flex-item-align: start;
+            align-self: flex-start;
+        }
+
+        /*flex align-self center*/
+        .fiasc {
+            -ms-flex-item-align: center;
+            -ms-grid-row-align: center;
+            align-self: center;
+        }
+
+        /*flex justify-content*/
+        .fjc {
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        /*最多3行*/
+        .content_3 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+        }
+
+        /*最多4行*/
+        .content_4 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            overflow: hidden;
+        }
+
+        /*下箭头*/
+        .arrow_down {
+            -webkit-transform: rotate(90deg);
+            transform: rotate(90deg);
+        }
+
+        /*上箭头*/
+        .arrow_up {
+            -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+        }
+
+        .d-cover {
+            position: fixed;
+            width: 100%;
+            height: 1.1rem;
+            left: 0;
+            bottom: 0;
+            background: #fff;
+            z-index: 1001;
+            border-top: 1px solid #f5f5f5;
+            opacity: 0.8;
+        }
+
+        .title {
+            font-size: 0.35rem;
+            -ms-flex-item-align: start;
+            align-self: flex-start;
+            background: #f7f7f9;
+            color: #878787;
+            line-height: 1rem;
+            padding-left: 0.3rem;
+            width: 100%;
+        }
+
+        p {
+            font-size: 0.38rem;
+            color: #585858;
+            font-weight: 300;
+        }
+
+        .box_head {
+            width: calc(100% - 1rem);
+            margin-top: 0.8rem;
+        }
+
+        .box_head div {
+            -webkit-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            -ms-flex-item-align: end;
+            align-self: flex-end;
+            border-top: 0.1rem solid #66cc5c;
+            height: 0.45rem;
+        }
+
+        .box_head div:first-child {
+            margin-right: 0.1rem;
+            border-left: 1px solid #66cc5c;
+        }
+
+        .box_head div:last-child {
+            margin-left: 0.1rem;
+            border-right: 1px solid #66cc5c;
+        }
+
+        .box_head img {
+            width: 0.9rem;
+            height: 0.9rem;
+        }
+
+        .box_main {
+            width: calc(100% - 1rem);
+            border: 1px solid #66cc5c;
+            padding: 0.5rem 0 0.8rem;
+            border-top: none;
+            margin-bottom: 1rem;
+        }
+
+        .box_main p {
+            font-weight: 400;
+            margin-bottom: 0.2rem;
+        }
+
+        .box_main span {
+            color: #adadad;
+            font-weight: 300;
+            font-size: 0.34rem;
+        }
+
+        .message {
+            color: #adadad;
+            font-weight: 300;
+        }
+
+        button {
+            width: calc(100% - 1rem);
+            margin: 0.6rem 0.2rem 0;
+            font-size: 0.3rem;
+            line-height: 0.8rem;
+            color: white;
+            border-radius: 0.1rem;
+        }
+    </style>
+
+</head>
+<body>
+<div class="main fp fcc">
+    <p class="title">格局商学</p>
+    <div class="box_head fp fr">
+        <div></div>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHwAAAB8CAYAAACrHtS+AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjRBOTg3RTZCMzlFOTExRTdBRUVERUZDQzcyQjMyRDhGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjRBOTg3RTZDMzlFOTExRTdBRUVERUZDQzcyQjMyRDhGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NEE5ODdFNjkzOUU5MTFFN0FFRURFRkNDNzJCMzJEOEYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NEE5ODdFNkEzOUU5MTFFN0FFRURFRkNDNzJCMzJEOEYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4+aHEEAAAMaUlEQVR42uxd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"/>
+        <div></div>
+    </div>
+    <div class="box_main fp fcc">
+        <div class="fp fc ">
+
+        </div>
+    </div>
+    <p class="message">您已成为格局商学</p>
+    <p class="message myGoods"></p>
+    <button style="background: #66cc5c" class="accomplish">返回</button>
+</div>
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//res.wx.qq.com/open/js/jweixin-1.2.0.js' charset='utf-8'></script>
+<script type='text/javascript' src='./pay.js' charset='utf-8'></script>
+<script>
+
+    !function (e) {
+        function t(a) {
+            if (i[a])return i[a].exports;
+            var n = i[a] = {exports: {}, id: a, loaded: !1};
+            return e[a].call(n.exports, n, n.exports, t), n.loaded = !0, n.exports
+        }
+
+        var i = {};
+        return t.m = e, t.c = i, t.p = "", t(0)
+    }([function (e, t) {
+        "use strict";
+        Object.defineProperty(t, "__esModule", {value: !0});
+        var i = window;
+        t["default"] = i.flex = function (e, t) {
+            var a = e || 100,
+                    n = t || 1,
+                    r = i.document,
+                    o = navigator.userAgent,
+                    d = o.match(/Android[\S\s]+AppleWebkit\/(\d{3})/i),
+                    l = o.match(/U3\/((\d+|\.){5,})/i),
+                    c = l && parseInt(l[1].split(".").join(""), 10) >= 80,
+                    p = navigator.appVersion.match(/(iphone|ipad|ipod)/gi),
+                    s = i.devicePixelRatio || 1;
+
+            p || d && d[1] > 534 || c || (s = 1);
+            var u = 1 / s, m = r.querySelector('meta[name="viewport"]');
+            m || (m = r.createElement("meta"), m.setAttribute("name", "viewport"), r.head.appendChild(m)), m.setAttribute("content", "width=device-width,user-scalable=no,initial-scale=" + u + ",maximum-scale=" + u + ",minimum-scale=" + u), r.documentElement.style.fontSize = a / 2 * s * n + "px"
+        }, e.exports = t["default"]
+    }]);
+    flex(100, 1)
+    var out_trade_no=getQueryString('out_trade_no')
+    //不存在单号或者返回错误直接去支付页面
+    $.get(BASEURL+'/pay/query',{out_trade_no:out_trade_no},function (result) {
+        if(result.code==200){//布置页面
+            var info=result.result.datail
+            var html='<p>购买成功 <span>['+info.time+']</span></p><p>消费金额：'+info.fee+'元</p>';
+            $(html).appendTo('.fp .fc')
+            $('<span>'+info.name+'学员</span>').appendTo('.myGoods')
+            //绑定不同页面的不同关闭逻辑
+            if(navigator.userAgent.toLowerCase().match(/MicroMessenger/i)=="micromessenger"){
+                $.get(BASEURL+'/pay/config',{url:encodeURI(window.location.href)},function (result) {
+                    if(result.code==200){
+                        wx.config({
+                            debug: result.result.debug, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                            appId: result.result.appId, // 必填，公众号的唯一标识
+                            timestamp: result.result.timestamp, // 必填，生成签名的时间戳
+                            nonceStr: result.result.nonceStr, // 必填，生成签名的随机串
+                            signature: result.result.signature,// 必填，签名，见附录1
+                            jsApiList: result.result.jsApiList // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+                        });
+                        wx.ready(function(){
+                            $('.accomplish').on('click',function () {
+                                wx.closeWindow();
+                                wx.hideAllNonBaseMenuItem();
+                            })
+                        });
+                        wx.error(function(res){
+                            console.log('微信错误')
+                        });
+                    }else {
+                        console.log('初始化失败')
+                    }
+                })
+            }else if(navigator.userAgent.toLowerCase().match(/AliPayClient/i)=="alipayclient"){
+                $('.accomplish').on('click',function () {
+                    AlipayJSBridge.call('closeWebview');
+                })
+            }else {
+                $('.accomplish').on('click',function () {
+                    window.history.back()
+                })
+            }
+        }else {
+            window.location.href=ROUTERURL
+        }
+    })
+</script>
+</body>
+</html>

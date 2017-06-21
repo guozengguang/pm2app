@@ -1,0 +1,81 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+              <li id="selectAll"><a href="javascript:void(0)"><span class="glyphicon glyphicon-check"></span>全选</a></li>
+              <li id="unSelect"><a href="javascript:void(0)"><span class="glyphicon glyphicon-unchecked"></span>全消</a></li>
+              <!--<li id="reverse"><a href="javascript:void(0)"><span class="glyphicon glyphicon-retweet"></span>反选</a></li>-->
+              <li id="save"><a href="javascript:void(0)"><span class="glyphicon glyphicon-save"></span>保存</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>设置开课区域</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <%classroom.forEach(function(node){%>
+              <div class="col-md-3">
+                <label class="checkbox-inline">
+                  <input type="checkbox" value="<%=node.classroom_name%>" <%item.forEach(function(n){if(n==node.classroom_name){%>
+                  checked="checked"
+                  <%}})%>> <%=node.classroom_name%>
+                </label>
+              </div>
+              <%})%>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function () {
+    $("#save").click(function (item) {
+      var goods_branch=allKey()
+      console.log(goods_branch)
+      if(goods_branch){
+        var goodsid=location.search.substr(9)
+        $.post("/admin/class_update",{goodsid:goodsid,goods_branch:goods_branch},function(result){
+          if(result.code==200){
+            effect.success(function(){
+              location.href='/admin/goods'
+            })
+          }else{
+            effect.error(result.message)
+          }
+        })
+      }else {
+        alert('至少选择一家')
+      }
+    })
+    //全选
+    $("#selectAll").click(function () {
+      $(":checkbox").attr("checked", true).prop("checked", true);
+    });
+    //全不选
+    $("#unSelect").click(function () {
+      $(":checkbox").attr("checked", false).prop("checked", false);
+    });
+    //设置全选复选框
+    $(":checkbox").click(function(){
+      $(this).attr("checked", $(this).prop("checked")).prop("checked", $(this).prop("checked"));
+    });
+    //获取选中选项的值
+    function allKey(){
+      var valArr = new Array;
+      $(":checkbox[checked]").each(function(i){
+        valArr[i] = $(this).val();
+      });
+      var vals = valArr.join(',');
+      return vals
+    };
+  });
+</script>
+<% include ../inc/footer.html%>

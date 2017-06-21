@@ -1,0 +1,544 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="/admin/branch_transfer_add"><span class="glyphicon glyphicon-plus"></span>新建</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <div class="form-group">
+              <input type="text" name="sTime" placeholder="开始时间" class="form-control input-md input_date">
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" name="eTime" placeholder="结束时间" class="form-control input-md input_date">
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-danger btn-sm search">
+                    <span class="glyphicon glyphicon-search"></span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div style="width:100%; overflow-x: scroll">
+        <table class="table table-condensed table-responsive lgtable" style="table-layout:fixed">
+          <thead>
+          <tr>
+            <th style="width: 40px">#</th>
+            <th style="width: 300px">操作</th>
+            <th style="width:120px">分院</th>
+            <th style="width:120px">付款单位</th>
+            <th style="width:180px">付款日期</th>
+            <th style="width:120px">转账银行</th>
+            <th style="width:180px">转账账号</th>
+            <th style="width:100px">付款金额</th>
+            <th style="width:100px">剩余金额</th>
+            <th style="width:300px">付款凭证</th>
+            <th style="width:100px">付款说明</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div id="page"></div>
+      <div>
+        <a class="btn btn-danger btn-xs trueMerge">合单</a>
+        <table class="table table-striped table-condensed table-responsive smtable" style="table-layout:fixed">
+          <thead>
+          <tr>
+            <th style="width: 100px">操作</th>
+            <th style="width:120px">分院</th>
+            <th style="width:100px">交易金额</th>
+            <th style="width:100px">剩余金额</th>
+            <th style="width:120px">转账银行</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //时间
+    $(".input_date").datetimepicker({
+      lang:'ch',
+      timepicker:false,
+      format:'Y-m-d',
+    });
+    var financialId=null;
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.search-form').serializeArray();
+        data.push({name:'form',value:1})
+        data.push({name:'page',value:page})
+        writeList(data)
+      }
+    };
+    //默认加载
+    writeList({form:1});
+    $('.search').on('click',function(){
+      var data=$('.search-form').serializeArray();
+      data.push({name:'form',value:1})
+      options.currentPage=1;
+      writeList(data);
+    });
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/financial_branch_list',data,function(result){
+        console.log(result.message.list)
+        if(result.code==200){
+
+          $(".lgtable tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo(".lgtable tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+
+    //分页初始值
+    var optionsAssociat = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > optionsAssociat.totalPages) {
+          optionsAssociat.currentPage = optionsAssociat.totalPages;
+        } else {
+          optionsAssociat.currentPage = page;
+        }
+        var data=$('.select_form').serializeArray();
+        data.push({name:'page',value:page})
+        writeListAssociat(data)
+      }
+    };
+    //查询
+    $('#associat_find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      optionsAssociat.currentPage=1;
+      writeListAssociat(data);
+    });
+    //写列表ajax
+    function writeListAssociat(data){
+      effect.show();
+      $.get('/admin/financial_member_ajax',data,function(result){
+        if(result.code==200){
+console.log(result)
+          $(".associattable tbody").empty('');
+          $("#associattmpl")
+                  .tmpl(result.message.list)
+                  .appendTo(".associattable tbody");
+          optionsAssociat.totalPages=result.message.pagecount;
+          if (optionsAssociat.totalPages > 0) {
+            $('#mpage').bootstrapPaginator(optionsAssociat);
+          } else {
+            $('#mpage').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    var catchArr=[]
+    $(document).on('click','.addMerge',function(){
+      var data=$(this).data();
+      if(catchArr.indexOf(data.id)==-1){
+        catchArr.push(data.id)
+        effect.success('添加成功')
+        $("#mergetmpl")
+                .tmpl(data)
+                .appendTo(".smtable tbody");
+      }else {
+        effect.error('重复添加')
+      }
+    });
+    $(document).on('click','.delMerge',function(){
+      var data=$(this).data();
+      $('#row_'+data.id).remove()
+      catchArr.splice(catchArr.indexOf(data.id),1)
+    });
+    $(document).on('click','.trueMerge',function(){
+      var mergeArr=[]
+      $('.smtable tbody a').each(function(i,v){
+        mergeArr.push($(v).data('id'))
+      })
+      if(mergeArr.sort().toString()==catchArr.sort().toString()){
+        $.post('/admin/financial_merge',{arr:mergeArr},function(result){
+          if(result.code==200){
+            location.reload()
+          }else {
+            effect.error(result.message)
+          }
+        })
+      }else {
+        effect.error('错误')
+      }
+    });
+    $(document).on('click','.falseMerge',function(){
+      var data=$(this).data();
+      $.post('/admin/financial_unmerge',{id:data.id},function(result){
+        if(result.code==200){
+          location.reload()
+        }else {
+          effect.error('拆单错误')
+        }
+      })
+    })
+    $(document).on('click','.associated',function(){
+      $("#modal_associat").modal('show');
+      financialId=$(this).data('id');
+      optionsAssociat.currentPage=1
+      $('.select_form')[0].reset();
+      writeListAssociat({});
+    });
+    $(document).on('change','#associatGoods',function(){
+      var fee=$(this).find('option:selected').data('fee')
+      $('input[name="fee"]').val(fee)
+    })
+    $(document).on('click','.trueAssociated',function(){
+      var data=$(this).data()
+      var goods=$("#associatGoods").val()
+      var fee=$('input[name="fee"]').val();
+      if(fee<=0){
+        return effect.error()
+      }
+      if(goods==0){
+        return effect.error()
+      }
+      if(!financialId){
+        return effect.error()
+      }
+      $.post('/admin/financial_associated',{financialId:financialId,mid:data.id,goods:goods,fee:fee},function(result){
+        console.log(result)
+        if (result.code==200){
+          effect.success('添加成功',function(){
+            $("#modal_associat").modal('hide');
+            var page=$("#page").find('li.active').find('a').html()
+            var data=$('.search-form').serializeArray();
+            data.push({name:'form',value:1})
+            data.push({name:'page',value:page})
+            options.currentPage=1;
+            writeList(data)
+            financialId=null
+          })
+        }else {
+          effect.error(result.message)
+        }
+      })
+    })
+    $(document).on('click','.delMember',function(){
+      var data=$(this).data()
+      $.post('/admin/financial_unassociated',{id:data.id},function(result){
+        if(result.code==200){
+          var page=$("#page").find('li.active').find('a').html()
+          var data=$('.search-form').serializeArray();
+          data.push({name:'form',value:1})
+          data.push({name:'page',value:page})
+          options.currentPage=1;
+          writeList(data)
+        }else {
+          effect.error(result.message)
+        }
+      })
+    })
+    $(document).on('click','.getQuestion',function () {
+      var id= $(this).data('id')
+      $.get('/admin/record_list',{id:id,type:1},function(result){
+        if(result.code==200){
+          $("#recordList").empty();
+          $("#recordtmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#recordList");
+          $('#modal_record').modal('show')
+        }else {
+          effect.error()
+        }
+      })
+    })
+    $(document).on('click','.setQuestion',function () {
+      var feedback_feky=$(this).data('id')
+      swal({
+        title: "问题说明!",
+        text: "请输入说明内容:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        animation: "slide-from-top",
+        inputPlaceholder: "请描述" }, function(inputValue){
+        if (!inputValue) return false;
+        var content=inputValue;
+        var data={
+          feedback_feky:feedback_feky ,
+          feedback_type: 1,
+          feedback_content: content
+        }
+        console.log(data)
+        $.post('/admin/record_create',data,function(result){
+          if(result.code==200){
+            effect.success()
+          }else {
+            effect.error()
+          }
+        })
+      });
+//      content=prompt('请对问题进行描述');
+//      if(!content){
+////        return effect.error('描述内容为空')
+//        return
+//      };
+//      var data={
+//        feedback_feky: $(this).data('id'),
+//        feedback_type: 1,
+//        feedback_content: content
+//      }
+//      $.post('/admin/record_create',data,function(result){
+//        if(result.code==200){
+//          effect.success()
+//        }else {
+//          effect.error()
+//        }
+//      })
+    })
+  });
+</script>
+<script id="recordtmpl" type="text/x-jquery-tmpl">
+  <li class="list-group-item">
+    <span class="badge">${createdAt}</span>
+    ${feedback_content}
+  </li>
+</script>
+<script id="associattmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${m_name}</td>
+    <td>${m_phone}</td>
+    <td>${m_company}</td>
+    <td>${en_position}</td>
+    <td class="text-center">
+      <a class="btn btn-info btn btn-xs trueAssociated" data-id='${mid}'> 添加</a>
+    </td>
+  </tr>
+</script>
+<script id="mergetmpl" type="text/x-jquery-tmpl">
+  <tr    id="row_${id}">
+    <td>
+     <a class="btn btn-danger btn-xs delMerge" data-id="${id}">删除记录</a>
+    </td>
+    <td>${room}</td>
+    <td>${money}</td>
+    <td>${remaining}</td>
+    <td>${number}</td>
+  </tr>
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr style="background:#ddd">
+  <td>${index}</td>
+    <td>
+      {{if statement_status==0}}
+        <div class="btn-group">
+        {{if statement_documents_type==0}}
+        <a class="btn btn-danger btn-xs addMerge" data-id="${statement_id}" data-room="${statement_classroomname}" data-money="${statement_money}" data-remaining="${statement_money_remaining}" data-number="${statement_account}">添加合单</a>
+        {{/if}}
+        {{if statement_documents_type==1}}
+        <a class="btn btn-success btn-xs falseMerge" data-id="${statement_id}">合单拆分</a>
+        {{/if}}
+        <a class="btn btn-info btn-xs associated" data-id="${statement_id}">关联学员</a>
+        </div>
+      {{else statement_status==1}}
+      待审核
+         <a class="btn btn-danger btn-xs" href="/admin/branch_transfer_edit?id=${statement_id}">编辑</a>
+      {{else statement_status==2}}
+      审核失败
+         <a class="btn btn-danger btn-xs" href="/admin/branch_transfer_edit?id=${statement_id}">编辑</a>
+      {{/if}}
+      <a class="btn btn-warning btn-xs setQuestion" data-id="${statement_id}">问题说明</a>
+      <a class="btn btn-primary btn-xs getQuestion" data-id="${statement_id}">说明记录</a>
+    </td>
+    <td>${statement_classroomname}</td>
+    <td>${statement_name}</td>
+    <td>${statement_payment_data}</td>
+    <td>${statement_issuing_bank}</td>
+    <td>${statement_account}</td>
+    <td>${statement_money}</td>
+    <td>${statement_money_remaining}</td>
+    <td>
+    {{if statement_pics}}
+    {{each(i,v) statement_pics}}
+    <a href="http://files.geju.com/${v}" target="_blank"><img src="http://files.geju.com/${v}" height="50px" width="50px" class="img-thumbnail"></a>
+    {{/each}}
+    {{/if}}
+    </td>
+    <td>${statement_desc}</td>
+    {{if children.length>0}}
+      {{each(i,v) children}}
+        <tr>
+          <td></td>
+          <td></td>
+          <td>${statement_classroomname}</td>
+          <td>${statement_name}</td>
+          <td>${statement_payment_data}</td>
+          <td>${statement_issuing_bank}</td>
+          <td>${statement_account}</td>
+          <td>${statement_money}</td>
+          <td>${statement_money_remaining}</td>
+          <td>
+          {{if statement_pics}}
+          {{each(i,v) statement_pics}}
+          <a href="http://files.geju.com/${v}" target="_blank"><img src="http://files.geju.com/${v}" height="50px" width="50px" class="img-thumbnail"></a>
+          {{/each}}
+          {{/if}}
+          </td>
+          <td>${statement_desc}</td>
+        </tr>
+      {{/each}}
+    {{/if}}
+  </tr>
+  {{if m.length>0}}
+  <tr>
+    <td>
+      <!--<a class="btn btn-warning btn-xs">已关联的学员</a>-->
+    </td>
+    <td colspan ="16" id="showMember_${statement_id}">
+      <table class="table table-striped table-condensed table-responsive memberList">
+        <thead>
+          <tr>
+            <th style="width:180px">操作</th>
+            <th style="width:180px">学员姓名</th>
+            <th style="width:180px">手机号</th>
+            <th style="width:180px">所报课程</th>
+            <th style="width:100px">学员性别</th>
+            <th style="width:160px">公司名称</th>
+            <th style="width:180px">职务</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each(i,v) m}}
+            <tr>
+              <td><a class="btn btn-primary btn-xs delMember" data-id="${v.en_uid}">删除学员</a></td>
+              <td>${m_name}</td>
+              <td>${m_phone}</td>
+              <td>${goods_name}</td>
+              <td>${m_sex}</td>
+              <td>${m_company}</td>
+              <td>${m_position}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</script>
+<!-- 视频model -->
+<div class="modal fade" id="modal_record" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          审核记录
+        </h5>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group" id="recordList">
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal_associat" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择学员
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <select id="associatGoods" class="form-control">
+              <option value="0" data-fee="0">--请选择课程--</option>
+              <%goods.forEach(function(node,index){%>
+              <option value="<%=node.goodsid%>" data-fee="<%=node.goods_fee%>"><%=node.goods_name%></option>
+              <%})%>
+            </select>
+          </div>
+          <div class="form-group form-group-sm">
+            <input type="text" value="0" name="fee" class="form-control input-sm" placeholder="费用">
+          </div>
+          <div class="form-group form-group-sm">
+            <input type="text" name="m_phone" class="form-control input-sm" placeholder="手机号码">
+          </div>
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <input type="text" name="m_name" class="form-control input-sm" placeholder="学员姓名" />
+              <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="associat_find">查询</span>
+                </span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed associattable">
+          <thead>
+          <tr>
+            <th style="width:120px">姓名</th>
+            <th style="width:180px">手机号码</th>
+            <!--<th style="width:180px">分院</th>-->
+            <th style="width:180px">公司</th>
+            <th style="width:180px">职位</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="mpage"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

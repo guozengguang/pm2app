@@ -1,0 +1,200 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <!--<div class="pull-right">-->
+          <!--<form class="form-inline search-form">-->
+            <!--<div class="input-group">-->
+              <!--<input type="text" name="classroom_name" placeholder="分院名称" class="form-control input-sm">-->
+              <!--<span class="input-group-btn">-->
+                <!--<button type="button" class="btn btn-danger btn-sm search">-->
+                  <!--<span class="glyphicon glyphicon-search"></span>-->
+                <!--</button>-->
+              <!--</span>-->
+            <!--</div>-->
+          <!--</form>-->
+        <!--</div>-->
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:100px">分院名称</th>
+          <th>设置</th>
+          <th></th>
+        </tr>
+        <%item.forEach(function(node,index){%>
+          <tr>
+            <td><%=node.classroom_name%></td>
+            <td>
+              <div class="input-group input-group-sm">
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger">添加</span>
+                    </span>
+                <input type="text" class="form-control" placeholder="设置班主任" id="row_b<%=node.classroom%>" value="<%banzhuren.forEach(function(n,i){if(n.group_classroom==node.classroom){%><%=n.m_name%><%}})%>">
+                    <span class="input-group-btn addInfo" data-id="6" data-classroom="b<%=node.classroom%>" data-room="<%=node.classroom%>">
+                      <span class="btn btn-danger">选择</span>
+                    </span>
+                    <!--<span class="input-group-btn delInfo" data-id="6" data-room="<%=node.classroom%>" <%banzhuren.forEach(function(n,i){if(n.group_classroom==node.classroom){%>data-user="<%=n.groupuser_user%>" data-group="<%=n.groupuser_group%>"<%}})%>>-->
+                      <!--<span class="btn btn-info">删除</span>-->
+                    <!--</span>-->
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger">添加</span>
+                    </span>
+                <input type="text" class="form-control" placeholder="设置班级助理" id="row_z<%=node.classroom%>" value="<%zhuli.forEach(function(v,j){if(v.group_classroom==node.classroom){%><%=v.m_name%><%}})%>">
+                    <span class="input-group-btn addInfo" data-id="9" data-classroom="z<%=node.classroom%>" data-room="<%=node.classroom%>">
+                      <span class="btn btn-danger">选择</span>
+                    </span>
+              </div>
+            </td>
+          </tr>
+        <%})%>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //讲师相关   打开讲师列表
+    var goodsid=location.search.substr(9);
+    var type=6
+    var myid=''
+    var room=''
+    $('.addInfo').on('click', function(event) {
+      $("#modal").modal('show');
+      type=$(this).data('id');
+      myid=$(this).data('classroom');
+      room=$(this).data('room');
+      writeList({type:4});
+    });
+    //添加讲师
+    $(document).on('click', '.trueInfo', function(event) {
+      var name=$(this).data('name');
+      var id=$(this).data('id');
+      $("#row_"+myid).val(name)
+      var data={name:name,id:id,type:type,goodsid:goodsid,room:room};
+      $.post("/admin/set_groupuser",data,function(result){
+        console.log(result)
+        if(result.code==200){
+          effect.success()
+        }else{
+          effect.error();
+        }
+      })
+      $("#modal").modal('hide');
+    });
+    //搜索
+    $('#find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      data.push({name:'type',value:4});
+      options.currentPage=1;
+      writeList(data);
+    })
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, t, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.select_form').serializeArray();
+        data.push({name:'type',value:4});
+        data.push({name:'page',value:page});
+        writeList(data)
+      }
+    };
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/students_ajax',data,function(result){
+        if(result.code==200){
+          $("#teacher tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#teacher tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td><img class="img-circle" {{if m_pics}}src="<%=aly%>/${m_pics}"{{/if}} width="45" height="45" ></td>
+    <td>${m_name}</td>
+    <td>${m_desc}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs trueInfo" data-name="${m_name}" data-id="${mid}"> 添加</a>
+    </div>
+    </td>
+  </tr>
+</script>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择院长
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <input type="text" name="m_name" class="form-control input-sm" placeholder="姓名" />
+                <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="find">查询</span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed" id="teacher">
+          <thead>
+          <tr>
+            <th style="width:80px">头像</th>
+            <th style="width:80px">姓名</th>
+            <th style="width:180px">简介</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="page"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../../inc/footer.html%>

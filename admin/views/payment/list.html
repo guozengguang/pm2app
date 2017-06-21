@@ -1,0 +1,154 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <div class="input-group">
+              <select name="goods" class="form-control input-sm" id="goodsid">
+                <option value="">全部产品</option>
+                <%goods.forEach(function(node,index){%>
+                <option value="<%=node.goodsid%>"><%=node.goods_name%></option>
+                <%})%>
+              </select>
+            </div>
+            <div class="input-group">
+              <select name="calssroom" class="form-control input-sm" id="classroomid">
+                <option value="">全部分院</option>
+                <%room.forEach(function(node,index){%>
+                <option value="<%=node.classroom%>"><%=node.classroom_name%></option>
+                <%})%>
+              </select>
+            </div>
+            <div class="input-group">
+              <input type="text" name="stime" placeholder="开始时间" class="form-control input-sm input_date">
+            </div>
+            <div class="input-group">
+              <input type="text" name="etime" placeholder="结束时间" class="form-control input-sm input_date">
+            </div>
+            <div class="input-group">
+              <input type="text" name="name" placeholder="姓名" class="form-control input-sm">
+            </div>
+            <div class="input-group">
+              <input type="text" name="tel" placeholder="手机号" class="form-control input-sm">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-danger btn-sm search">
+                  <span class="glyphicon glyphicon-search"></span>
+                </button>
+              </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>姓名</th>
+          <th style="width:80px">手机号</th>
+          <th style="width:100px">公司</th>
+          <th style="width:100px">职位</th>
+          <th style="width:100px">分院</th>
+          <th style="width:100px">课程</th>
+          <th style="width:80px">应付金额</th>
+          <th style="width:80px">实际金额</th>
+          <th style="width:80px">状态</th>
+          <th style="width:80px">类型</th>
+          <th style="width:180px" class="text-center">时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+$(function(){
+  $(".input_date").datetimepicker({
+    lang:'ch',
+    step:30
+  });
+  //分页初始值
+  var options = {
+    currentPage: 1,//当前页数
+    totalPages: 0,//总页数
+    numberOfPages: 12,//做多显示page页
+    bootstrapMajorVersion: 1,//版本
+    alignment: "center",
+    onPageClicked: function (e, originalEvent, type, page) {
+      if (page > options.totalPages) {
+        options.currentPage = options.totalPages;
+      } else {
+        options.currentPage = page;
+      }
+      var data=$('.search-form').serializeArray();
+      data.push({name:'page',value:page});
+      writeList(data)
+    }
+  };
+  //默认加载
+  writeList();
+  //默认加载
+  writeList();
+  $('.search').on('click',function(){
+    var data=$('.search-form').serializeArray();
+    options.currentPage=1;
+    writeList(data);
+  });
+  $('#goodsid,#classroomid').on('change',function(){
+    var data=$('.search-form').serializeArray();
+    options.currentPage=1;
+    writeList(data);
+  })
+  //写列表ajax
+  function writeList(data){
+    effect.show();
+    $.get('/admin/payment_list',data,function(result){
+      console.log(result)
+      if(result.code==200){
+        $("table tbody").empty('');
+        $("#inittmpl")
+            .tmpl(result.message.list)
+            .appendTo("table tbody");
+        options.totalPages=result.message.pagecount;
+        if (options.totalPages > 0) {
+          $('#page').bootstrapPaginator(options);
+        } else {
+          $('#page').empty();
+        }
+        effect.hide();
+      }else{
+        effect.hide();
+        effect.error('请求失败')
+      }
+    })
+  };
+});
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+    <td>${name}</td>
+    <td>${tel}</td>
+    <td>${company}</td>
+    <td>${position}</td>
+    <td>${calssroom}</td>
+    <td>${goods}</td>
+    <td>${fee}</td>
+    <td>${total_fee}</td>
+    <td>${statusDesc}</td>
+    <td>${typeDesc}</td>
+    <td>${createdat}</td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>

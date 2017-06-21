@@ -1,0 +1,145 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>编辑活动</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="activity_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="activity_official" class="control-label">是否官方 <span> &nbsp;</span></label>
+                  <label class="radio-inline">
+                    <input type="radio" name="activity_official" value="1" <%if(item.activity_official==1){%>checked<%}%>> 官方
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="activity_official" value="0" <%if(item.activity_official==0){%>checked<%}%>> 非官方
+                  </label>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="activity_stime" class="control-label">开始时间<span>*</span></label>
+                  <input value="<%=item.activity_stime%>" type="text" name="activity_stime" placeholder="选择开始时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="activity_etime" class="control-label">结束时间<span>*</span></label>
+                  <input value="<%=item.activity_etime%>" type="text" name="activity_etime" placeholder="选择结束时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="activity_img" class="control-label">展示图<span><small>建议规格1242*477</small></span></label>
+                  <div class="input-group input-group-sm">
+                    <input value="<%=item.activity_img%>" type="text" name="activity_img" placeholder="展示图" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="progress" style="width: 100%;">
+                    <div class="progress-bar" style="width: 0%;">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <img src="<%=aly%>/<%=item.activity_img%>"  id="activity_img_img">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="activity_title" class="control-label">活动主题<span>*</span></label>
+                      <input value="<%=item.activity_title%>" type="text" name="activity_title" placeholder="活动主题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                      <input value="<%=item.activity_id%>" type="hidden" name="activity_id">
+                    </div>
+                    <!--<div class="form-group form-group-sm col-md-12">-->
+                      <!--<label for="activity_sponsor" class="control-label">主办方<span>*</span></label>-->
+                      <!--<input value="<%=item.activity_sponsor%>" type="text" name="activity_sponsor" placeholder="主办方" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>-->
+                    <!--</div>-->
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="activity_address" class="control-label">活动地点<span>*</span></label>
+                      <input value="<%=item.activity_address%>" type="text" name="activity_address" placeholder="活动地点" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="activity_link" class="control-label">外链<span>*</span></label>
+                      <input value="<%=item.activity_link%>" type="text" name="activity_link" placeholder="外链" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="activity_content" class="control-label">活动描述（分享使用）<span>*</span></label>
+                      <input value="<%=item.activity_content%>" type="text" name="activity_content" placeholder="活动描述" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <!--<div class="form-group form-group-sm col-md-12">-->
+                      <!--<label for="activity_count" class="control-label">浏览数<span></span></label>-->
+                      <!--<input value="<%=item.activity_count%>" type="text" name="activity_count" placeholder="浏览数" class="form-control">-->
+                    <!--</div>-->
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //时间
+    $(".input_date").datetimepicker({
+      step:1,
+      lang:'ch',
+    });
+    //验证提交
+    $('#activity_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#activity_form').serializeArray();
+      $.post("/admin/activity_update",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/activity'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+
+    //上传图片
+    newupload('addImg','activity_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+  })
+</script>
+<% include ../inc/footer.html%>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>格局商学学员录入管理系统</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!--为了防止手机号被iOS屏蔽-->
+    <meta name="format-detection" content="telephone=no">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font/iocns.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <style type="text/css">
+        #myModal .modal-body h6 {
+            text-align: center;
+            width: 18%;
+            border-right: 2px solid #ddd;
+            display: inline-block;
+            margin-right: 5px;
+            padding: .2rem;
+        }
+
+        #myModal .modal-body p {
+            display: inline-block;
+            border: 1px solid #ddd;
+            margin: 5px 3px;
+            padding: .2rem;
+            background: #ddd;
+        }
+
+        #myModal .modal-body {
+            overflow: auto;
+            text-align: left;
+            height: 500px;
+        }
+
+        .ppp {
+            width: 80%;
+            display: inline-block;
+        }
+    </style>
+
+    <script type="text/javascript" src="js/comm.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a href="list.html" class="btn goHome"><span class="lw lw-icon-left-open-big"> </span></a>
+            <button type="button" class="navbar-toggle btn-link collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="lw lw-icon-menu-1"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!--li><a href="#"><span class="lw lw-icon-user-1"></span> 个人中心</a></li-->
+                <li id="studentInfo_li" class="active"><a href="list.html"><span class="lw lw-icon-vcard"></span>
+                    学员信息</a></li>
+                <li><a href="student_ownership_transfer.html"><span class="lw lw-icon-shuffle-1"></span> 学员归属转移</a></li>
+                <!--<li><a href="list.html"><span class="lw lw-icon-archive"></span> 报备中心</a></li>-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="lw lw-icon-user-1"></span> <span id="phoneSpan"></span> <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="update_pwd.html"><span class="lw lw-icon-key"></span> 密码修改</a></a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="login.html"><span class="lw lw-icon-logout-1"></span> 退出系统</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container mb-input">
+    <div class=" liuchen">
+        <img id="titleImg" src="images/add_Student.jpg"/>
+    </div>
+    <!--h3 >学员信息提交</h3-->
+
+    <form class="mobile-form">
+
+        <div class="input-group" id="userName_div">
+            <span class="input-group-addon" id="basicUser">学员姓名<span class="lw lw-icon-snowflake"></span></span>
+            <input type="text" class="form-control" id="userName" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group" id="userTel_div">
+            <span class="input-group-addon" id="basic-user-tel">学员电话<span class="lw lw-icon-snowflake"></span></span>
+            <input type="tel" class="form-control" id="userTel" aria-describedby="basic-addon1" style="width: 60%">
+            <button id="btnCheckButton" class="btn btn-lg btn-primary" type="button" onclick="checkPhone()"
+                    style="float: right;margin-top: 10px;margin-right: 5px;padding-top: 5px;">报备检查
+            </button>
+        </div>
+
+        <div class="input-group" id="goods_select_div">
+            <span class="input-group-addon" id="basic-user-good">意向课程<span class="lw lw-icon-snowflake"></span> </span>
+            <select class="form-control" id="goods_select">
+                <option value="选择要报备的课程">选择要报备的课程</option>
+            </select>
+        </div>
+
+        <div class="input-group" id="classRooms_select_div">
+            <span class="input-group-addon" id="basic-user_classroom">所属分院<span
+                    class="lw lw-icon-snowflake"></span></span>
+            <!--<select class="form-control" id="classRooms_select">-->
+            <!--<option>选择要报备的分院</option>-->
+            <!--</select>-->
+            <input type="text" class="form-control" name="classRoom" id="classRoom" aria-describedby="basic-addon1"
+                   style="width: 50%;" disabled="disabled">
+            <button id="btnSelectClassRoom" class="btn btn-lg btn-primary" type="button" onclick="selectClassRoom()"
+                    style="float: right;margin-top: 10px;margin-right: 10px;padding-top: 5px">选择分院
+            </button>
+        </div>
+
+        <div class="input-group" id="numberID_div">
+            <span class="input-group-addon" id="basic-hrMail">身份证号</span>
+            <input type="text" class="form-control" name='numberID' id="numberID" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group" id="companyName_div">
+            <span class="input-group-addon" id="basic-companyName">公司名称</span>
+            <input type="text" class="form-control" name='companyName' id="companyName" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group" id="studentDuties_div">
+            <span class="input-group-addon" id="basic-studentDuties">学员职务</span>
+            <input type="text" class="form-control" name='studentDuties' id="studentDuties"
+                   aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group" id="recommended_div">
+            <span class="input-group-addon" id="basic-recommended">推 荐 人</span>
+            <input type="text" class="form-control" name='recommended' id="recommended" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group" id="remarks_div">
+            <span class="input-group-addon" id="basic-remarks">备注说明</span>
+            <textarea class="form-control" rows="3" name='remarks' id="remarks"></textarea>
+        </div>
+
+    </form>
+
+    <!--弹出选择分院列表的框-->
+    <div class="weixinmodal">
+        <div class="modal fade " id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">选择分院</h4>
+                    </div>
+                    <div class="modal-body modal-rn" style="height: 500px;overflow: scroll">
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p class="userTishi" id="err_p"><span class="lw lw-icon-attention-1" id="err_span"></span></p>
+</div>
+
+<div class="container footer">
+    <button type="button" class="btn btn-success btn-lg" onclick="submitInfos()">提交信息</button>
+</div>
+
+<script>
+    $(function () {
+        //已经来就先屏蔽掉学院信息的选中状态
+        $("#studentInfo_li").removeClass("active");
+
+        $("#phoneSpan").html($.cookie("currentUserPhone"));
+
+        $("#err_p").hide();//默认错误提示区域是隐藏的
+
+        addGoods();
+
+        //如果是添加就显示选择分院 否则就不显示
+        var operation = ToolUtils.getURLParam("operation");
+        if (operation == "modify") {
+            $("#btnSelectClassRoom").hide();
+        } else {
+            $("#btnSelectClassRoom").show();
+        }
+        //修改页面的时候 自动初始化填写信息
+        initMemberInfo();
+    });
+
+    function initMemberInfo() {
+        var this_en_uid = ToolUtils.getURLParam("uid");
+        if (this_en_uid != null && this_en_uid != "") {
+            $("#titleImg").attr("src", "images/modify_Student.jpg");
+            //如果有值 证明是进行修改操作的
+            //如果是进行修改操作 则隐藏报备检查按钮
+            $("#btnCheckButton").hide();
+
+            var url = 'http://api.geju.com/business/report/list/' + $.cookie("currentUserPhone");
+            $.ajax({
+                url: url,
+                dataType: "json",
+                async: true,
+                data: "",
+                type: "GET",
+                success: function (res) {
+                    if (res.code == '200') {
+                        var list = res.result.list;
+                        for (i = 0; i < list.length; i++) {
+
+                            var en_uid = list[i]["en_uid"];//学员编号
+                            if (en_uid == this_en_uid) {
+
+                                var m_name = list[i]["m_name"];//学员姓名
+                                var m_phone = list[i]["m_phone"];//学员电话
+                                var time = list[i]["time"];//时间
+                                var referrerName = $.cookie("currentUserName");//推荐人姓名
+                                var goods_name = list[i]["goods_name"];//所报课程
+                                var en_classroom = list[i]["classroom_name"];//所属分院
+                                var cardId = list[i]["m_card"];//身份证号
+
+                                $.ajax({
+                                    url: 'http://api.geju.com/business/report/member/info/' + $.cookie("currentUserPhone"),
+                                    dataType: "json",
+                                    async: false,
+                                    data: {uid: this_en_uid},
+                                    type: "POST",
+                                    success: function (res) {
+                                        if (res.code == '200') {
+                                            $("#userName").val(m_name);
+                                            $("#userTel").val(m_phone);
+
+//                                            $("#goods_select option[value=" + goods_name + "]").attr("selected", "selected");
+
+                                            $("#goods_select").html("<option value='"+goods_name+"'>"+goods_name+"</option>");
+                                            $("#goods_select").attr("disabled","disabled");
+
+                                            $("#classRoom").val(en_classroom);
+                                            $("#classRoom").attr("disabled", "disabled");
+
+                                            $("#btnSelectClassRoom").hide();
+
+                                            $("#numberID").val(cardId);
+                                            $("#companyName").val(res.result.data.m_company);
+                                            $("#studentDuties").val(res.result.data.m_position);
+                                            $("#recommended").val(referrerName);
+
+                                            $("#recommended").attr("disabled", "disabled");
+
+                                            $("#userTel").attr("disabled", "disabled");
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    } else if (res.code == '401') {
+                        window.location.href = "./login.html";
+                    }
+                }
+            });
+        } else {
+            $("#titleImg").attr("src", "images/add_Student.jpg");
+        }
+    }
+    //选择分院弹出框
+    function selectClassRoom() {
+        $("#myModal").modal();
+        //请求分院列表
+        var url = "http://api.geju.com/business/report/classroom/" + $.cookie("currentUserPhone");
+        $.ajax({
+            url: url,
+            dataType: "json",
+            async: true,
+            data: "",
+            type: "GET",
+            success: function (res) {
+                if (res.code == '200') {
+                    var htl = "";
+
+                    $.each(res.result.list, function (index, obj) {
+                        htl += '<div><h6 class="hhh">' + obj.area_name + '</h6><div style="cursor:pointer;" class="ppp">';
+                        $.each(obj.classroom, function (index, v) {
+                            htl += "<p onclick=choose('" + v.classroom_name + "','" + v.classroom + "')>" + v.classroom_name + "</p>"
+                        });
+                        htl += "</div></div>"
+                    });
+                    $(".modal-rn").html(htl);
+
+                } else if (res.code == "401") {
+                    window.location.href = "./login.html";
+                }
+                else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+    //报备检查
+    function checkPhone() {
+        var userTel = $("#userTel").val();
+        if (userTel == "") {
+            alert("请输入手机号!");
+            return;
+        }
+        else {
+            var url = "http://api.geju.com/business/report/check/" + $.cookie("currentUserPhone");
+            $.ajax({
+                url: url,
+                dataType: "json",
+                async: true,
+                data: {phone: userTel},
+                type: "POST",
+                success: function (res) {
+                    if (res.code == '200') {
+                        alert("可以报备!");
+                    } else if (res.code == '401') {
+                        window.location.href = "./login.html";
+                    }
+                    else {
+                        alert("已存在报备!请重新填写!");
+                        $("#userTel").val("");
+                    }
+                }
+            });
+        }
+    }
+    //选择分院名称
+    function choose(field1, field2) {
+        $("#classRoom").val(field1);
+        $("#classRoom").attr("key", field2);
+        $('#myModal').modal('hide');
+    }
+    //验证提交信息
+    function checkSubmitInfo(userName, userTel, good, classRoom, cardId) {
+        var completeCheck = false;
+        //验证信息
+        if (userName == "") {
+            completeCheck = false;
+            $("#err_p").show();
+            $("#userName_div").addClass("error");
+            $("#err_span").html("姓名不能为空");
+            return;
+        } else {
+            $("#userName_div").removeClass("error");
+            $("#err_p").hide();
+            completeCheck = true;
+        }
+
+        if (userTel == "" || userTel == null) {
+            completeCheck = false;
+            $("#err_p").show();
+            $("#userTel_div").addClass("error");
+            $("#err_span").html("手机号不能为空");
+            return;
+        } else {
+            if (isNumberId(userTel) == false) {
+                completeCheck = false;
+                $("#err_p").show();
+                $("#userTel_div").addClass("error");
+                $("#err_span").html("手机号格式不正确");
+                return;
+            } else {
+                $("#userTel_div").removeClass("error");
+                $("#err_p").hide();
+                completeCheck = true;
+            }
+        }
+
+        if (good == "选择要报备的课程") {
+            completeCheck = false;
+            $("#err_p").show();
+            $("#goods_select_div").addClass("error");
+            $("#err_span").html("请选择意向课程");
+            return;
+        } else {
+            $("#goods_select_div").removeClass("error");
+            $("#err_p").hide();
+            completeCheck = true;
+        }
+
+
+        if (classRoom == "" || classRoom == null) {
+            completeCheck = false;
+            $("#err_p").show();
+            $("#classRooms_select_div").addClass("error");
+            $("#err_span").html("请选择所属分院");
+            return;
+        } else {
+            $("#classRooms_select_div").removeClass("error");
+            $("#err_p").hide();
+            completeCheck = true;
+        }
+
+        if (cardId != "" && cardId != null) {
+            if (isCardNo(cardId) == false) {
+                completeCheck = false;
+                $("#err_p").show();
+                $("#numberID_div").addClass("error");
+                $("#err_span").html("身份证号格式不正确");
+                return;
+            } else {
+                $("#numberID_div").removeClass("error");
+                $("#err_p").hide();
+                completeCheck = true;
+            }
+        }
+
+        return completeCheck;
+    }
+    //提交信息
+    function submitInfos() {
+
+        //学员姓名
+        var userName = $("#userName").val();
+        //学员电话
+        var userTel = $("#userTel").val();
+        //意向课程
+        var goodName = $('#goods_select option:selected').attr("value")
+        var goodId = $('#goods_select option:selected').attr("id");
+        //所属分院
+        var classRoomName = $("#classRoom").val();
+        var classRoomId = $("#classRoom").attr("key");
+        //身份证号
+        var cardId = $("#numberID").val();
+        //公司名称
+        var companyName = $("#companyName").val();
+        //学员职务
+        var studentDuties = $("#studentDuties").val();
+        //推荐人
+        var recommended = $("#recommended").val();
+        //备注说明
+        var remarks = $("#remarks").val();
+
+        //验证提交信息
+        var isCheckComplete = checkSubmitInfo(userName, userTel, goodName, classRoomName, cardId);
+
+        if (isCheckComplete == true) {
+
+            var this_en_uid = ToolUtils.getURLParam("uid");
+            var this_mid = ToolUtils.getURLParam("mid");
+
+            if (this_en_uid != "" && this_en_uid != null) {
+                //修改
+                var url = "http://api.geju.com/business/report/check/info/" + $.cookie("currentUserPhone");
+                $.ajax({
+                    url: url,
+                    dataType: "json",
+                    async: true,
+                    data: {
+                        mid: this_mid,
+                        name: userName,
+                        card: cardId,
+                        company: companyName,
+                        position: studentDuties,
+                        desc: remarks
+                    },
+                    type: "POST",
+                    success: function (res) {
+                        if (res.code == '200') {
+                            alert("修改成功!");
+                            window.location.href = "./list.html";
+                        } else if (res.code == '401') {
+                            window.location.href = "./login.html";
+                        } else {
+                            alert("报备信息修改失败!");
+                        }
+                    }
+                });
+            } else {
+                //添加
+                var url = "http://api.geju.com/business/report/add/" + $.cookie("currentUserPhone");
+                $.ajax({
+                    url: url,
+                    dataType: "json",
+                    async: true,
+                    data: {
+                        phone: userTel,
+                        name: userName,
+                        goodsid: goodId,
+                        classroom: classRoomId,
+                        card: cardId,
+                        company: companyName,
+                        position: studentDuties,
+                        reference: recommended,
+                        desc: remarks
+                    },
+                    type: "POST",
+                    success: function (res) {
+                        if (res.code == '200') {
+                            window.location.href = "./list.html";
+                        } else if (res.code == '401') {
+                            window.location.href = "./login.html";
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                });
+            }
+        }
+    }
+    //加载课程列表
+    function addGoods() {
+        var url = "http://api.geju.com/business/report/goods/" + $.cookie("currentUserPhone");
+        $.ajax({
+            url: url,
+            dataType: "json",
+            async: true,
+            data: "",
+            type: "GET",
+            success: function (res) {
+                if (res.code == '200') {
+                    var list = res.result.list;
+                    for (i = 0; i < list.length; i++) {
+                        var mainHtml = $("#goods_select").html();
+                        var name = list[i]["name"];//分院名
+                        var id = list[i]["id"];//分院编号
+
+                        var thisHtml = "<option value=" + name + " id='" + id + "'>" + name + "</option>";
+
+                        mainHtml += thisHtml;
+
+                        $("#goods_select").html(mainHtml);
+                    }
+                } else if (res.code == '401') {
+                    window.location.href = "./login.html";
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+
+    //正则表达式验证函数
+    function isCardNo(card) {
+        // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
+        var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+        if (reg.test(card) === false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function isNumberId(numberId) {
+        //var reg = /^[1]([3][0-9]{1}|59|58|88|89)[0-9]{8}$/;
+        var reg = /^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/;
+        if (reg.test(numberId) == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<% include ../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>创建新专辑</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="special_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="special_img" class="control-label">展示图<span><small>建议规格423*239</small></span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" name="special_img" placeholder="展示图" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="progress" style="width: 100%;">
+                    <div class="progress-bar" style="width: 0%;">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <img src=""  id="special_img_img">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="special_title" class="control-label">专辑标题<span>*</span></label>
+                      <input type="text" name="special_title" placeholder="专辑标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="special_summary" class="control-label">专辑描述<span>*</span></label>
+                      <input type="text" name="special_summary" placeholder="专辑描述" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+<!--                    <div class="form-group form-group-sm col-md-6">
+                      <label for="special_subtitle" class="control-label">专辑副标题<span>*</span></label>
+                      <input type="text" name="special_subtitle" placeholder="专辑副标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="special_count" class="control-label">浏览数<span></span></label>
+                      <input type="text" name="special_count" placeholder="浏览数" class="form-control">
+                    </div>-->
+                    <!--<div class="form-group form-group-sm col-md-12">-->
+                      <!--<div id="group_editor">-->
+                        <!--<label for="special_content" class="control-label">详细介绍</label>-->
+                        <!--<textarea id="special_content" name="special_content" value='' style="width:100%;height:320px;" class="setEditor"></textarea>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //验证提交
+    $('#special_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+//      $("#special_content").val(editor[0].html())
+      var data=$('#special_form').serializeArray();
+      $.post("/admin/special_create",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/special'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+
+    //上传图片
+    newupload('addImg','special_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+  })
+</script>
+<% include ../inc/footer.html%>

@@ -1,0 +1,123 @@
+
+body{font-family: "Microsoft Yahei",sans-serif; background: #34424B}
+a {  color: #ffffff; text-decoration: none; 
+}
+
+a:focus, a:hover{  color: rgba(255, 255, 225, 0.6); text-decoration: none; outline: none; 
+    -moz-outline-style: none;   }
+  
+ol, ul { list-style: outside none none; padding: 0; }
+ 
+/**学员扫码页**/
+.index-title{  text-align: center; font-weight: 200; width: 100%; margin-top: 80px; padding: 20px 0 10px 0; color: #ffffff; font-weight: 100;}
+.container.mb-input{ background: #f0f0f0; padding-bottom: 32px; max-width: 640px; width: 100%;min-height: 730px; border-radius: 10px 10px 0 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); margin: 100px auto 0;  }
+.container.footer{background: #ffffff none repeat scroll 0 0; bottom: 0; height: 75px; left: 0; margin-bottom: 20px; max-width: 640px; padding-top: 13px; border-radius: 0 0 10px 10px;  text-align: center; width: 100%; z-index: 200; border-top: 1px solid #eeeeee;}
+.container.footer button{max-width: 640px; width: 100%;}
+.container h3{font-weight: 300; margin-bottom: 20px; text-align: center;}
+.container .userTishi{text-align: center; width: 100%; color: #DD0C16; padding: 10px; font-weight: 300;}
+ 
+.container .mobile-form{margin: 0 -15px; background: #ffffff;}
+.container .mobile-form .input-group{margin-top: -1px; }
+ 
+.container .mobile-form .input-group-addon{border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; border-left: medium none; font-size: 1.8rem; border-radius: 0; padding: 0 0 0 16px; color: #999999; min-height: 58px; line-height: 32px; background: none;}
+.container .mobile-form .error .input-group-addon{ color: #DD0C16; background: #FFDDDE;}
+.container .mobile-form .error .form-control{color: #DD0C16; background: #FFDDDE;}
+.container .mobile-form .form-control{ border-top: 1px solid #f0f0f0; background: #ffffff; outline:none; border-bottom: 1px solid #f0f0f0; font-size: 1.8rem; border-right: medium none; border-left: medium none; border-radius: 0; min-height: 58px; box-shadow: none !important; -webkit-box-shadow: none; -moz-box-shadow: none; line-height: 32px; }
+.container .mobile-form .form-control::placeholder{color: #d0d0d0;}
+.container .mobile-form textarea.form-control{line-height: 1.2em !important;}
+.container .mobile-form select.form-control{appearance:none; -moz-appearance:none;  -webkit-appearance:none; background: rgba(0, 0, 0, 0) url("../images/select.png")  no-repeat scroll 96% 50%; background-size: auto 40% ; }
+.container .mobile-form .form-control:focus{ border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;}
+.container .mobile-form .input-group .tlabel{ padding-top: 12px;}
+.container .mobile-form .input-group .tlabel label{font-size: 1.5rem; font-weight: 400; margin-right: 20px;}
+
+
+.mb-input .liuchen{   margin: 0 -15px; background: #f0f0f0; border-radius: 10px 10px 0 0; overflow: hidden;}
+.mb-input .liuchen img{ width: 100%;}
+input.form-control{box-shadow: none !important;}
+.form-control[disabled]{background: #ffffff;}
+nav.navbar-default{ background: #ffffff;}
+nav .navbar-brand{height: 64px; padding: 15px 20px;}
+nav .navbar-brand img{height: 100%;}
+nav .nav > li > a{padding: 22px 30px;}
+nav .navbar-header .navbar-toggle{margin-top: 15px; padding: 6px 12px;}
+
+
+/**LIST**/
+.con-list{margin:80px auto 45px; padding: 10px; min-height: 450px;}
+/* .con-list .panel-body .bodyTable{overflow-x: auto !important; width: 100% !important;} */
+.con-list .panel-body .bodyTable{overflow-x: auto; width: 100%;}
+.con-list .panel-footer{ min-height: 56px;}
+.con-list .panel-footer .btn-group{ float: right;}
+
+/**LOGIN**/
+.form-signin {
+		  max-width: 330px;
+		  padding: 15px;
+		  margin: 0 auto;
+		}
+		.form-signin .form-signin-heading,
+		.form-signin .checkbox {
+		  margin-bottom: 10px;
+		}
+		.form-signin .checkbox {
+		  font-weight: normal;
+		}
+		.form-signin .form-control {
+		  position: relative;
+		  height: auto;
+		  -webkit-box-sizing: border-box;
+		     -moz-box-sizing: border-box;
+		          box-sizing: border-box;
+		  padding: 10px;
+		  font-size: 16px;
+		}
+		.form-signin .form-control:focus {
+		  z-index: 2;
+		}
+		.form-signin input[type="text"] {
+		  margin-bottom: -1px;
+		  border-bottom-right-radius: 0;
+		  border-bottom-left-radius: 0;
+		}
+		.form-signin input[type="password"] {
+		  margin-bottom: 10px;
+		  border-top-left-radius: 0;
+		  border-top-right-radius: 0;
+		}
+
+@media only screen and (max-width:768px) {
+     
+ 	.container .mobile-form .form-control{padding-right: 20px; text-align: right; }
+ 	.index-title { display: none;}
+ 	.container.footer{background: #ffffff none repeat scroll 0 0; bottom: 0; border-radius: 0; height: 75px; left: 0; margin-bottom: 0; padding-top: 10px; position: fixed; text-align: center; width: 100%; z-index: 200; border-top: 1px solid #eeeeee;}
+ 	.container.mb-input { border: 0 none; border-radius: 0;  box-shadow: none; margin: 60px auto 0;}
+ 	.form-control{appearance:none; -moz-appearance:none;  -webkit-appearance:none;  }
+ 	nav .navbar-brand{margin-left: 20%;}
+ 	.goHome{float: left; padding:0 0 0 20px;  font-size: 22px; line-height: 65px; color: #122B40;}
+ 	nav .container-fluid{background: #333333;}
+ 	.container .mobile-form .input-group .tlabel label:last-child{margin-right: 0;}
+    nav .container-fluid .navbar-header { background: #ffffff; }
+    .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;}
+    select.form-control{ text-align: right; }
+    .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;}
+    .navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
+    background-color: transparent;
+    color: #ffffff;}
+    .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus, .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+    background-color: transparent;
+    color: #ffffff;}
+    .navbar-default .navbar-nav .open .dropdown-menu .divider {  background-color: rgba(0, 0, 0, 0.3);}
+    .navbar-fixed-bottom .navbar-collapse, .navbar-fixed-top .navbar-collapse {
+    max-height: 440px;}
+    .container .mobile-form select.form-control{ padding-right: 40px; direction: rtl; }
+    
+    .con-list .panel-footer{border-radius: 0; bottom: 0;  position: fixed; width: 100%;}
+    .con-list{ padding: 0; margin:65px auto 6px ;}
+    .con-list .panel { border: 0px; border-radius: 0px;}
+}
+
+ 

@@ -1,0 +1,610 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>
+
+<div ng-controller="HotelActivityController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="col-md-12">
+                                <div class="row">
+
+                                    <form id="create_form" name="create_form" role="form">
+                                        <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                                            <div ng-class="create_form.title.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <input ng-model="data.id" type="hidden" name="id" class="form-control"
+                                                       id="id" placeholder="ID">
+                                                <label for="name">活动标题</label>
+                                                <input ng-model="data.title" type="text" name="title"
+                                                       class="form-control"
+                                                       id="name" placeholder="活动名称" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.province.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="province">省/市</label>
+                                                <select ng-model="data.province"
+                                                        ng-change="province_change(data.province)"
+                                                        ng-options="v.name as v.name for v in province" name="province"
+                                                        id="province" class="form-control" required></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.city.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="city">县/区</label>
+                                                <select ng-model="data.city" ng-options="v.name as v.name for v in city"
+                                                        name="city" id="city" class="form-control" required></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.address.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="address">详细地址</label>
+                                                <input ng-model="data.address" type="text" name="address"
+                                                       class="input_date form-control" id="address" placeholder="详细地址"
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="address">通过地址获取经纬度</label>
+                                                <div>
+                                                    <button class="btn btn-info" type="button"
+                                                            ng-disabled="create_form.province.$error.required ||
+                                                             create_form.city.$error.required ||
+                                                             create_form.address.$error.required"
+                                                            ng-click="map_init(data.province + ',' + data.city + ',' + data.address)">
+                                                        获取
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                                            <div data-qq-map-longitude-latitude style="width: 100%; height: 500px;"
+                                                 longitude="data.longitude" latitude="data.latitude"
+                                                 init="map_init">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="longitude">经度</label>
+                                                <input ng-model="data.longitude" type="text" name="longitude"
+                                                       class="input_date form-control" id="longitude" disabled
+                                                       placeholder="经度">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="latitude">纬度</label>
+                                                <input ng-model="data.latitude" type="text" name="latitude"
+                                                       class="input_date form-control" id="latitude" disabled
+                                                       placeholder="详细地址">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.start_time.$error.required
+                                            ? 'form-group has-error' : 'form-group'">
+                                                <label for="start_time">活动开始时间</label>
+                                                <input ng-model="data.start_time" type="text" name="start_time"
+                                                       class="input_date form-control" id="start_time"
+                                                       placeholder="活动开始时间" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.start_time.$error.required
+                                            || data.end_time < data.start_time
+                                            ? 'form-group has-error' : 'form-group'">
+                                                <label for="end_time">活动结束时间</label>
+                                                <input ng-model="data.end_time" type="text" name="end_time"
+                                                       class="input_date form-control" id="end_time"
+                                                       placeholder="活动结束时间">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.enroll_start_time.$error.required || data.enroll_start_time > data.start_time
+                                            ? 'form-group has-error' : 'form-group'">
+                                                <label for="enroll_start_time">活动报名开始时间</label>
+                                                <input ng-model="data.enroll_start_time" type="text"
+                                                       name="enroll_start_time"
+                                                       class="input_date form-control" id="enroll_start_time"
+                                                       min="{{ data.start_time }}" max="{{ data.end_time }}"
+                                                       placeholder="活动开始时间" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.enroll_end_time.$error.required || data.enroll_end_time < data.enroll_start_time
+                                            ? 'form-group has-error' : 'form-group'">
+                                                <label for="enroll_end_time">活动报名结束时间</label>
+                                                <input ng-model="data.enroll_end_time" type="text"
+                                                       name="enroll_end_time"
+                                                       class="input_date form-control" id="enroll_end_time"
+                                                       min="{{ data.enroll_start_time }}" max="{{ data.end_time }}"
+                                                       placeholder="活动结束时间" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.human_upper.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="human_upper">人数上限</label>
+                                                <input ng-model="data.human_upper" type="text" name="human_upper"
+                                                       class="form-control"
+                                                       id="human_upper" placeholder="人数上限" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="human_lower">人数下限</label>
+                                                <input ng-model="data.human_lower" type="text" name="human_lower"
+                                                       class="form-control"
+                                                       id="human_lower" placeholder="人数下限" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="{
+                                                    'has-error': create_form.enough_human.$error.max || create_form.enough_human.$error.min
+                                                    }" class="form-group">
+                                                <label for="enough_human">人数达到(人数)</label>
+                                                <input ng-model="data.enough_human"  name="enough_human"
+                                                       class="form-control" type="number"
+                                                       min="{{ data.human_lower }}" max="{{ data.human_upper }}"
+                                                       id="enough_human" placeholder="人数达到(人数)">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div class="form-group">
+                                                <label for="name">人数达到(费用)</label>
+                                                <input ng-model="data.enough_price" type="text" name="enough_price"
+                                                       class="form-control"
+                                                       id="enough_price" placeholder="人数达到(费用)">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="{
+                                                    'has-error': create_form.not_enough_human.$error.max || create_form.not_enough_human.$error.min
+                                                    }" class="form-group">
+                                                <label for="not_enough_human">人数不足(人数)</label>
+                                                <input ng-model="data.not_enough_human" type="number"
+                                                       min="{{ data.human_lower }}" max="{{ data.human_upper }}"
+                                                       name="not_enough_human" class="form-control"
+                                                       id="not_enough_human" placeholder="人数不足(人数)">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div  class="form-group">
+                                                <label for="not_enough_price">人数不足的数量对应的费用</label>
+                                                <input ng-model="data.not_enough_price" type="text"
+                                                       name="not_enough_price" class="form-control"
+
+                                                       id="not_enough_price" placeholder="人数不足(费用)">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.partake_type.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="partake_type">活动参与人群</label>
+                                                <select ng-model="data.partake_type" name="partake_type"
+                                                        id="partake_type" class="form-control" required>
+                                                    <option value="0">不限</option>
+                                                    <option value="1">学员</option>
+                                                    <option value="2">非学员</option>
+                                                    <option value="3">课程班</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div ng-if="data.partake_type == 3" class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.lessons.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="city">请选择课程班</label>
+                                                <select ng-model="data.lessons"
+                                                        ng-options="lesson.goodsid as lesson.goods_name for lesson in lessons"
+                                                        name="lessons" id="lessons" class="form-control" multiple
+                                                        required></select>
+                                            </div>
+                                        </div>
+
+                                        <hr width="100%"/>
+
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.manager.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="manager">活动负责人</label>
+                                                <input ng-model="data.manager" type="text" name="manager"
+                                                       class="form-control"
+                                                       id="manager" placeholder="活动负责人" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                            <div ng-class="create_form.manager_phone.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="manager_phone">负责人联系电话</label>
+                                                <input ng-model="data.manager_phone" type="text" name="manager_phone"
+                                                       class="form-control"
+                                                       id="manager_phone" placeholder="负责人联系电话" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                                            <div ng-class="create_form.describe.$error.required ? 'form-group has-error' : 'form-group'">
+                                                <label for="describe">描述</label>
+                                                <textarea ng-model="data.describe" class="form-control" name="describe"
+                                                          id="describe" rows="4" required></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div ng-if="data.cover_picture"
+                                                     class="col-xs-4 col-md-4 col-lg-4 col-md-4">
+                                                    <a href="javascript: void 0;" class="thumbnail"
+                                                       style="position: relative">
+                                                        <span ng-click="remove_cover_picture($index)"
+                                                              class="label label-danger"
+                                                              style="position: absolute;right: 0; top: 0;">删除</span>
+                                                        <img src="{{ 'http://gejubusinessbucket.oss-cn-beijing.aliyuncs.com/' + data.cover_picture }}"
+                                                             alt="">
+                                                    </a>
+                                                    <hr ng-if="$index%3===2"/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <label for="upload_cover_image">宣传图片<span>必选</span><sub>图片分辨率为1242*477</sub></label>
+                                                    <div>
+                                                        <input type="hidden" ng-model="data.cover_picture"
+                                                               name="cover_picture" required>
+                                                        <button id="upload_cover_image"
+                                                                ng-class="create_form.cover_picture.$error.required ? 'btn-danger' : ' btn-warning'"
+                                                                class="btn btn-sm"
+                                                                type="button">上传
+                                                        </button>
+                                                    </div>
+                                                    <p class="help-block">
+                                                        <small>最大1M，只支持jpg,gif,png,这可能需要10s-15s</small>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div ng-repeat="image in data.picture"
+                                                     class="col-xs-4 col-md-4 col-lg-4 col-md-4">
+                                                    <a href="javascript: void 0;" class="thumbnail"
+                                                       style="position: relative">
+                                                        <span ng-click="remove_picture($index)"
+                                                              class="label label-danger"
+                                                              style="position: absolute;right: 0; top: 0;">删除</span>
+                                                        <img src="{{ 'http://gejubusinessbucket.oss-cn-beijing.aliyuncs.com/' + image }}"
+                                                             alt="">
+                                                    </a>
+                                                    <hr ng-if="$index%3===2"/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <label for="upload_image">活动图片 <sub>建议不超过9张</sub></label>
+                                                    <div>
+                                                        <button id="upload_image" class="btn btn-sm btn-warning"
+                                                                type="button">上传
+                                                        </button>
+                                                    </div>
+                                                    <p class="help-block">
+                                                        <small>最大1M，只支持jpg,gif,png,这可能需要10s-15s</small>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div area-branch-checked checked-branches="data.branches" checked-areas="data.areas"></div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                                                    <div ng-class="create_form.is_stay.$error.required ? 'form-group has-error' : 'form-group'">
+                                                        <label for="is_stay">是否可以住宿</label>
+                                                        <select ng-model="data.is_stay"
+                                                                name="is_stay" id="is_stay" class="form-control"
+                                                                required>
+                                                            <option value="0">否</option>
+                                                            <option value="1">是</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button ng-disabled="create_form.$invalid" ng-click="submit()" type="button"
+                                                class="btn btn-success pull-left"
+                                                id="create">保存
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .service('HotelActivityService', function ($http) {
+                this.lesson = function () {
+                    return $http({
+                        url: '/admin/good/list',
+                        method: 'GET'
+                    })
+                };
+                this.city = function () {
+                    return $http({
+                        url: '/city',
+                        method: 'GET'
+                    })
+                };
+                this.branch = function () {
+                    return $http({
+                        url: '/admin/area/list',
+                        method: 'GET'
+                    })
+                };
+                this.delete_activity = function (id) {
+                    return $http({
+                        url: '/admin/hotel/activity/delete',
+                        method: 'POST',
+                        data: {id: id}
+                    })
+                };
+                this.create = function (data) {
+                    console.log(data);
+                    return $http({
+                        url: '/admin/hotel/activity/create',
+                        method: 'POST',
+                        data: data
+                    })
+                };
+                this.update = function (data) {
+                    delete data.updated_at;
+                    delete data.created_at;
+                    delete data.deleted_at;
+                    return $http({
+                        url: '/admin/hotel/activity/update',
+                        method: 'POST',
+                        data: data
+                    })
+                };
+                this.detail = function (id) {
+                    return $http({
+                        url: '/admin/hotel/activity/detail',
+                        method: 'GET',
+                        params: {
+                            id: id
+                        }
+                    })
+                }
+            })
+            .controller('HotelActivityController', function ($scope, $compile, HotelActivityService, staticService) {
+
+                if (staticService.query.id) {
+                    HotelActivityService.detail(staticService.query.id).success(function (result) {
+                        var data = result.result;
+                        data.cover_picture = data.cover_picture.split('.com/')[1];
+                        _.forEach(data.picture, function (v, i) {
+                            data.picture[i] = v.split('.com/')[1];
+                        });
+                        _.forEach(data.lessons, function (v, i) {
+                            data.lessons[i] = +data.lessons[i];
+                        });
+
+                        data.start_time = moment(data.start_time).format('YYYY-MM-DD');
+                        data.end_time = moment(data.end_time).format('YYYY-MM-DD');
+                        data.enroll_start_time = moment(data.enroll_start_time).format('YYYY-MM-DD');
+                        data.enroll_end_time = moment(data.enroll_end_time).format('YYYY-MM-DD');
+                        data.is_stay = data.is_stay ? '1' : '0';
+                        data.partake_type = data.partake_type.toString();
+                        data.not_enough_human = data.not_enough_human==0 ?'':data.not_enough_human;
+                        data.enough_human = data.enough_human==0 ?'':data.enough_human;
+                        _.forEach(data.branches,function(n,i){
+                            data.branches[i] = Number(n);
+                        })
+
+                        $scope.data = data;
+                        $scope.map_init(data.province + ',' + data.city + ',' + data.address);//初始化地图坐标
+                    })
+                } else {
+                    $scope.data = {
+                        title: '',
+                        province: '',
+                        city: '',
+                        address: '',
+                        longitude: '',
+                        latitude: '',
+                        start_time: '',
+                        end_time: '',
+                        enroll_start_time: '',
+                        enroll_end_time: '',
+                        human_upper: '',
+                        human_lower: '',
+                        enough_human: '',
+                        enough_price: '',
+                        not_enough_human: '',
+                        not_enough_price: '',
+                        partake_type: '',
+                        lessons: '',
+                        manager: '',
+                        manager_phone: '',
+                        describe: '',
+                        cover_picture: '',
+                        picture: [],
+                        branches: [],
+                        areas: [],
+                        state: 0,
+                        is_stay: '0'
+                    };
+                }
+
+                HotelActivityService.city().success(function (result) {
+                    $scope.province = result.result.list;
+                });
+                HotelActivityService.lesson().success(function (result) {
+                    $scope.lessons = result.result;
+                });
+                $scope.$watch('data.province', function (value, o) {
+                    angular.forEach($scope.province, function (v, i) {
+                        if (v.name === value) {
+                            //console.log(v.name, value);
+                            $scope.city = v.children
+                        }
+                    });
+                });
+                /* 获取全部分院 */
+                HotelActivityService.branch().success(function (result) {
+                    var list = result.result;
+                    $scope.branches_id = [];
+                    $scope.areas = list;
+                    angular.forEach(list, function (v) {
+                        angular.forEach(v.classroom, function (w) {
+                            $scope.branches_id.push(w.classroom);
+                        });
+                    });
+                    $scope.branches = list;
+                });
+                $scope.$watch('data.describe', function (value, o) {
+                    if(value>5000){
+                        sweetAlert("最多输入5000字符", '', "error");
+                        $scope.data.describe = $scope.data.describe.substr(0, 5000);
+                    }
+                });
+                $scope.submit = function () {
+                    var data = $scope.data;
+                    if (data.id) {
+                        HotelActivityService.update(data).success(function () {
+                            location.replace('/hotel/activity/manage');
+                        })
+                    } else {
+                        HotelActivityService.create(data).success(function () {
+                            location.replace('/hotel/activity/manage');
+                        })
+                    }
+                };
+                /* 上传图片逻辑 */
+                newupload($('#upload_image')[0], '', function (err, result) {
+                    if (err) {
+                        sweetAlert("上传失败", err, "error");
+                    } else {
+                        $scope.$apply(function () {
+                            $scope.data.picture.push(result.message.name);
+                        });
+                    }
+                });
+                newupload($('#upload_cover_image')[0], '', function (err, result) {
+                    if (err) {
+                        sweetAlert("上传失败", err, "error");
+                    } else {
+                        $scope.$apply(function () {
+                            console.log(result.message.name);
+                            $scope.data.cover_picture = result.message.name;
+                        });
+                    }
+                });
+                /* 删除图片逻辑 */
+                $scope.remove_picture = function (index) {
+                    var picture = $scope.data.picture;
+                    _.remove(picture, function (v, i) {
+                        return index === i;
+                    });
+                };
+                $scope.remove_cover_picture = function () {
+                    $scope.data.cover_picture = undefined;
+                }
+            });
+</script>
+<script>
+    /* 这里开始是 时间选择器 */
+    //开始时间
+    function dataPicker($dom) {
+        $dom.datetimepicker({
+            format: 'Y-m-d',
+            timepicker: false
+        });
+    }
+    dataPicker($('#start_time'));
+    dataPicker($('#end_time'));
+    dataPicker($('#enroll_start_time'));
+    dataPicker($('#enroll_end_time'));
+</script>

@@ -1,0 +1,51 @@
+<% include ../../../inc/head.html%>
+<script src="https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.js"></script>
+<script type="text/javascript" src="/javascripts/js/masonry.js"></script>
+<link rel="stylesheet" href="http://g.alicdn.com/de/prismplayer/1.4.7/skins/default/index-min.css" />
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+
+            <li><a href="/admin/goods/child/topic_add?classid=<%=classid%>"><span class="glyphicon glyphicon-plus"></span>新建</a></li>
+            <li><small style="color: red"></small></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-hover table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:50px">#</th>
+          <th >话题</th>
+          <th style="width:180px">创建时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%item.forEach(function(node,index){%>
+          <tr>
+            <td><%=index+1%></td>
+            <td>
+              <a href="/admin/goods/child/topic_edit?id=<%=node.topic_id%>"><%=node.topic_title%></a>
+              <a href="/admin/goods/child/topic_video?id=<%=node.topic_id%>"> <span class="label label-danger">视频</span></a>
+            </td>
+            <td>
+              <%=node.createdAt%>
+            </td>
+          </tr>
+        <%})%>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% include ../../../inc/footer.html%>

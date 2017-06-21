@@ -1,0 +1,534 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="/admin/member_add"><span class="glyphicon glyphicon-plus"></span>新建</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <div class="form-group">
+              <input type="text" name="m_name" placeholder="姓名" class="form-control input-sm"/>
+            </div>
+            <div class="input-group">
+              <input type="text" name="m_phone" placeholder="手机号码" class="form-control input-sm">
+              <span class="input-group-btn">
+              <button type="button" class="btn btn-danger btn-sm search">
+                <span class="glyphicon glyphicon-search"></span>
+              </button>
+            </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-condensed">
+        <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th style="width:200px">学员姓名</th>
+          <th style="width:180px">手机号</th>
+          <th >公司名称</th>
+          <th style="width:180px">职务</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+$(function(){
+  //分页初始值
+  var options = {
+    currentPage: 1,//当前页数
+    totalPages: 0,//总页数
+    numberOfPages: 12,//做多显示page页
+    bootstrapMajorVersion: 1,//版本
+    alignment: "center",
+    onPageClicked: function (e, originalEvent, type, page) {
+      if (page > options.totalPages) {
+        options.currentPage = options.totalPages;
+      } else {
+        options.currentPage = page;
+      }
+      var data=$('.search-form').serializeArray();
+      data.push({name:'page',value:page});
+      writeList(data)
+    }
+  };
+  //默认加载
+  writeList({});
+  $('.search').on('click',function(){
+    var data=$('.search-form').serializeArray();
+    options.currentPage=1;
+    writeList(data);
+  });
+  //写列表ajax
+  function writeList(data){
+    effect.show();
+    $.get('/admin/financial_member_class_ajax',data,function(result){
+      console.log(result)
+      if(result.code==200){
+        $("table tbody").empty('');
+        $("#inittmpl")
+            .tmpl(result.message.list)
+            .appendTo("table tbody");
+        options.totalPages=result.message.pagecount;
+        if (options.totalPages > 0) {
+          $('#page').bootstrapPaginator(options);
+        } else {
+          $('#page').empty();
+        }
+        effect.hide();
+      }else{
+        effect.hide();
+        effect.error('请求失败')
+      }
+    })
+  };
+  //设置状态
+  $(document).on('click','.setStatus',function(){
+    var data=$(this).data();
+
+    if(data.status==2){
+      swal({
+        title: "审核失败!",
+        text: "请输入审核内容:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        animation: "slide-from-top",
+        inputPlaceholder: "请描述" }, function(inputValue){
+        if (!inputValue) return false;
+        data.content=inputValue;
+        updateUser(data)
+      });
+    }
+    if(data.status==1){
+      swal({
+        title: "确认审核",
+        text: "审核成功该用户将成为APP会员！",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        closeOnConfirm: true },function(){
+        data.content='审核成功';
+        updateUser(data)
+      });
+    }
+  });
+  //用户审核
+  function updateUser(data) {
+    $.post('/admin/user_class_update',data,function(result){
+      if(result.code==200){
+        var page=$("#page").find('li.active').find('a').html()
+        writeList({page:page});
+      }else {
+        effect.error()
+      }
+    })
+  }
+  //查看审核记录
+  $(document).on('click','.getRecord',function(){
+    var id= $(this).data('id')
+    $.get('/admin/record_list',{id:id,type:0},function(result){
+      if(result.code==200){
+        $("#recordList").empty();
+        $("#recordtmpl")
+                .tmpl(result.message.list)
+                .appendTo("#recordList");
+        $('#modal_record').modal('show')
+      }else {
+        effect.error()
+      }
+    })
+
+  })
+  //查看付款单
+  $(document).on('click','.getPayment', _.throttle(function(){
+    var id= $(this).data('id')
+    $.get('/admin/payment_list',{id:id},function(result){
+      if(result.code==200){
+        $("#paymentList").empty();
+        $("#paymenttmpl")
+                .tmpl(result.message.list)
+                .appendTo("#paymentList");
+        $('#modal_payment').modal('show')
+      }else {
+        effect.error()
+      }
+    })
+
+  }, 500,{
+    'trailing': false
+  }));
+  function showMemberById(data){
+    $.get('/admin/member_by_mid',{mid:data.mid},function(result){
+      console.log(result)
+      if(result.code==200){
+        $("#memberByIdList").empty();
+        $("#membertmpl")
+                .tmpl(result.message.list)
+                .appendTo("#memberByIdList");
+      }else {
+        effect.error('错误')
+      }
+    });
+  }
+  //查看分院
+  var mid=null
+  $(document).on('click','.checkReport',function(){
+    var data=$(this).data();
+    $('#modal_member').modal('show');
+    mid=data.mid;
+    showMemberById({mid:data.mid})
+  });
+  //指派分院
+  $(document).on('click','.addReport',function(){
+    if(!mid){
+      return effect.error('未知错误')
+    }
+    var data={mid:mid}
+    swal({
+      title: "选择下发的分院",
+      text: '<select class="form-control" id="reportRoom">\
+            <%classroom.forEach(function(node,index){%>\
+              <option value="<%=node.classroom%>"><%=node.classroom_name%></option>\
+                      <%})%>\
+            </select>',
+      html: true,
+      showCancelButton: true,
+      cancelButtonText: "取消",
+      confirmButtonText: "确认!",
+      animation: "slide-from-top",
+    },function(){
+      var id=$("#reportRoom").val()
+      $.post('/admin/banch_member',{id:id,mid:data.mid},function(result){
+        if(result.code==200){
+          swal({   title: "成功",   text: "已下发到"+$("#reportRoom").find("option:selected").html(),   timer: 1000,   showConfirmButton: false });
+          showMemberById({mid:data.mid})
+        }else {
+          swal({   title: "失败",   text: "分发失败",   timer: 1000,   showConfirmButton: false });
+        }
+      })
+    });
+
+  });
+  //指派分院
+  $(document).on('click','.unReport',function(){
+    var data=$(this).data();
+    $.post('/admin/banch_member_break',data,function(result){
+      console.log(result)
+      if(result.code==200){
+        swal({   title: "成功",   text: "取消成功",   timer: 1000,   showConfirmButton: false });
+
+        showMemberById({mid:data.id})
+      }else {
+        swal({   title: "失败",   text: result.message,   timer: 1000,   showConfirmButton: false });
+      }
+    })
+
+  });
+});
+</script>
+<script id="membertmpl" type="text/x-jquery-tmpl">
+  <li class="list-group-item">
+    <span class="badge unReport" data-id=${mid} data-classroomid=${en_classroomid} style="cursor:pointer">取消</span>
+    ${classroom_name}
+  </li>
+</script>
+<script id="paymenttmpl" type="text/x-jquery-tmpl">
+  <li class="list-group-item">
+    {{if statement_documents_form==0}}
+      pos
+      {{if statement_documents_type==0}}
+      单条
+      {{else statement_documents_type==1}}
+      合单
+      {{else statement_documents_type==2}}
+      子单据
+      {{/if}}
+      <div style="width:100%; overflow-x: scroll">
+        <table class="table table-condensed table-responsive lgtable" style="table-layout:fixed">
+          <thead>
+          <tr>
+            <th style="width:120px">分院</th>
+            <th style="width:120px">清算日期</th>
+            <th style="width:120px">交易日期</th>
+            <th style="width:120px">交易时间</th>
+            <th style="width:120px">终端号</th>
+            <th style="width:100px">交易金额</th>
+            <th style="width:100px">剩余金额</th>
+            <th style="width:100px">清算金额</th>
+            <th style="width:100px">手续费</th>
+            <th style="width:120px">参考号</th>
+            <th style="width:180px">卡号</th>
+            <th style="width:120px">流水号</th>
+            <th style="width:100px">交易类型</th>
+            <th style="width:100px">卡类别</th>
+            <th style="width:180px">发卡行</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#ddd">
+              <td>${statement_classroomname}</td>
+              <td>${statement_closing_data}</td>
+              <td>${statement_trade_data}</td>
+              <td>${statement_trade_time}</td>
+              <td>${statement_terminal}</td>
+              <td>${statement_money}</td>
+              <td>${statement_money_remaining}</td>
+              <td>${statement_closing_money}</td>
+              <td>${statement_commission}</td>
+              <td>${statement_reference_number}</td>
+              <td>${statement_account}</td>
+              <td>${statement_serial_number}</td>
+              <td>${statement_type}</td>
+              <td>${statement_card_type}</td>
+              <td>${statement_issuing_bank}</td>
+              {{if children.length>0}}
+                {{each(i,v) children}}
+                  <tr>
+                    <td>${v.statement_classroomname}</td>
+                    <td>${v.statement_closing_data}</td>
+                    <td>${v.statement_trade_data}</td>
+                    <td>${v.statement_trade_time}</td>
+                    <td>${v.statement_terminal}</td>
+                    <td>${v.statement_money}</td>
+                    <td>${v.statement_money_remaining}</td>
+                    <td>${v.statement_closing_money}</td>
+                    <td>${v.statement_commission}</td>
+                    <td>${v.statement_reference_number}</td>
+                    <td>${v.statement_account}</td>
+                    <td>${v.statement_serial_number}</td>
+                    <td>${v.statement_type}</td>
+                    <td>${v.statement_card_type}</td>
+                    <td>${v.statement_issuing_bank}</td>
+                  </tr>
+                {{/each}}
+              {{/if}}
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    {{else}}
+      转账
+      {{if statement_documents_type==0}}
+      单条
+      {{else statement_documents_type==1}}
+      合单
+      {{else statement_documents_type==2}}
+      子单据
+      {{/if}}
+      <div style="width:100%; overflow-x: scroll">
+        <table class="table table-condensed table-responsive lgtable" style="table-layout:fixed">
+          <thead>
+          <tr>
+            <th style="width:120px">分院</th>
+            <th style="width:120px">付款单位</th>
+            <th style="width:180px">付款日期</th>
+            <th style="width:120px">转账银行</th>
+            <th style="width:180px">转账账号</th>
+            <th style="width:100px">付款金额</th>
+            <th style="width:100px">剩余金额</th>
+            <th style="width:300px">付款凭证</th>
+            <th style="width:100px">付款说明</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#ddd">
+              <td>${statement_classroomname}</td>
+              <td>${statement_name}</td>
+              <td>${statement_payment_data}</td>
+              <td>${statement_issuing_bank}</td>
+              <td>${statement_account}</td>
+              <td>${statement_money}</td>
+              <td>${statement_money_remaining}</td>
+              <td>
+              {{if statement_pics}}
+              {{each(i,v) statement_pics}}
+              <a href="http://files.geju.com/${v}" target="_blank"><img src="http://files.geju.com/${v}" height="50px" width="50px" class="img-thumbnail"></a>
+              {{/each}}
+              {{/if}}
+              </td>
+              <td>${statement_desc}</td>
+              {{if children.length>0}}
+                {{each(i,v) children}}
+                  <tr>
+                    <td>${statement_classroomname}</td>
+                    <td>${statement_name}</td>
+                    <td>${statement_payment_data}</td>
+                    <td>${statement_issuing_bank}</td>
+                    <td>${statement_account}</td>
+                    <td>${statement_money}</td>
+                    <td>${statement_money_remaining}</td>
+                    <td>
+                    {{if statement_pics}}
+                    {{each(i,v) statement_pics}}
+                    <a href="http://files.geju.com/${v}" target="_blank"><img src="http://files.geju.com/${v}" height="50px" width="50px" class="img-thumbnail"></a>
+                    {{/each}}
+                    {{/if}}
+                    </td>
+                    <td>${statement_desc}</td>
+                  </tr>
+                {{/each}}
+              {{/if}}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    {{/if}}
+  </li>
+</script>
+<script id="recordtmpl" type="text/x-jquery-tmpl">
+  <li class="list-group-item">
+    <span class="badge">${createdAt}</span>
+    ${feedback_content}
+  </li>
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr style="background:#ddd">
+    <td>${index}</td>
+    <td>
+      <a href="/admin/member_edit?mid=${mid}">${m_name}</a>
+      {{if classroom==0}}
+        <a href="javascript:void(0)" class="checkReport" data-mid="${mid}"> <span class="label label-primary">查看分院</span></a>
+      {{else}}
+      {{/if}}
+    </td>
+    <td>${m_phone}</td>
+    <td>${m_company}</td>
+    <td>${m_position}</td>
+  </tr>
+  {{if m.length>0}}
+  <tr>
+    <td>
+      <!--<a class="btn btn-warning btn-xs">已关联的学员</a>-->
+    </td>
+    <td colspan ="15" id="showMember_${statement_id}">
+      <table class="table table-condensed table-responsive memberList">
+        <thead>
+          <tr>
+            <th style="width: 120px">报名分院</th>
+            <th>所报课程</th>
+            <th style="width: 120px">课程费用</th>
+            <th style="width: 80px">报名方式</th>
+            <th style="width: 180px">报名时间</th>
+            <th style="width: 80px">状态</th>
+            <th style="width: 200px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each(i,v) m}}
+            <tr>
+              <td>${v.classroom_name}</td>
+              <td>${v.goods_name}</td>
+              <td>${v.en_fee}</td>
+              <td>
+              {{if v.en_type==0}}
+              pos
+              {{else v.en_type==1}}
+              转账
+              {{/if}}
+              </td>
+              <td>${v.createdAt }</td>
+              <td>
+                {{if v.en_cid==0}}
+                  未关联账单
+                {{else}}
+                  {{if v.en_status==0}}
+                  未审核
+                  {{else v.en_status==1}}
+                  通过
+                  {{else v.en_status==2}}
+                  未通过
+                  {{/if}}
+                {{/if}}
+              </td>
+              <td>
+              <a class="btn btn-warning btn-xs getRecord" data-id="${en_uid}">查看审核记录</a>
+              {{if classroom==0}}
+                {{if v.en_status==1}}
+                审核成功
+                {{else}}
+                <a class="btn btn-warning btn-xs setStatus" data-status="1" data-id="${en_uid}">通过</a>
+                <a class="btn btn-warning btn-xs setStatus" data-status="2" data-id="${en_uid}">不通过</a>
+                {{/if}}
+              {{else}}
+                 <a class="btn btn-warning btn-xs getPayment" data-id="${en_uid}">查看付款单</a>
+              {{/if}}
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</script>
+<div class="modal fade" id="modal_record" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          审核记录
+        </h5>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group" id="recordList">
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal_payment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          关联单据
+        </h5>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group" id="paymentList">
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal_member" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          所属分院
+        </h5>
+      </div>
+      <div class="modal-body">
+        <span class="btn btn-danger addReport">新增指派</span>
+        <ul class="list-group" id="memberByIdList">
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

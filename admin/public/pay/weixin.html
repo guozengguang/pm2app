@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>支付</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <style>
+        .card,.list-block{
+            margin: 0;
+        }
+        .card-header .card-cover{
+            width: 50%;
+            margin: 0 auto;
+        }
+        .list-block .item-title.label{
+            width: 25%;
+            text-align: center;
+        }
+        .city-picker .col-city,.city-picker .col-province,.picker-items-col.picker-items-col-center  {
+            width: auto;
+            font-size: .8rem;
+        }
+        .picker-items-col.picker-items-col-center.picker-items-col-absolute,
+        .picker-items-col.picker-items-col-center,
+        .picker-items-col-wrapper,
+        .picker-item{
+            width: 100%!important;
+        }
+    </style>
+</head>
+<body >
+<div class="page-group">
+    <div class="page page-current">
+        <header class="bar bar-nav">
+            <h1 class="title">格局商学院 课程购买</h1>
+        </header>
+        <div class="content">
+            <div class="list-block">
+                <form id="pay_form">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">所属分院</div>
+                                    <div class="item-input">
+                                        <input type="text" name="room" id="city-picker" placeholder="必选项,请点击选择" readonly>
+                                        <input type="hidden" id="province" name="province">
+                                        <input type="hidden" id="place" name="place">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">课程班</div>
+                                    <div class="item-input">
+                                        <input type="text" name="goods" placeholder="必选项,请点击选择" readonly>
+                                        <input type="hidden" name="goodsid">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">学费 :</div>
+                                    <div class="item-input">
+                                        <input type="text" name="fee" onkeyup="value=value.replace(/[^\-?\d.]/g,'')" readonly placeholder="请先选择所属分院及课程班">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">姓名 :</div>
+                                    <div class="item-input">
+                                        <input type="text" name="name" placeholder="必填项">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">手机号 :</div>
+                                    <div class="item-input">
+                                        <input type="tel" name="tel" placeholder="必填项">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">公司名称 :</div>
+                                    <div class="item-input">
+                                        <input type="text" name="company" placeholder="选填项">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">职位 :</div>
+                                    <div class="item-input">
+                                        <input type="text" name="position" placeholder="选填项">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <div class="col-100"><a href="#" class="button button-big button-fill button-danger payment">提交</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//res.wx.qq.com/open/js/jweixin-1.2.0.js' charset='utf-8'></script>
+<script type='text/javascript' src='./pay.js?id=12' charset='utf-8'></script>
+<script>
+    $(function () {
+        $.get(BASEURL+'/pay/config',{url:encodeURI(window.location.href)},function (result) {
+            if(result.code==200){
+                wx.config({
+                    debug: result.result.debug, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                    appId: result.result.appId, // 必填，公众号的唯一标识
+                    timestamp: result.result.timestamp, // 必填，生成签名的时间戳
+                    nonceStr: result.result.nonceStr, // 必填，生成签名的随机串
+                    signature: result.result.signature,// 必填，签名，见附录1
+                    jsApiList: result.result.jsApiList // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+                });
+                wx.ready(function(){
+                    wx.hideAllNonBaseMenuItem();
+                });
+                wx.error(function(res){
+                    console.log(res)
+                    console.log('微信错误')
+                });
+            }else {
+                console.log('初始化失败')
+            }
+        })
+        //课程列表picker
+        var goods=getQueryString('goods')
+        $.get(BASEURL+'/pay/goods',{goods:goods},function (result) {
+            if(result.code==200){
+                //如果只有一节课那么直接选定
+                var list=result.result.list;
+                if(list.length==1){
+                    $('input[name="goodsid"]').val(list[0].id)
+                    $('input[name="goods"]').val(list[0].name)
+                    $('input[name="fee"]').val(list[0].fee)
+                }else {
+                    var arr1=[],arr2=[]
+                    $.each(list,function (index,node) {
+                        arr1.push(node.name)
+                        arr2.push([node.id,node.fee])
+                    })
+                    initGoods({arr1:arr1,arr2:arr2})
+                }
+            }
+        })
+        //分院picker
+        $.get(BASEURL+'/pay/room',function (result) {
+            if(result.code==200){
+                (function($){
+                    init($,result.result.list)
+                })(Zepto);
+            }
+            initRoom()
+        })
+        //支付宝下单
+        var code=getQueryString('code')
+        var submitStatus=false;
+        if(!code){
+            window.location.href=ROUTERURL
+        }else {
+            $.get(BASEURL+'/pay/openid',{code:code},function (result) {
+                if(result.code!=200 || result.result.errcode==40163){//code  失效
+                    window.location.href=ROUTERURL
+                }else {
+                    var openid=result.result.openid;
+                    $('.payment').on('click',function () {
+                        if(submitStatus){
+                            submitStatus=true;
+                            return $.toast('请勿频繁操作');
+                        }
+                        var data=$('#pay_form').serializeArray()
+                        data.push({name:'openid',value:openid})
+                        $.ajax({
+                            type: 'POST',
+                            url: BASEURL+'/pay/payment',
+                            data: data,
+                            dataType: 'json',
+                            timeout: 5000,
+                            success: function(result){
+                                if(result.code==200){
+                                    WeixinJSBridge.invoke(
+                                            'getBrandWCPayRequest', result.result,
+                                            function(res){
+                                                if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                                                    window.location.href=BASEURL+'/pay/ok.html?out_trade_no='+result.result.out_trade_no
+                                                }    // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+                                            }
+                                    );
+                                }else {
+                                    $.toast(result.message);
+                                }
+                                return submitStatus=false;
+                            },
+                            error: function(xhr, type){
+                                submitStatus=false;
+                                return $.toast('网络异常');
+                            }
+                        })
+                    })
+                }
+            })
+        }
+    })
+
+    function initGoods(data) {
+        $('input[name="goods"]').picker({
+            toolbarTemplate: '<header class="bar bar-nav">\
+              <button class="button button-link pull-right close-picker">确定</button>\
+              <h1 class="title">课程班</h1>\
+              </header>',
+            cols: [
+                {
+                    textAlign: 'center',
+                    values:data.arr2,
+                    displayValues:data.arr1
+                }
+            ],
+            formatValue:function(picker, value, displayValue){
+                var key=value.toString().split(',')
+                $('input[name="goodsid"]').val(key[0])
+                $('input[name="fee"]').val(key[1])
+                return displayValue
+            }
+        });
+    }
+    function initRoom() {
+        $("#city-picker").cityPicker({
+            toolbarTemplate: '<header class="bar bar-nav">\
+                <button class="button button-link pull-right close-picker">确定</button>\
+                <h1 class="title">所属分院</h1>\
+                </header>',
+            province: '#province',//省输入框,一般都是隐藏的，获取身份ID
+            place: '#place' //城市输入框，一般都是隐藏的，获取城市ID
+        });
+    }
+</script>
+</body>
+</html>

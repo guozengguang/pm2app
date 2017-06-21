@@ -1,0 +1,302 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div>
+                <div class="pull-left">
+                </div>
+                <div class="pull-right">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a class="toggle_f_b" href="#init" aria-controls="init" data-toggle="tab" aria-expanded="true" data-from="0">前台数据</a></li>
+                <li><a class="toggle_f_b" href="#other" aria-controls="other" data-toggle="tab" aria-expanded="false" data-from="1">后台数据</a></li>
+            </ul>
+            <div class="tab-content" style="margin-top:15px;">
+                <div class="tab-pane active" id="init">
+                    <button class="btn btn-danger btn-sm creatInit" type="button" data-from="0">添加</button>
+                    <table class="table table-hover table-striped table-condensed" id="initTable">
+                        <thead>
+                        <tr>
+                            <th>描述</th>
+                            <th style="width: 100px">姓名</th>
+                            <%if(locals.current_user_roles.r_permission.indexOf('7004')>=0 || locals.current_user_roles.r_permission===""){%>
+                            <th style="width:160px;">投票数</th>
+                            <%}%>
+                            <th style="width:40px;">状态</th>
+                            <th style="width: 200px" class="text-center">操作</th>
+                        <tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane " id="other">
+                    <button class="btn btn-danger btn-sm creatInit" type="button" data-from="1">添加</button>
+                    <table class="table table-hover table-striped table-condensed" id="otherTable">
+                        <thead>
+                        <tr>
+                            <th>描述</th>
+                            <%if(locals.current_user_roles.r_permission.indexOf('7004')>=0 || locals.current_user_roles.r_permission===""){%>
+                            <th style="width:160px;">投票数</th>
+                            <%}%>
+                            <th style="width:40px;">状态</th>
+                            <th style="width: 200px" class="text-center">操作</th>
+                        <tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var getSearch = (function () {
+        var args = {};
+        return function () {
+            var query = location.search.substring(1);
+            var pairs = query.split("&");
+            for (var i = 0; i < pairs.length; i++) {
+                var items = pairs[i].split('=');
+                args[items[0]] = items[1];
+            }
+            return args;
+        }
+    })();
+    var parent_id = getSearch().id;
+    var from = 0;
+    $(function () {
+        $('.toggle_f_b').on('click',function () {
+            from = $(this).data('from');
+        })
+        initList();
+        $('.creatInit').on('click', function () {
+            var btn = $(this);
+            var from = $(this).data('from');
+            var data = {
+                from: from
+            };
+            data.id = new Date().getTime();
+            btn.hide();
+            if(from){
+                $('#inittmp2')
+                        .tmpl(data)
+                        .prependTo("#otherTable tbody")
+            }else {
+                $('#inittmpl')
+                        .tmpl(data)
+                        .prependTo("#initTable tbody")
+            }
+        });
+        $(document).on('click', '.initDel', function () {
+            var id = $(this).attr('data-id');
+            var uid = $(this).attr('data-uid');
+            var name = $(this).attr('data-name');
+            swal({
+                title: "确定删除 "+ name +" ?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                animation: "slide-from-top",
+                closeOnConfirm: true,
+                html: false
+            }, function () {
+                if (uid) {
+                    $('#row_' + uid).remove();
+                    $('.creatInit').show();
+                    initDel(uid);
+                }
+                if (id) {
+                    $('#row_' + id).remove();
+                    initDel(id);
+                }
+            });
+        });
+        $(document).on('click', '.initSave', function () {
+            var id = $(this).attr('data-id');
+            var uid = $(this).attr('data-uid');
+            var data = {};
+            if (uid) {
+                var row = $('#row_' + uid);
+                data.parent_id = parent_id;
+            }
+            if (id) {
+                var row = $('#row_' + id);
+                data.id = id;
+            }
+            data.describe = row.find('input[name="describe"]').val();
+            data.vote_count = row.find('input[name="vote_count"]').val();
+            data.name = row.find('input[name="name"]').val();
+            data.from = row.find('input[name="from"]').val() || from;
+            initSave(data);
+        });
+        $(document).on('click', '.up_online', function () {
+            var id = $(this).attr('data-id') || $(this).attr('data-uid');
+            $.post('/admin/questionnaire/content/update', {
+                id: id,
+                state: 1
+            }, function (result) {
+                if (result.code == 200) {
+                    effect.success(function () {
+                        $('.creatInit').show();
+                        initList();
+                    });
+                } else {
+                    swal("上线失败", result.message, "warning")
+                }
+            })
+        });
+        $(document).on('click', '.down_online', function () {
+            var id = $(this).attr('data-id') || $(this).attr('data-uid');
+            $.post('/admin/questionnaire/content/update', {
+                id: id,
+                state: 0
+            }, function (result) {
+                if (result.code == 200) {
+                    effect.success(function () {
+                        $('.creatInit').show();
+                        initList();
+                    });
+                } else {
+                    swal("下架失败", result.message, "warning")
+                }
+            })
+        });
+    });
+    function initSave(data) {
+        var url = '';
+        if (data.id) {
+            url = '/admin/questionnaire/content/update';
+        } else {
+            url = '/admin/questionnaire/content/create';
+        }
+        $.post(url, data, function (result) {
+            if (result.code == 200) {
+                effect.success(function () {
+                    $('.creatInit').show();
+                    initList();
+                });
+            } else {
+                swal("保存失败", result.message, "warning")
+            }
+        })
+    };
+    function initDel(id) {
+        $.post('/admin/questionnaire/content/delete', {id: id}, function (result) {
+            if (result.code == 200) {
+                effect.success(function () {
+                    $('.creatInit').show();
+                });
+            } else {
+                swal("删除失败", result.message, "warning")
+            }
+        })
+    }
+    function initList() {
+        effect.show();
+        $.get('/admin/questionnaire/content/list?parent_id=' + parent_id + '&from=0', function (result) {
+            if (result.code == 200) {
+                $("#initTable tbody").empty();
+                $('#listtmpl')
+                        .tmpl(result.result)
+                        .appendTo("#initTable tbody");
+                effect.hide();
+            } else {
+                effect.hide();
+            }
+        });
+        $.get('/admin/questionnaire/content/list?parent_id=' + parent_id + '&from=1', function (result) {
+            if (result.code == 200) {
+                $("#otherTable tbody").empty();
+                $('#listtmp2')
+                        .tmpl(result.result)
+                        .appendTo("#otherTable tbody");
+                effect.hide();
+            } else {
+                effect.hide();
+            }
+        })
+    }
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="describe"  placeholder="描述" value="${describe}"></td>
+    <td><input type="text" class="form-control input-sm" name="name"  placeholder="姓名" value="${name}"></td>
+<%if(locals.current_user_roles.r_permission.indexOf('7004')>=0 || locals.current_user_roles.r_permission===""){%>
+    <td>
+        <input type="text" class="form-control input-sm" name="vote_count"  placeholder="投票数" value="${vote_count}">
+    </td>
+<%}%>
+    <td style="vertical-align: middle">下架</td>
+    <td class="text-center"><span class="btn-group"><button class="btn btn-success btn-sm initSave" type="button" data-uid="${id}">保存</button><button class="btn btn-danger btn-sm initDel" type="button" data-uid="${id}">删除</button></span>
+        <input type="hidden" class="form-control input-sm" name="from"  placeholder="投票数" value="${from}">
+    </td>
+  </tr>
+</script>
+<script id="inittmp2" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="describe"  placeholder="描述" value="${describe}"></td>
+<%if(locals.current_user_roles.r_permission.indexOf('7004')>=0 || locals.current_user_roles.r_permission===""){%>
+    <td>
+        <input type="text" class="form-control input-sm" name="vote_count"  placeholder="投票数" value="${vote_count}">
+    </td>
+<%}%>
+    <td style="vertical-align: middle">下架</td>
+    <td class="text-center"><span class="btn-group"><button class="btn btn-success btn-sm initSave" type="button" data-uid="${id}">保存</button><button class="btn btn-danger btn-sm initDel" type="button" data-uid="${id}">删除</button></span>
+        <input type="hidden" class="form-control input-sm" name="from"  placeholder="投票数" value="${from}">
+    </td>
+  </tr>
+</script>
+<script id="listtmpl" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="describe"  placeholder="描述" value="${describe}"></td>
+    <td style="vertical-align: middle">${ name }</td>
+<%if(locals.current_user_roles.r_permission.indexOf('7004')>=0 || locals.current_user_roles.r_permission===""){%>
+    <td><input type="text" class="form-control input-sm" name="vote_count"  placeholder="投票数" value="${vote_count}"></td>
+<%}%>
+    <td style="vertical-align: middle">${state ? '上架' : '下架' }</td>
+    <td class="text-center">
+        <span class="btn-group">
+        {{if state}}
+            <button class="btn btn-info btn-sm down_online" type="button" data-id="${id}">下架</button>
+        {{else}}
+            <button class="btn btn-danger btn-sm up_online" type="button" data-id="${id}">上架</button>
+        {{/if}}
+            <button class="btn btn-success btn-sm initSave" type="button" data-id="${id}">保存</button>
+            <button class="btn btn-danger btn-sm initDel" type="button" data-id="${id}" data-name="${describe}">删除</button>
+        </span>
+    </td>
+  </tr>
+
+</script>
+<script id="listtmp2" type="text/x-jquery-tmpl">
+  <tr id="row_${id}">
+    <td><input type="text" class="form-control input-sm" name="describe"  placeholder="描述" value="${describe}"></td>
+<%if(locals.current_user_roles.r_permission.indexOf('7004')>=0 || locals.current_user_roles.r_permission===""){%>
+    <td><input type="text" class="form-control input-sm" name="vote_count"  placeholder="投票数" value="${vote_count}"></td>
+<%}%>
+    <td style="vertical-align: middle">${state ? '上架' : '下架' }</td>
+    <td class="text-center">
+        <span class="btn-group">
+        {{if state}}
+            <button class="btn btn-info btn-sm down_online" type="button" data-id="${id}">下架</button>
+        {{else}}
+            <button class="btn btn-danger btn-sm up_online" type="button" data-id="${id}">上架</button>
+        {{/if}}
+            <button class="btn btn-success btn-sm initSave" type="button" data-id="${id}">保存</button>
+            <button class="btn btn-danger btn-sm initDel" type="button" data-id="${id}" data-name="${describe}">删除</button>
+        </span>
+    </td>
+  </tr>
+
+</script>
+<% include ../inc/footer.html%>

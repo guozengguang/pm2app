@@ -1,0 +1,74 @@
+<% include ../../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>编辑课后回顾</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <form id="child_form">
+                  <div  class="panel">
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="class_name" class="control-label">课程名称</label>
+                          <input type="text" readonly  placeholder="课程名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.class_name%>"  pattern="^\S{1,28}$" data-bv-regexp-message='标题为28个以内汉字'>
+                          <input type="hidden" name="classid" placeholder="课程名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' value="<%=item.classid%>">
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div id="back_editor">
+                            <label for="class_back" class="control-label">课后回顾</label>
+                            <textarea id="class_back" name="class_back" value='' style="width:100%;height:240px;" class="setEditor"><%=item.class_back%></textarea>
+                          </div>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function() {
+    //验证提交
+    $('#child_form').bootstrapValidator().on('success.form.bv', function (e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      $("#class_back").val(editor[0].html());
+      var data = $('#child_form').serializeArray();
+      $.post("/admin/child_update", data, function (result) {
+        if (result.code == 200) {
+          effect.success(function () {
+            location.href = "/admin/class/child?goodsid=<%=item.class_goodsid%>"
+          })
+        } else {
+          effect.error(result.message)
+        }
+      })
+    });
+  })
+</script>
+<% include ../../inc/footer.html%>

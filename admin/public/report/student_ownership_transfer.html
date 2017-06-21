@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>格局商学学员录入管理系统</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--为了防止手机号被iOS屏蔽-->
+    <meta name = "format-detection" content = "telephone=no">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font/iocns.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a href="#" class="btn goHome"><span class="lw lw-icon-left-open-big"> </span></a>
+            <button type="button" class="navbar-toggle btn-link collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="lw lw-icon-menu-1"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!--li><a href="#"><span class="lw lw-icon-user-1"></span> 个人中心</a></li-->
+                <li><a href="list.html"><span class="lw lw-icon-vcard"></span> 学员信息</a></li>
+                <li class="active"><a href="#"><span class="lw lw-icon-shuffle-1"></span> 学员归属转移</a></li>
+                <!--<li><a href="list.html"><span class="lw lw-icon-archive"></span> 报备中心</a></li>-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="lw lw-icon-user-1"></span> <span id="loginPhone"></span> <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="update_pwd.html"><span class="lw lw-icon-key"></span> 密码修改</a></a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="quit()"><span class="lw lw-icon-logout-1"></span> 退出系统</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container con-list">
+    <div class="panel panel-default">
+        <!--<div class="panel-heading">-->
+            <!--<a href="student_ownership_transfer_apply.html" type="button" class="btn btn-info">归属转移申请</a>-->
+            <!--<input id="btn_student_query" onclick="query()" type="button" style="float: right" class="btn btn-info"-->
+                   <!--value="查询"/>-->
+            <!--<input id="student_phone" style="float: right;margin-right: 10px;margin-top: 3px;" type="text"-->
+                   <!--placeholder="手机号查询" required/>-->
+            <!--<input id="student_name" style="float: right;margin-right: 10px;margin-top: 3px;" type="text"-->
+                   <!--placeholder="姓名查询" required/>-->
+        <!--</div>-->
+        <div class="panel-body">
+            <div class="bodyTable" style="overflow: scroll;width: 100%">
+                <table class="table table-hover" style="min-width: 1000px">
+                    <thead>
+                    <tr>
+                        <div class="panel-heading" style="min-width: 1000px">
+                            <a href="student_ownership_transfer_apply.html" type="button" class="btn btn-info">归属转移申请</a>
+                            <input id="btn_student_query" onclick="query()" type="button" style="float: right" class="btn btn-info"
+                                   value="查询"/>
+                            <!--<input id="student_phone" style="float: right;margin-right: 10px;margin-top: 3px;" type="text"-->
+                                   <!--placeholder="手机号查询" required/>-->
+                            <input id="student_name" style="float: right;margin-right: 10px;margin-top: 3px;" type="text"
+                                   placeholder="输入手机号或姓名查询" required/>
+                        </div>
+                    </tr>
+                    <tr>
+                        <th style="width:90px">学员编号</th>
+                        <th style="width:90px">姓名</th>
+                        <th style="width:90px">电话</th>
+                        <th style="width:90px">原归属人</th>
+                        <th style="width:90px">申请时间</th>
+                        <th style="width:90px">审核状态</th>
+                        <th style="width:90px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="mainTbody">
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div id="pageTool" class="btn-group" role="group" aria-label="...">
+                <!--<button type="button" class="btn btn-default"><span class="lw lw-icon-angle-double-left"></span></button>
+               <button type="button" class="btn btn-default">1</button>
+               <button type="button" class="btn btn-default">2</button>
+               <button type="button" class="btn btn-default">3</button>
+               <button type="button" class="btn btn-default">4</button>
+               <button type="button" class="btn btn-default">5</button>
+               <button type="button" class="btn btn-default"><span class="lw lw-icon-angle-double-right"></span></button>-->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="js/comm.js"></script>
+<script type="text/javascript" src="js/public.js"></script>
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/util.js"></script>
+<script type="text/javascript">
+    var loginPhone = $.cookie("currentUserPhone");
+
+    var pagecount = 0;
+    var pagesize = 5;
+    var nowpage = 0;
+    var studentName = $("#student_name").val();
+//    var studentPhone = $("#student_phone").val();
+    if (loginPhone == null || loginPhone == "") {
+        window.location.href = "login.html";
+    } else {
+        $("#loginPhone").html(loginPhone);
+        $.ajax({
+            url: 'http://api.geju.com/business/report/apply/affiliation/' + $.cookie("currentUserPhone") + "?page=0&pagesize=" + pagesize +"&name=" + studentName,
+            dataType: "json",
+            async: true,
+            data: "",
+            type: "GET",
+            success: function (res) {
+                if (res.code == '200') {
+                    pagecount = res.result.pagecount;
+                    if (res.result.pagecount > 0) {
+                        var pagli = "";
+                        for (var i = 0; i < res.result.pagecount; i++) {
+                            var pg = i + 1;
+                            pagli += '<a href="#" onclick="javascript:toPage(' + i + ')" class="btn btn-default">' + pg + '</a>';
+                        }
+                        $("#pageTool").html(pagli);
+                    }
+                    loadTable(res.result.list);
+                } else if (res.code == '401') {
+                    window.location.href = "./login.html";
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+
+    function query() {
+        studentName = $("#student_name").val();
+//        studentPhone = $("#student_phone").val();
+        toPage(0);
+    }
+
+    function toPage(page) {
+        nowpage = page;
+        $.ajax({
+            url: 'http://api.geju.com/business/report/apply/affiliation/' + $.cookie("currentUserPhone") + "?page=" + page + "&pagesize=" + pagesize + "&name=" + studentName,
+            dataType: "json",
+            async: true,
+            data: "",
+            type: "GET",
+            success: function (res) {
+                if (res.code == '200') {
+                    loadTable(res.result.list);
+                    if (pagecount != res.result.pagecount) {
+                        pagecount = res.result.pagecount;
+                        $("#pageTool").html("");
+                        if (res.result.pagecount > 0) {
+                            var pagli = "";
+                            for (var i = 0; i < res.result.pagecount; i++) {
+                                var pg = i + 1;
+                                pagli += '<a href="#" onclick="javascript:toPage(' + i + ')" class="btn btn-default">' + pg + '</a>';
+                            }
+                            $("#pageTool").html(pagli);
+                        }
+                    }
+                }else if(res.code == '401'){
+                    window.location.href = "./login.html";
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+
+    function loadTable(list) {
+        $("#mainTbody").html("");
+        for (i = 0; i < list.length; i++) {
+            var mainHtml = $("#mainTbody").html();
+            var m_name = list[i]["m_name"];//学员姓名
+            var m_phone = list[i]["m_phone"];//学员电话
+            var new_name = list[i]["new_name"];//新的归属人
+            var old_name = list[i]["old_name"];//原归属人
+            var time = list[i]["time"];//申请时间
+            var id = list[i]["id"];
+            var status = list[i]["status"];//审核状态 0未审核 1通过 2未通过
+            var mid = list[i]["mid"];//学院ID
+            var index = list[i]["index"];//学员编号
+            var status_str = "";
+            if (status == 0) {
+                status_str = "未审核";
+            } else if (status == 1) {
+                status_str = "通过";
+            } else if (status == 2) {
+                status_str = "未通过";
+            }
+            var thisHtml = "<tr>" +
+                "<td style='width:90px'>" + index + "</td>" +
+                "<td style='width:90px'>" + m_name + "</td>" +
+                "<td style='width:90px'>" + m_phone + "</td>" +
+                "<td style='width:90px'>" + old_name + "</td>" +
+                "<td style='width:90px'>" + time + "</td>" +
+                "<td style='width:90px'>" + status_str + "</td>";
+            if (status == 0) {
+                thisHtml += "<td><a href='#' style='color:blue' onclick='deleteData(" + id + ")'>删除</a></td>";
+            } else {
+                thisHtml += "<td></td>";
+            }
+            thisHtml += "</tr >";
+
+            mainHtml += thisHtml;
+
+            $("#mainTbody").html(mainHtml);
+        }
+    }
+
+    function deleteData(id) {
+        $.ajax({
+            url: 'http://api.geju.com/business/report/del/affiliation/' + loginPhone,
+            dataType: "json",
+            async: true,
+            data: {id: loginPhone, uid: id},
+            type: "POST",
+            success: function (res) {
+                if (res.code == '200') {
+                    alert("删除成功");
+                    toPage(nowpage);
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

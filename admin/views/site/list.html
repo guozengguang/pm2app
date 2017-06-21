@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>现场控制</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!--Bootstrap v4.0.0-alpha.5-->
+    <link rel="stylesheet" href="/site/css/bootstrap.min.css">
+    <link href="/site/font/iocns.css" rel="stylesheet">
+    <link rel="stylesheet" href="/site/css/index.css">
+    <link rel='stylesheet' href='http://files.cdn.geju.com/static/css/bootstrapValidator.min.css' />
+
+</head>
+
+
+<body>
+<div class="container-fluid con home">
+    <!--NAV-->
+    <!--<div class="left-nav h-100">
+        <p><img src="/site/img/logo@2x.png"/></p>
+        <ul>
+            <li class="active">
+                <p class="lw lw-icon-sliders"> </p>
+                <p class="nav-text">现场控制</p>
+            </li>
+        </ul>
+    </div>-->
+    <!--中间内容-->
+    <div class="middle-content">
+        <div class="md-title">
+            <h3>直播现场互动管理   </h3>
+
+            <p class="user-img"><img  src="/site/img/2243528274243.jpg" ></p>
+            <p class="user">场控管理员：admin | <a href="javascript:void(0)" id="logout">注销</a></p>
+        </div>
+        <div class="course">
+
+            <div class="row">
+                <h4>最新课程</h4>
+                <%nowList.forEach(function(node){%>
+                <div class="col-sm-6 col-md-6 col-xl-2 col-lg-4 ">
+                    <a href="/site/control/detail/<%=node.classid%>" ><img src="<%=node.class_img%>" class="rounded " alt="..."></a>
+                </div>
+                <%})%>
+            </div>
+
+            <div class="row">
+                <h4>历史课程</h4>
+                <%backList.forEach(function(node){%>
+                <div class="col-sm-6 col-md-6 col-xl-2 col-lg-4 ">
+                    <a href="/site/control/detail/<%=node.classid%>" ><img src="<%=node.class_img%>" class="rounded " alt="..."></a>
+                </div>
+                <%})%>
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+
+    <!--右侧辅助-->
+    <!--<div class="right-aid">
+        &lt;!&ndash;
+            作者：liwei601x@qq.com
+            时间：2016-11-08
+            描述：当前此功能还没有开启
+
+        <h4>互动控制台</h4>
+        <div class="chaozhuot ">
+            <div class="col-sm-6">
+                <button type="button" class="  btn btn-info " data-toggle="button" aria-pressed="false" autocomplete="off">
+                  <span class="zh">开启题问</span>
+                  <span class="lw lw-icon-ok-circle"></span>
+                </button>
+            </div>
+            <div class="col-sm-6">
+                <button type="button" class="  btn btn-info " data-toggle="button" aria-pressed="false" autocomplete="off">
+                  <span class="zh">显示题板</span>
+                  <span class="lw lw-icon-ok-circle"></span>
+                </button>
+            </div>
+        </div>
+        &ndash;&gt;
+        <h4>系统信息</h4>
+
+    </div>-->
+
+
+</div>
+
+
+
+<!-- 用户登录 -->
+
+<div class="modal fade bd-example-modal-sm admin-login" tabindex="-1" role="dialog" data-backdrop="static"  aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="top-logo"> <img src="/site/img/login_logo.png"/></p>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="adminuser">管理员用户名</label>
+                        <input type="text" class="form-control" id="adminuser" aria-describedby="userHelp" value="admin" readonly>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword">登录密码</label>
+                        <input type="password" class="form-control" id="exampleInputPassword">
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="enter">登陆</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/site/js/jquery.min.js"></script>
+<script src="/site/js/tether.min.js"></script>
+<script src="/site/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://files.cdn.geju.com/static/js/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="http://files.cdn.geju.com/static/js/bootstrapValidator.min.js"></script>
+<script src="http://cdn.bootcss.com/plupload/2.1.7/plupload.full.min.js"></script>
+<script>
+    $(function(){
+        //控制登陆
+        <%if(!Validate){%>
+            $('.admin-login').modal('show');
+        <%}%>
+
+        //设置cookie
+        $('#enter').click(function(){
+            loginIn()
+        });
+        $('#exampleInputPassword').on('keydown',function(evt){
+            if(event.keyCode==13){
+                loginIn()
+            }
+        });
+        $('#logout').click(function(){
+            document.cookie="admin='';path=/";
+            $('.admin-login').modal('show');
+        });
+        function loginIn() {
+            var key=$('#adminuser').val()
+            var value=$('#exampleInputPassword').val();
+            document.cookie=key+"="+value+";path=/";
+            $.post('/site/control/login',{key:key,value:value},function(result){
+                if(result.code==200){
+                    $('.admin-login').modal('hide');
+                }
+            })
+        }
+    })
+</script>
+
+</body>
+</html>

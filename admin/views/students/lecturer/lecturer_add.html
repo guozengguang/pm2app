@@ -1,0 +1,157 @@
+<% include ../../inc/head.html%>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-body" style="padding:15px 0">
+              <form id="stu_form">
+                <div class="col-md-3" style="padding:0">
+                  <div class="well">
+                    <div class="form-group form-group-sm">
+                      <label for="m_phone" class="control-label">讲师编号<span>*</span></label>
+                      <input type="text" name="m_phone" placeholder="讲师编号" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' readonly>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_type" class="control-label">身份<span>*</span></label>
+                      <select name="m_type" class="form-control">
+                        <option value="1">讲师</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_sex" class="control-label">性别<span>*</span></label>
+                      <select name="m_sex" class="form-control">
+                        <option value="男" selected="selected">男</option>
+                        <option value="女">女</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <label for="m_pics" class="control-label">头像<span><small>建议规格450*450</small></span></label>
+                      <div class="input-group input-group-sm">
+                        <input type="text" name="m_pics" placeholder="上传头像" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <!--<span class="cropper-gml">上传</span>-->
+                          <span >上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="progress" style="width: 100%;">
+                        <div class="progress-bar" style="width: 0%;">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                      <div class="thumbnail">
+                        <img src=""  id="m_pics_img">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-9" style="padding:0 0 0 15px">
+                  <div  class="panel panel-danger">
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_name" class="control-label">讲师名称<span>*</span></label>
+                          <input type="text" name="m_name" placeholder="讲师名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_title" class="control-label">讲师头衔<span>*</span></label>
+                          <input type="text" name="m_title" placeholder="讲师头衔" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                        <label for="m_area" class="control-label">地区<span></span></label>
+                          <input type="text" name="m_area" placeholder="地区" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                        <label for="m_city" class="control-label">城市<span></span></label>
+                          <input type="text" name="m_city" placeholder="城市" class="form-control">
+                        </div>
+
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_email" class="control-label">讲师邮箱<span></span></label>
+                          <input type="text" name="m_email" placeholder="讲师邮箱" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_url" class="control-label">公司网址<span></span></label>
+                          <input type="text" name="m_url" placeholder="公司网址" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_place" class="control-label">公司地址<span></span></label>
+                          <input type="text" name="m_place" placeholder="公司地址" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_company" class="control-label">公司名称<span></span></label>
+                          <input type="text" name="m_company" placeholder="公司名称" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-6">
+                          <label for="m_position" class="control-label">公司职务<span></span></label>
+                          <input type="text" name="m_position" placeholder="公司职务" class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <label for="m_desc" class="control-label">个人简介<span></span></label>
+                          <textarea name="m_desc" rows="10" class="form-control"></textarea>
+                        </div>
+                        <div class="form-group form-group-sm col-md-12">
+                          <div class="">
+                            <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //验证提交
+    $('input[name="m_phone"]').val(parseInt(moment().format("YYMMDDHHmmssSS")))
+    $('#stu_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      var data=$('#stu_form').serializeArray();
+      $.post("/admin/students_create",data,function(result){
+        console.log(result)
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/lecturer_list'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    newupload('addImg','m_pics',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+  })
+</script>
+<% include ../../inc/footer.html%>
+<% include ../../inc/cropper.html%>

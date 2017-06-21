@@ -1,0 +1,147 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <!--<li>-->
+              <!--<a href="javascript:void (0)" target="_self" id="exports"><span class="glyphicon glyphicon-export"></span> 导出excel </a>-->
+            <!--</li>-->
+            <li>
+              <a href="javascript:void (0)" >总金额:<span id="total"> </span> </a>
+            </li>
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <!--<div class="form-group">-->
+              <!--<input type="text" name="stime" placeholder="开始时间" class="input-sm form-control" id="s">-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<input type="text" name="etime" placeholder="结束时间" class="input-sm form-control" id="e">-->
+            <!--</div>-->
+            <div class="input-group">
+              <input type="text" name="po_toname" placeholder="讲师" class="form-control input-sm">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-danger btn-sm search">
+                  <span class="glyphicon glyphicon-search"></span>
+                </button>
+              </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>打赏对象</th>
+          <th style="width:80px">打赏金额</th>
+          <th style="width:260px">打赏人微信名</th>
+          <th style="width:100px">性别</th>
+          <th style="width:120px">城市</th>
+          <th style="width:120px">省</th>
+          <th style="width:180px" class="text-center">打赏时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //时间
+    $("#s").datetimepicker({
+      step:5,
+      lang:'ch',
+      onSelectTime:function(){
+        var current=$("#s").val();
+        var emindate=moment($("#s").val()).format("YYYY/MM/DD");
+        $("#e").datetimepicker({minDate:emindate,step:5,lang:'ch'});
+      }
+    });
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.search-form').serializeArray();
+        data.push({name:'page',value:page});
+        writeList(data)
+      }
+    };
+    //默认加载
+    writeList()
+    //搜索
+    $('.search').on('click',function(){
+      var data=$('.search-form').serializeArray();
+      options.currentPage=1
+      writeList(data);
+    })
+    //导出列表
+    $("#exports").on("click", function () {
+      window.location.href='/admin/get_rewardWechatExcel?'+$('.search-form').serialize()
+    })
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/reward_wechat_ajax',data,function(result){
+        if(result.code==200){
+          $("table tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("table tbody");
+          options.totalPages=result.message.pagecount;
+          $('#total').html(result.message.total)
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+  });
+
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+    <td>${po_toname}</td>
+    <td>${money_sum}</td>
+    <td>${po_nickname}</td>
+    <td>
+    {{if po_sex=='1'}}
+    男
+    {{else po_sex=='2'}}
+    女
+    {{else}}
+    未设置
+    {{/if}}
+    </td>
+    <td>${po_city}</td>
+    <td>${po_province}</td>
+    <td>${createdAt}</td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>

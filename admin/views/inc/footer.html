@@ -1,0 +1,138 @@
+﻿<div id="goTop" style="position: fixed;bottom: 40px;right: 20px;"><a class="btn btn-md btn-danger"><span class="glyphicon glyphicon-menu-up" style="font-size:20px"></span></a></div>
+<div class="modal fade" id="modal_changepwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">修改密码</h4>
+            </div>
+            <div class="modal-body" style="overflow-y:auto">
+                <div id="success_changepwd" class="tip alert alert-success fade in" style="display:none;">操作成功！</div>
+                <div id="error_changepwd" class="tip alert alert-danger fade in" style="display:none;">参数非法！</div>
+                <form name="change_form" id="change_form" method="post">
+                    <div class="form-group">
+        				<div id="group_post_title">
+        					<label for="user_pass" class="control-label">旧密码<span id="msg_user_pass">*</span></label>
+        					<input type="password" name="user_pass" id="user_pass" placeholder="必填" class="validate form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+        				</div>
+        			</div>
+                    <div class="form-group">
+        				<div id="group_user_pass_new">
+        					<label for="user_pass_new">新密码<span id="msg_user_pass_new">*(6-18位，必须包含一个大写字母，一个小写字母)</span></label>
+        					<input type="password" name="user_pass_new" id="user_pass_new" value="" placeholder="必填" class="validate form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' pattern="(?=^.{6,18}$)(?=(?:.*?\d){1})(?=.*[a-z])(?=(?:.*?[A-Z]){1})(?!.*\s)[0-9a-zA-Z!@#$%*()_+^&]*$" data-bv-regexp-message='强度不符合'>
+        				</div>
+        			</div>
+                    <div class="form-group">
+        				<div id="Div1">
+        					<label for="user_pass_new_confim">确认密码<span id="msg_user_pass_new_confim">*</span></label>
+        					<input type="password" name="user_pass_new_confim" id="user_pass_new_confim" value="" placeholder="必填" class="validate form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+        				</div>
+        			</div>
+                    <div class="form-group">
+        				<button type="submit" class="btn btn-danger center-block">保存</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<% include effect.html%>
+<script>
+//上传组件
+function newupload(id,src,db){
+    var uploader=new plupload.Uploader({ //实例化一个plupload上传对象
+        runtimes:"html5,flash,silverlight,html4",
+        browse_button : id,
+        url : '/aly_upload_img',
+        auto_start:true,
+        filters: {
+            mime_types : [ //只允许上传图片和zip文件
+                { title : "Image files", extensions : "jpg,gif,png" }
+            ],
+            max_file_size:"10mb",
+            prevent_duplicates : false //不允许选取重复文件
+        },
+        multi_selection:false,
+        multipart:true,
+        multipart_params:{},
+        unique_names:true,
+        resize:{
+            width: 400000000,
+            height: 20000000,
+            crop: false,
+            preserve_headers: true
+        }
+    });
+    uploader.init(); //初始化
+    //绑定文件添加进队列事件
+    uploader.bind('FilesAdded',function(uploader,files){
+        for(var i = 0, len = files.length; i<len; i++){
+            var file_name = files[i].name; //文件名
+        }
+        uploader.start(); //开始上传
+    });
+    uploader.bind('BeforeUpload',function(uploader,file){
+        uploader.settings.multipart_params.size = file.size;
+    });
+
+    uploader.bind('UploadComplete',function(uploader,files){
+        console.log(files);
+    });
+    uploader.bind("FileUploaded",function(uploader,file,responseObject){
+        var result=JSON.parse(responseObject.response);
+        if(result.code===200){
+            result.id=id;
+            result.src=src;
+            db(null,result)
+        }else{
+            db('上传失败',{})
+        }
+    })
+}
+$(function(){
+    //返回顶部
+    $("#goTop").hide();
+    $(document).on('scroll',function(event) {
+        $("#goTop").show();
+        $("#goTop").on('click',function(event) {
+            $('body').scrollTop(0);
+        })
+    });
+    //全选功能
+    $("[name='chkall']").click(function () {
+        if ($(this).is(":checked")) {
+            $(":checkbox").prop("checked",true);
+        }else{
+            $(":checkbox").prop("checked",false);
+        }
+    });
+    //修改密码
+
+    $('#change_form').bootstrapValidator().on('success.form.bv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target),
+                validator = $form.data('bootstrapValidator');
+        var data=$('#change_form').serializeArray();
+        $.post("/changepwd",data,function(result){
+            if(result.code==200){
+                location.href='/login'
+            }else{
+                effect.error(result.message)
+            }
+        })
+    });
+    //left
+    var url = '<%=locals.path%>';
+    $("#accordion").find("a").each(function () {
+        var href = $(this).attr("href"),
+            index = url.indexOf(href);
+        if (index >= 0) {
+            $(this).addClass("active");
+            $(this).parent().parent().addClass("in");
+        }
+    })
+})
+</script>
+</body>
+</html>

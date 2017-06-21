@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html style="font-size: 50px;" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<meta name="viewport"-->
+    <!--content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>-->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <title>课程购买</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        *, *:before, *:after {
+            /*-webkit-tap-highlight-color: rgba(0, 0, 0, 0);*/
+        }
+
+        /*html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {*/
+        * {
+            border: 0 none;
+            font-size: inherit;
+            color: inherit;
+            margin: 0;
+            padding: 0;
+            vertical-align: baseline;
+
+            /* 在X5新内核Blink中，在排版页面的时候，会主动对字体进行放大，会检测页面中的主字体，当某一块字体在我们的判定规则中，认为字号较小，并且是页面中的主要字体，就会采取主动放大的操作。然而这不是我们想要的，可以采取给最大高度解决 */
+            max-height: 100000px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: normal;
+        }
+
+        em, strong {
+            font-style: normal;
+        }
+
+        ul, ol, li {
+            list-style: none;
+        }
+
+        body {
+            line-height: 1.5;
+            color: #212121;
+            background-color: #f2f2f2;
+            font-weight: 100;
+            height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .margin_line_top {
+            border-top: 0.15rem solid #F5F5F5;
+        }
+
+        .margin_line_bottom {
+            border-bottom: 0.15rem solid #F5F5F5;
+        }
+
+        .main {
+            max-width: 10rem;
+            background: white;
+            min-height: 100vh;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .fp {
+            display: -webkit-box; /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */ /* 老版本语法: Firefox (buggy) */
+            display: -ms-flexbox; /* 混合版本语法: IE 10 */ /* 新版本语法: Chrome 21+ */
+            display: flex; /* 新版本语法: Opera 12.1, Firefox 22+ */
+            display: -ms-box;
+        }
+
+        /*flex 1*/
+        .fi1 {
+            /*自由伸缩的item,自动撑满*/
+            -webkit-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+
+        .fi3 {
+            /*自由伸缩的item,自动撑满*/
+            -webkit-box-flex: 3;
+            -ms-flex: 3;
+            flex: 3;
+        }
+
+        /*flex column*/
+        .fc {
+            /*flex旧版垂直居中*/
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-box-orient: vertical;
+
+            -ms-flex-direction: column;
+
+            flex-direction: column;
+        }
+
+        /*flex column center*/
+        .fcc {
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+
+        /*flex row*/
+        .fr {
+            -webkit-box-orient: horizontal;
+            -ms-box-orient: horizontal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+        }
+
+        /*flex row center*/
+        .frc {
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+        }
+
+        /*flex align-self flex-start*/
+        .fiass {
+            -ms-flex-item-align: start;
+            align-self: flex-start;
+        }
+
+        /*flex align-self center*/
+        .fiasc {
+            -ms-flex-item-align: center;
+            -ms-grid-row-align: center;
+            align-self: center;
+        }
+
+        /*flex justify-content*/
+        .fjc {
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        /*最多3行*/
+        .content_3 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+        }
+
+        /*最多4行*/
+        .content_4 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            overflow: hidden;
+        }
+
+        /*下箭头*/
+        .arrow_down {
+            -webkit-transform: rotate(90deg);
+            transform: rotate(90deg);
+        }
+
+        /*上箭头*/
+        .arrow_up {
+            -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+        }
+
+        .d-cover {
+            position: fixed;
+            width: 100%;
+            height: 1.1rem;
+            left: 0;
+            bottom: 0;
+            background: #fff;
+            z-index: 1001;
+            border-top: 1px solid #f5f5f5;
+            opacity: 0.8;
+        }
+        .title {
+            font-size: 0.35rem;
+            -ms-flex-item-align: start;
+            align-self: flex-start;
+            background: #f7f7f9;
+            color: #878787;
+            line-height: 1rem;
+            padding-left: 0.3rem;
+            width: 100%;
+        }
+        img {
+            width: 1rem;
+            height: 1rem;
+            margin-top: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 0.38rem;
+            color: #585858;
+            font-weight: 300;
+        }
+
+        button {
+            width: calc(100% - 1rem);
+            margin: 0.6rem 0.2rem 0;
+            font-size: 0.3rem;
+            line-height: 0.8rem;
+            color: white;
+            border-radius: 0.1rem;
+        }
+    </style>
+
+</head>
+<body>
+<div class="main fp fcc">
+    <p class="title">提示</p>
+
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHwAAAB8CAYAAACrHtS+AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjEyOTMwOTUxMzlFQTExRTc5NTU0QkEzQUFFN0EyQThGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjEyOTMwOTUyMzlFQTExRTc5NTU0QkEzQUFFN0EyQThGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MTI5MzA5NEYzOUVBMTFFNzk1NTRCQTNBQUU3QTJBOEYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MTI5MzA5NTAzOUVBMTFFNzk1NTRCQTNBQUU3QTJBOEYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7F5e1bAAAIA0lEQVR42uyd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"/>
+    <p>请使用微信或支付宝</p>
+    <p>扫描二维码，完成缴费</p>
+</div>
+<script>
+    /**
+     * Created by karnaughk on 2017/3/10.
+     */
+    //阿里团队的高清方案 rem http://www.jianshu.com/p/985d26b40199
+    !function (e) {
+        function t(a) {
+            if (i[a])return i[a].exports;
+            var n = i[a] = {exports: {}, id: a, loaded: !1};
+            return e[a].call(n.exports, n, n.exports, t), n.loaded = !0, n.exports
+        }
+
+        var i = {};
+        return t.m = e, t.c = i, t.p = "", t(0)
+    }([function (e, t) {
+        "use strict";
+        Object.defineProperty(t, "__esModule", {value: !0});
+        var i = window;
+        t["default"] = i.flex = function (e, t) {
+            var a = e || 100,
+                    n = t || 1,
+                    r = i.document,
+                    o = navigator.userAgent,
+                    d = o.match(/Android[\S\s]+AppleWebkit\/(\d{3})/i),
+                    l = o.match(/U3\/((\d+|\.){5,})/i),
+                    c = l && parseInt(l[1].split(".").join(""), 10) >= 80,
+                    p = navigator.appVersion.match(/(iphone|ipad|ipod)/gi),
+                    s = i.devicePixelRatio || 1;
+
+            p || d && d[1] > 534 || c || (s = 1);
+            var u = 1 / s, m = r.querySelector('meta[name="viewport"]');
+            m || (m = r.createElement("meta"), m.setAttribute("name", "viewport"), r.head.appendChild(m)), m.setAttribute("content", "width=device-width,user-scalable=no,initial-scale=" + u + ",maximum-scale=" + u + ",minimum-scale=" + u), r.documentElement.style.fontSize = a / 2 * s * n + "px"
+        }, e.exports = t["default"]
+    }]);
+    flex(100, 1);
+</script>
+</body>
+</html>

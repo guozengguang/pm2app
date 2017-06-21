@@ -1,0 +1,341 @@
+<% include ../inc/head.html%>
+    <script src="/javascripts/js/clipboard.min.js"></script>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="sidebar">
+                <% include ../inc/left.html%>
+            </div>
+            <div class="main">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <ul class="list-inline">
+                                <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                            </ul>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><b><%= title %></b></div>
+                            <div class="panel-body" style="padding:15px 0">
+                                <form id="notifics_form" action="/admin/um" method="post">
+                                    <div class="col-md-12" style="padding:0 0 0 15px">
+                                        <div class="panel panel-danger">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="form-group form-group-sm col-md-12 clearfix">
+                                                        <%if(locals.current_user.user_branch=='0' || locals.current_user_roles.r_permission===""){%>
+                                                            <%if(locals.current_user_roles.r_permission.indexOf('1201')>=0 || locals.current_user_roles.r_permission===""){%>
+                                                                <div class="row col-md-3">
+                                                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                                                        <select id="lesson" name="group" class="btn">
+                                                                            <option value="-1" selected>
+                                                                                --- 请选择课程 ---
+                                                                            </option>
+                                                                        </select>
+                                                                        <input id="other" type="text" class="form-control" placeholder="选择其他课程时请输入" style="display: none; margin-top: 20px">
+                                                                        <input id="use" type="text" class="form-control" placeholder="请输入用途" style="margin-top: 20px;">
+                                                                        <div class="form-group form-group-sm" style="margin-top: 20px">
+                                                                            <label for="lesson_img" class="control-label">背景图片<span><small>规格竖屏 16:9</small></span></label>
+                                                                            <input type="hidden" name="lesson_img" placeholder="上传产品封面照" class="form-control" readonly value="public/groupdefault.png">
+                                                                            <div class="thumbnail">
+                                                                                <img id='lesson_img' src="http://files.geju.com/public/groupdefault.png" width="135" height="135">
+                                                                            </div>
+                                                                        </div>
+                                                                        <button id="addImg" class="btn btn-info" type="button" style="margin-top: 20px;">上传图片</button>
+                                                                        <button id="create" class="btn btn-danger pull-right" type="button" style="margin-top: 20px;">生成页面地址</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-9">
+                                                                    <%}else{%>
+                                                                        <div class="col-md-12">
+                                                                            <%}%>
+                                                                                <%}else{%>
+                                                                                    <div class="col-md-12">
+                                                                                        <%}%>
+                                                                                            <table class="table">
+                                                                                                <thead>
+                                                                                                    <tr>
+                                                                                                        <th>序号</th>
+                                                                                                        <th>课程名称</th>
+                                                                                                        <th>网址</th>
+                                                                                                        <th>
+                                                                                                            <select class="btn" name="used" id="used">
+                                                                        <option value="0">用途</option>
+                                                                    </select>
+                                                                                                        </th>
+                                                                                                        <th>生成日期</th>
+                                                                                                        <th>背景图片</th>
+
+                                                                                                        <%if(locals.current_user.user_branch=='0' || locals.current_user_roles.r_permission===""){%>
+                                                                                                            <%if(locals.current_user_roles.r_permission.indexOf('1202')>=0 || locals.current_user_roles.r_permission===""){%>
+                                                                                                                <th>操作</th>
+                                                                                                            <%}%>
+                                                                                                        <%}%>
+                                                                                                    </tr>
+                                                                                                </thead>
+                                                                                                <tbody>
+
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                            <div id="page"></div>
+                                                                                    </div>
+                                                                        </div>
+                                                                </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                </form>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${lesson_id}</td>
+    <td>${goods_name || lesson_alias}</td>
+    <td>${address}
+        <button data-clipboard-action="copy" data-clipboard-text="${address}" type="button" class="pull-right copy btn btn-info">复制</button>
+    </td>
+    <td style="text-align: center">${enroll_use}</td>
+    <td>${ createdAt }</td>
+    <td>
+        <img src="${background_img}" alt="" style="max-width: 50px; max-height: 50px:">
+    </td>
+    <td>
+        <%if(locals.current_user.user_branch=='0' || locals.current_user_roles.r_permission===""){%>
+            <%if(locals.current_user_roles.r_permission.indexOf('1202')>=0 || locals.current_user_roles.r_permission===""){%>
+                <button data-id="${lesson_id}" type="button" class="delete_lesson btn btn-danger">删除</button>
+            <%}%>
+        <%}%>
+    </td>
+  </tr>
+</script>
+            <script id="inittmp2" type="text/x-jquery-tmpl">
+    <li class="list-group-item clearfix">
+        <input type="hidden" name="students" value="${phone}">${name}
+        <button class="btn btn-danger pull-right delete_button" type="button">删除</button>
+    </li>
+</script>
+<% include ../inc/footer.html%>
+    <script>
+    var img_src;
+    newupload('addImg','lesson_img',function(err,result){
+        if (err){
+            effect.error(err);
+        }else {
+            img_src = result.message.url;
+            $("#lesson_img").attr("src",result.message.url);
+        }
+    });
+    var keyword = {};
+    /* 课程信息加载 */
+    var city = {
+        $dom:null,
+        init: function (id) {
+            this.$dom = $('#'+id);
+            this.getDate();//获取数据
+            this.Event();//绑定相关事件
+        },
+        getDate:function () {
+            var self = this;
+            $.get('/production/list', function (result) {
+                self.insertDom(self.$dom ,result.result.list);
+            })
+        },
+        insertDom:function ($dom, data) {
+            var html = '<option value="-1" selected>--- 请选择课程 ---</option>';
+            $.each(data,function (i,v) {
+                html += '<option value="'+ v.goodsid+'"> '+ v.goods_name +' </option>';
+            });
+            html += '<option value="-2">其他</option>';
+            $dom.html(html)
+        },
+        Event:function () {
+            var self = this;
+            var other = $('#other');
+            this.$dom.on('change',function (e) {
+                var number = +self.$dom.val();
+                if(number === -2){
+                    other.show();
+                }else {
+                    other.hide();
+                }
+            })
+        }
+    };
+    city.init('lesson');
+
+    /* 页面地址生成 */
+    var create_address = {
+        init:function () {
+            this.Event();
+            this.lesson = $('#lesson');
+            this.other = $('#other');
+            this.use = $('#use');
+        },
+        Event: function () {
+            $('#create').on('click',this.format_data);
+        },
+        format_data:function () {
+            var self = create_address;
+            var data = {};
+            var number = +self.lesson.val();
+            var value = self.other.val();
+            var use = self.use.val();
+            if(!img_src){
+                effect.error('图片未上传');
+                return false;
+            }
+            if(!/\S/.test(use)){
+                effect.error('请输入用途');
+                return false;
+            }
+            data.use = use;
+            if(number === -1){
+                effect.error('请选择课程');
+                return false;
+            }else if(number === -2){
+                if(!/\S/.test(value)){
+                    effect.error('请输入其他课程名称');
+                    return false;
+                }
+                data.alias = value;
+            }else {
+                // 发送 number
+                data.lesson = number
+            }
+            data.img = img_src;
+            self.post(data);
+        },
+        post: function (data) {
+            $.post('/enroll/lesson',data,function (result) {
+                console.log(result);
+                location.reload();
+            })
+        }
+    };
+    create_address.init();
+    /* 筛选信息开始 */
+    var filter = {
+        init: function () {
+            this.getDate();
+            this.bind_event();
+        },
+        getDate:function () {
+            $.get('/enroll/lesson/type',function (result) {
+                filter.insertDom(result.result.list)
+            })
+        },
+        insertDom:function (data) {
+            var html;
+            html = '<option value="" selected>用途</option>';
+            $.each(data,function (i,v) {
+                html += '<option value="'+ v.enroll_use+'"> '+ v.enroll_use +' </option>'
+            });
+            this.used.html(html);
+        },
+        bind_event: function () {
+            var self = this;
+            this.used = $('#used');
+            this.used.on('change',function () {
+                var value = self.used.val();
+                if(value){
+                    keyword.keyword = value;
+                    writeList(keyword);
+                }else {
+                    writeList();
+                }
+            })
+        }
+    };
+    filter.init();
+    /* 复制开始 */
+    new Clipboard('.copy').on('success', function(e) {
+        effect.success('复制成功');
+    }).on('error', function(e) {
+        effect.error('复制失败');
+    });
+    /* 复制出错 */
+      /* 删除课程 */
+    $(document).on('click','.delete_lesson',function(){
+        var id = $(this).data('id');
+        console.log(id);
+        swal({
+        title: "确定删除当前简章?",
+        text: "",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "确定",
+        cancelButtonText:"取消",
+        animation: "slide-from-top",
+        closeOnConfirm: false,
+        html: false
+        }, function(){
+            $.post('/admin/lesson/delete',{id : id },function(result){
+                if(result.code == 200){
+                    location.reload();
+                }else{
+                    swal("删除失败", result.message, "warning")
+                }
+            })
+        });
+    })
+</script>
+<script>
+    $(".input_date").datetimepicker({
+        lang:'ch',
+        step:30
+    });
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            writeList({
+                page: page
+            })
+        }
+    };
+    //默认加载
+    writeList();
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        $.get('/enroll/lesson', data, function (result) {
+            if (result.code == 200) {
+                var base = result.result.baseUrl;
+                $.each(result.result.list, function (i, v) {
+                    v.address = base + '?' + v.lesson_id;
+                    v.createdAt = (+new Date( v.createdAt )).dateInfo('Y年M月D日 h:m')
+                })
+                $("table tbody").empty('');
+                $("#inittmpl")
+                        .tmpl(result.result.list)
+                        .appendTo("table tbody");
+                options.totalPages = Math.ceil(result.result.count / 12);
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    };
+</script>

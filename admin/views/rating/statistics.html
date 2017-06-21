@@ -1,0 +1,608 @@
+<% include ../inc/head.html%>
+
+<link href="//cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="//cdn.bootcss.com/bootstrap-select/2.0.0-beta1/js/bootstrap-select.min.js"></script>
+<script>
+    /**
+     * ExcellentExport 2.0.0
+     * A client side Javascript export to Excel.
+     *
+     * @author: Jordi Burgos (jordiburgos@gmail.com)
+     * @url: https://github.com/jmaister/excellentexport
+     *
+     */
+    /*jslint browser: true, bitwise: true, vars: true, white: true */
+    /*global define, exports, module */
+
+    (function (global) {
+        'use strict';
+
+        var ExcellentExport = (function() {
+
+            function b64toBlob(b64Data, contentType, sliceSize) {
+                // function taken from http://stackoverflow.com/a/16245768/2591950
+                // author Jeremy Banks http://stackoverflow.com/users/1114/jeremy-banks
+                contentType = contentType || '';
+                sliceSize = sliceSize || 512;
+
+                var byteCharacters = window.atob(b64Data);
+                var byteArrays = [];
+
+                var offset;
+                for (offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                    var byteNumbers = new Array(slice.length);
+                    var i;
+                    for (i = 0; i < slice.length; i = i + 1) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    var byteArray = new window.Uint8Array(byteNumbers);
+
+                    byteArrays.push(byteArray);
+                }
+
+                var blob = new window.Blob(byteArrays, {
+                    type: contentType
+                });
+                return blob;
+            }
+
+            var version = "2.0.0";
+            var uri = {excel: 'data:application/vnd.ms-excel;base64,', csv: 'data:application/csv;base64,'};
+            var template = {excel: '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta name=ProgId content=Excel.Sheet> <meta name=Generator content="Microsoft Excel 11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'};
+            var csvDelimiter = ",";
+            var csvNewLine = "\r\n";
+            var base64 = function(s) {
+                return window.btoa(window.unescape(encodeURIComponent(s)));
+            };
+            var format = function(s, c) {
+                return s.replace(new RegExp("{(\\w+)}", "g"), function(m, p) {
+                    return c[p];
+                });
+            };
+
+            var get = function(element) {
+                if (!element.nodeType) {
+                    return document.getElementById(element);
+                }
+                return element;
+            };
+
+            var fixCSVField = function(value) {
+                var fixedValue = value;
+                var addQuotes = (value.indexOf(csvDelimiter) !== -1) || (value.indexOf('\r') !== -1) || (value.indexOf('\n') !== -1);
+                var replaceDoubleQuotes = (value.indexOf('"') !== -1);
+
+                if (replaceDoubleQuotes) {
+                    fixedValue = fixedValue.replace(/"/g, '""');
+                }
+                if (addQuotes || replaceDoubleQuotes) {
+                    fixedValue = '"' + fixedValue + '"';
+                }
+
+                return fixedValue;
+            };
+
+            var tableToCSV = function(table) {
+                var data = "";
+                var i, j, row, col;
+                for (i = 0; i < table.rows.length; i=i+1) {
+                    row = table.rows[i];
+                    for (j = 0; j < row.cells.length; j=j+1) {
+                        col = row.cells[j];
+                        data = data + (j ? csvDelimiter : '') + fixCSVField(col.textContent.trim());
+                    }
+                    data = data + csvNewLine;
+                }
+                return data;
+            };
+
+            function createDownloadLink(anchor, base64data, exporttype, filename) {
+                var blob;
+                if (window.navigator.msSaveBlob) {
+                    blob = b64toBlob(base64data, exporttype);
+                    window.navigator.msSaveBlob(blob, filename);
+                    return false;
+                } else if(window.URL.createObjectURL) {
+                    blob = b64toBlob(base64data, exporttype);
+                    var blobUrl = window.URL.createObjectURL(blob, exporttype, filename);
+                    anchor.href = blobUrl;
+                } else {
+                    var hrefvalue = "data:" + exporttype + ";base64," + base64data;
+                    anchor.download = filename;
+                    anchor.href = hrefvalue;
+                }
+
+                // Return true to allow the link to work
+                return true;
+            }
+
+            var ee = {
+                /** @export */
+                excel: function(anchor, table, name) {
+                    /* 获取table 中的内容 */
+                    var dom = document.querySelectorAll(table);
+                    var i = 0, len = dom.length,html = '';
+                    for(;i<len;i++){
+                        html += dom[i].innerHTML;
+                    }
+                    /* 获取table 中的内容 */
+                    var ctx = {worksheet: name || 'Worksheet', table: html};
+                    var b64 = base64(format(template.excel, ctx));
+                    return createDownloadLink(anchor, b64, 'application/vnd.ms-excel','export.xls');
+                },
+                /** @export */
+                csv: function(anchor, table, delimiter, newLine) {
+                    if (delimiter !== undefined && delimiter) {
+                        csvDelimiter = delimiter;
+                    }
+                    if (newLine !== undefined && newLine) {
+                        csvNewLine = newLine;
+                    }
+
+                    table = get(table);
+                    var csvData = tableToCSV(table);
+                    var b64 = base64(csvData);
+                    return createDownloadLink(anchor,b64,'application/csv','export.csv');
+                }
+            };
+
+            return ee;
+        }());
+
+        // AMD support
+        if (typeof define === 'function' && define.amd) {
+            define(function () { return ExcellentExport; });
+            // CommonJS and Node.js module support.
+        } else if (typeof exports !== 'undefined') {
+            // Support Node.js specific `module.exports` (which can be a function)
+            if (typeof module !== 'undefined' && module.exports) {
+                exports = module.exports = ExcellentExport;
+            }
+            // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
+            exports.ExcellentExport = ExcellentExport;
+        } else {
+            global.ExcellentExport = ExcellentExport;
+        }
+    })(this);
+</script>
+<script src="/javascripts/utils.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div ng-controller="StatisticsCtrl" class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="page-header">
+                        <h1><%= title %> <small>数据统计页面</small></h1>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <select ng-model="select_rating"
+                                                ng-options="item.id as item.name for item in rating_list"
+                                                id="rating_name" name="name" type="text"
+                                                class="selectpicker show-tick form-control" data-live-search="true"
+                                                data-live-search-style="begins" title="请搜索评价表名称"></select>
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input ng-model="start_time" name="start_time" type="text"
+                                               class="input_date form-control" placeholder="开始时间">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <div class="">
+                                        <input ng-model="end_time" name="end_time" type="text"
+                                               class="input_date form-control" placeholder="结束时间">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3 col-sm-3 col-xs-3">
+                                    <button ng-click="search()" class="search_button btn btn-default" type="button">查询</button>
+                                </div>
+                            </div><!-- /.row -->
+                        </div>
+
+                        <div id="main" style="display: none" class="panel-body">
+                            <table class="table_excel" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                        <td colspan="3">
+                                            <a download="statistics.xls" href="#" onclick="return ExcellentExport.excel(this, '.table_excel', 'Sheet Name Here');"  class="search_button btn btn-danger pull-right">导出</a>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <h5>
+                                                <strong>
+                                                    评价表名称：
+                                                </strong>
+                                                {{ data.name }}
+                                            </h5>
+                                        </td>
+                                        <td>
+                                            <h5>
+                                                <strong>
+                                                    反馈数量：
+                                                </strong>
+                                                {{ data.statistics_count }}
+                                            </h5>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h5>
+                                                <strong>
+                                                    评价课程：
+                                                </strong>
+                                                {{ data.goodName  + ' ' +  data.className}}
+                                            </h5>
+                                        </td>
+                                        <td>
+                                            <h5 ng-if="start_time || end_time">
+                                                <strong>
+                                                    时间：
+                                                </strong>
+                                                {{ (start_time || '2016-01-01 00:00') + ' - ' + (end_time || '至今') }}
+                                            </h5>
+                                        </td>
+                                        <td>
+                                            <h5>
+                                                <strong>
+                                                    学员数量：
+                                                </strong>
+                                                {{ data.count }}
+                                            </h5>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                            <!--<div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                                            <h5>
+                                                <strong>
+                                                    评价表名称：
+                                                </strong>
+                                                {{ data.name }}
+                                            </h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <h5>
+                                                <strong>
+                                                    反馈数量：
+                                                </strong>
+                                                {{ data.statistics_count }}
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <h5>
+                                                <strong>
+                                                    评价课程：
+                                                </strong>
+                                                {{ data.goodName  + ' ' +  data.className}}
+                                            </h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <h5 ng-if="start_time || end_time">
+                                                <strong>
+                                                    时间：
+                                                </strong>
+                                                {{ (start_time || '2016-01-01 00:00') + ' - ' + (end_time || '至今') }}
+                                            </h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <h5>
+                                                <strong>
+                                                    学员数量：
+                                                </strong>
+                                                {{ data.count }}
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <hr>
+                            <div ng-repeat="level_2 in data.children">
+                                <!-- 单选复选类型 开始 -->
+                                <table ng-if="level_2.method==1 || level_2.method==2" style="min-width: 100%" class="table table_excel">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="3">
+                                                <h4>
+                                                    {{($index + 1 | transformNo) + '、' +  level_2.name }}
+                                                    <small ng-if="(level_2.property.indexOf('required') != -1)">
+                                                        (必填)
+                                                    </small>
+                                                </h4>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- 单选复选类型 开始 -->
+                                    <tr ng-repeat="level_3 in level_2.children" >
+                                        <td style="width: 50px">
+                                            <span class="label label-success">{{$index + 1}}</span>
+                                        </td>
+                                        <td>
+                                            {{ level_3.name }}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-success pull-right">{{ level_3.children | count:level_3.id }}</span>
+                                        </td>
+                                    </tr>
+                                    <!-- 单选复选类型 结束 -->
+                                    </tbody>
+                                </table>
+                                <!-- 单选复选类型 结束 -->
+                                <!-- 评分类型 开始 -->
+                                <div ng-if="level_2.method==3" class="ibox float-e-margins">
+                                    <div class="ibox-content">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table_excel">
+                                                <thead >
+                                                <tr>
+                                                    <th colspan="100">
+                                                        <h4>{{($index + 1 | transformNo) + '、' +  level_2.name }}</h4>
+                                                    </th>
+                                                </tr>
+                                                <tr class="bg-success">
+                                                    <th>课程评价</th>
+                                                    <th ng-repeat="value in level_2.score">{{ value }}分</th>
+                                                    <th>平均分</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr ng-repeat="level_3 in level_2.children">
+                                                    <td>{{ level_3.name }}</td>
+                                                    <td ng-repeat="value in level_2.score">{{ level_3.children | count:value }}</td>
+                                                    <td>
+                                                                <span ng-class="level_3.children | average | class_name:level_2.score.length">
+                                                                    {{level_3.children | average}}
+                                                                </span>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 评分类型 结束 -->
+                                <table ng-if="level_2.method==4" style="min-width: 100%" class="table table_excel">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">
+                                                <h4>{{($index + 1 | transformNo) + '、' +  level_2.name }}</h4>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-hide="level_3.hide" ng-repeat="level_3 in (level_2.children | show_all:!level_2.show_all )">
+                                            <td style="width: 50px;">
+                                                <span class="label label-success">{{$index + 1}}</span>
+                                            </td>
+                                            <td>
+                                                {{ level_3.value }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style="text-align: center">
+                                    <button ng-if="level_2.method==4 && !level_2.show_all" class="show_all btn btn-link" ng-click="level_2.show_all = !level_2.show_all">
+                                        显示更多
+                                        <span class="caret"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var rating_name;
+    $(function () {
+        //开始时间
+        $(".input_date").datetimepicker({
+            step: 30,
+            lang: 'ch'
+        });
+        rating_name = $('#rating_name').selectpicker({
+            liveSearch: true,
+        });
+    });
+    angular.module('cms')
+            .filter('transformNo', function () {
+                return transform_No
+            })
+            .filter('show_all',function () {
+                return function (list, boolean) {
+                    var i = 2,len = list.length;
+                    for(;i<len;i++){
+                        list[i].hide = boolean
+                    }
+                    return list;
+                }
+            })
+            .filter('count', function () {
+                return function (list, value) {
+                    var count = 0;
+                    angular.forEach(list, function (v, i, list) {
+                        if(v.value == value){
+                            count ++;
+                        }
+                    });
+                    return count;
+                }
+            })
+            .filter('average', function () {
+                return function (list) {
+                    if(!list){
+                        return 0;
+                    }
+                    var length = list.length,
+                            score = 0;
+                    angular.forEach(list, function (v, i, list) {
+                        score += Number(v.value);
+                    });
+                    return (score/length).toFixed(2);
+                }
+            })
+            .filter('class_name',function () {
+                return function (average, count) {
+                    var value = average / count;
+                    if(value >= 0.9){
+                        return 'label label-success'
+                    }else if(value >= 0.6){
+                        return 'label label-warning'
+                    }else {
+                        return 'label label-danger'
+                    }
+                }
+            })
+            .service('StatisticsService', function ($http) {
+                this.get_list = function (filter) {
+                    return $http({
+                        url: '/admin/rating/list',
+                        method: 'GET',
+                        params: {size: 10000}
+                    })
+                };
+                this.rating = function (id, start_time, end_time) {
+                    if (id) {
+                        return $http({
+                            url: '/admin/rating/result',
+                            method: 'GET',
+                            params: {
+                                id: id,
+                                start_time: start_time,
+                                end_time: end_time
+                            }
+                        })
+                    } else {
+                        return {
+                            success: function () {
+                            }
+                        }
+                    }
+                };
+            })
+            .controller('StatisticsCtrl', function ($scope, StatisticsService) {
+                /* 筛选信息 */
+                $scope.start_time = undefined;
+                $scope.end_time = undefined;
+                $scope.select_rating = 0;
+                /* 添加下拉列表数据 */
+                StatisticsService.get_list().success(function (result) {
+                    // select 列表
+                    //搜索下拉框
+                    $scope.rating_list = [{
+                        name: '请选择评价表',
+                        id: 0
+                    }].concat(result.result.rows);
+                    var timer = setTimeout(function () {
+                        clearTimeout(timer);
+                        timer = null;
+                        rating_name.selectpicker('refresh');
+                    }, 500);
+                });
+
+                $scope.search = function () {
+                    StatisticsService.rating($scope.select_rating, $scope.start_time , $scope.end_time).success(function (result) {
+                        var map = result.result;
+                        angular.forEach(map.children, function (v) {
+                            if(v.method == 3){
+                                var score = v.score;
+                                var arr = [],i = 1;
+                                while (i <= score){
+                                    arr.push(i++);
+                                }
+                                v.score = arr;
+                            }
+                        });
+                        $scope.data = map;
+                        $('#main').show();
+                    })
+                };
+            });
+</script>
+<% include ../inc/footer.html%>
+
+<!-- 原始样式 -->
+<!--<div class="row">
+    <div ng-repeat="level_2 in data.children" class="col-md-12">
+        <div class="ibox-title">
+            <h4>{{($index + 1 | transformNo) + '、' +  level_2.name }}</h4>
+        </div>
+        &lt;!&ndash; 单选复选类型 开始 &ndash;&gt;
+        <div ng-if="level_2.method==1 || level_2.method==2" class="ibox float-e-margins">
+            <ul class="list-group clear-list m-t">
+                <li ng-repeat="level_3 in level_2.children" class="list-group-item fist-item" style="border: 1px solid #ddd;">
+                    <span class="label label-success">{{$index + 1}}</span> {{ level_3.name }}
+                    <span class="badge badge-success">{{ level_3.children | count:level_3.id }}</span>
+                </li>
+            </ul>
+        </div>
+        &lt;!&ndash; 单选复选类型 结束 &ndash;&gt;
+        &lt;!&ndash; 评分类型 开始 &ndash;&gt;
+        <div ng-if="level_2.method==3" class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="bg-success">
+                        <tr>
+                            <th>课程评价</th>
+                            <th ng-repeat="value in level_2.score">{{ value }}分</th>
+                            <th>平均分</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="level_3 in level_2.children">
+                            <td>{{ level_3.name }}</td>
+                            <td ng-repeat="value in level_2.score">{{ level_3.children | count:value }}</td>
+                            <td>
+                                    <span ng-class="level_3.children | average | class_name:level_2.score.length">
+                                        {{level_3.children | average}}
+                                    </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        &lt;!&ndash; 评分类型 结束 &ndash;&gt;
+        &lt;!&ndash; 评论类型 开始 &ndash;&gt;
+        <div ng-if="level_2.method==4">
+            <ul class="list-group clear-list m-t">
+                <li ng-if="show_more || $index < 5" ng-repeat="level_3 in level_2.children" class="list-group-item fist-item" style="border: 1px solid #ddd;">
+                    <span class="label label-success">{{$index + 1}}</span> {{ level_3.value }}
+                </li>
+            </ul>
+        </div>
+        &lt;!&ndash; 评论类型 结束 &ndash;&gt;
+    </div>
+</div>-->

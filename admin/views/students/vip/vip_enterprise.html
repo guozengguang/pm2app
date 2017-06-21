@@ -1,0 +1,245 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>企业详情</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="activity_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="status" class="control-label">推荐位 <span> &nbsp;</span></label>
+                  <label class="radio-inline">
+                    <input type="radio" name="status" value="0" <%if(item.status==0){%>checked<%}%> > 不推荐
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="status" value="1" <%if(item.status==1){%>checked<%}%>> 推荐
+                  </label>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="logo" class="control-label">logo<span>*</span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" value="<%=item.logo%>" name="logo" placeholder="上传logo" class="form-control" readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <span class="input-group-btn">
+                          <span class="btn btn-danger fileinput-button btn-sm">
+                              <span>上传</span>
+                              <input id="logo_img_img" type="file" name="files[]" accept="image/*">
+                          </span>
+                        </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <%if(item.logo){%>
+                    <img src="<%=item.logo%>"  id="logo_img">
+                    <%}%>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="subscription" class="control-label">订阅号<span>*</span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" value="<%=item.subscription%>" name="subscription" placeholder="上传订阅号" class="form-control" readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <span class="input-group-btn">
+                          <span class="btn btn-danger fileinput-button btn-sm">
+                              <span>上传</span>
+                              <input id="subscription_img_img" type="file" name="files[]" accept="image/*">
+                          </span>
+                        </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <%if(item.subscription){%>
+                    <img src="<%=item.subscription%>"  id="subscription_img">
+                    <%}%>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="pics" class="control-label">照片<span>*</span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" value="<%=item.pics%>" name="pics" placeholder="上传照片" class="form-control" readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <span class="input-group-btn">
+                          <span class="btn btn-danger fileinput-button btn-sm">
+                              <span>上传</span>
+                              <input id="pics_img_img" type="file" name="files[]" accept="image/*">
+                          </span>
+                        </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <%if(item.pics){%>
+                    <img src="<%=item.pics%>"  id="pics_img">
+                    <%}%>
+                  </div>
+                </div>
+
+                <div class="form-group form-group-sm">
+                  <label for="productPics" class="control-label">产品图片<span>*</span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" value="<%=item.productPics%>" name="productPics" placeholder="上传产品图片" class="form-control" readonly >
+                    <span class="input-group-btn">
+                          <span class="btn btn-danger fileinput-button btn-sm">
+                              <span>上传</span>
+                              <input id="productPics_img_img" type="file" name="files[]" accept="image/*">
+                          </span>
+                        </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <%if(item.productPics){%>
+                    <img src="<%=item.productPics%>"  id="productPics_img">
+                    <%}%>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">企业名称<span>*</span></label>
+                      <input value="<%=item.name%>" type="text" name="name" placeholder="企业名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                      <input value="<%=item.id%>" type="hidden" name="id">
+                      <input value="<%=mid%>" type="hidden" name="member">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                    <label for="" class="control-label">省<span>*</span></label>
+                    <input value="<%=item.province%>" type="text" name="province" placeholder="省" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">市<span>*</span></label>
+                      <input value="<%=item.city%>" type="text" name="city" placeholder="市" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">地址<span>*</span></label>
+                      <input value="<%=item.address%>" type="text" name="address" placeholder="地址" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                    <label for="" class="control-label">电话<span>*</span></label>
+                    <input value="<%=item.phone%>" type="text" name="phone" placeholder="电话" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">行业<span>*</span></label>
+                      <select name="trade" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        <%trade.forEach(function(node,index){%>
+                        <option value="<%=node.name%>" <%if(node.name==item.trade){%>selected<%}%>><%=node.name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">网站<span>*</span></label>
+                      <input value="<%=item.website%>" type="text" name="website" placeholder="网站" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">规模<span>*</span></label>
+                      <select name="scale" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        <%scale.forEach(function(node,index){%>
+                        <option value="<%=node.name%>" <%if(node.name==item.scale){%>selected<%}%>><%=node.name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="" class="control-label">营业额<span>*</span></label>
+                      <select name="turnover" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        <%turnover.forEach(function(node,index){%>
+                        <option value="<%=node.name%>" <%if(node.name==item.turnover){%>selected<%}%>><%=node.name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="" class="control-label">公司介绍<span>*</span></label>
+                      <textarea required data-bv-trigger="blur" data-bv-notempty-message='必填项目' class="form-control" style="height: 120px" name="desc"><%=item.desc%></textarea>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="" class="control-label">产品介绍<span>*</span></label>
+                      <textarea class="form-control" style="height: 120px" name="productDesc"><%=item.productDesc%></textarea>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    $('#activity_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#activity_form').serializeArray();
+      $.post("/admin/vip_enterprise_update",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href ='javascript:history.go(-1)'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    //通讯录图片goods_titleimg
+    newupload('logo_img_img','logo',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        console.log(result)
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //通讯录图片goods_titleimg
+    newupload('pics_img_img','pics',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //通讯录图片goods_titleimg subscription
+    newupload('productPics_img_img','productPics',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //通讯录图片goods_titleimg subscription
+    newupload('subscription_img_img','subscription',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+  })
+</script>
+<% include ../../inc/footer.html%>

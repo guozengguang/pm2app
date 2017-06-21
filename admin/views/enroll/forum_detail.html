@@ -1,0 +1,371 @@
+<% include ../inc/head.html%>
+<script src="/javascripts/js/excellentexport.min.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <form role="form" class="form-inline" style="width:100%;text-align:center" id="form_detail_form">
+                            <div class="panel-body" style="padding:15px 0">
+                                <div class="form-group form-group-sm">
+                                    <label for="sourceName">发表人:</label>
+                                    <input id="sourceName" name="sourceName" type="text" class="form-control" placeholder="发表人">
+                                </div>
+                                    <div class="form-group form-group-sm">
+                                        <label for="start_time">发表时间:</label>
+                                        <input type="text" name="start_time" placeholder="开始时间"
+                                               class="form-control start_date">
+                                        <span class="input-group-btn">
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label for="end_time">-</label>
+                                        <input type="text" name="end_time" placeholder="结束时间"
+                                               class="form-control end_date">
+                                        <span class="input-group-btn">
+                                    </div>
+                                <div class="form-group form-group-sm">
+                                    <label for="audit_status">审核状态</label>
+                                    <select class="form-control" name="audit_status">
+                                        <option value="">全部</option>
+                                        <option value="0">未审核</option>
+                                        <option value="1">审核通过</option>
+                                        <option value="2">审核未通过</option>
+                                    </select>
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <label for="reply_status">回复状态</label>
+                                    <select class="form-control"  name="reply_status">
+                                        <option value="">全部</option>
+                                        <option value="0">未回复</option>
+                                        <option value="1">已回复</option>
+                                    </select>
+                                </div>
+                                    <div class="input-group">
+                                        <button class="search_button btn btn-info" type="button">查询</button>
+                                        <a href="javascript:void(0);" onclick="exportData(this);" class="search_button btn btn-danger pull-right" style="margin-left: 5px;">导出</a>
+                                </div>
+                            </div>
+                            </form>
+                        <hr class="ke-hr">
+                        <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-striped table-condensed" id="formDataTable">
+                                            <thead>
+                                            <tr>
+                                                <th style="width: 260px">图片</th>
+                                                <th style="width: 180px">发表者</th>
+                                                <th >内容</th>
+                                                <th style="width: 180px">发表时间</th>
+                                                <th style="width: 180px">回复状态</th>
+                                                <th style="width: 180px">审核状态</th>
+                                                <th style="width: 180px">操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        <table class="table table-striped table-condensed" id="allDataTable" style="display: none;border-collapse:collapse;">
+                                            <thead>
+                                            <tr>
+                                                <th style="width: 260px">图片URL</th>
+                                                <th style="width: 180px">发表者</th>
+                                                <th >内容</th>
+                                                <th style="width: 180px">发表时间</th>
+                                                <th style="width: 180px">回复状态</th>
+                                                <th style="width: 180px">审核状态</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        <div id="page"></div>
+                                    </div>
+                                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<tr>
+        <td>
+        {{each(i,v) pics}}
+            {{if v}}
+              <a href="${v}" target="_blank"><img class="img-rounded" src="${v}" width="45" height="45" ></a>
+            {{/if}}
+        {{/each}}
+        </td>
+        <td>【${sourceName}】说：</td>
+        <td>
+            ${content}
+            <span class="badge btn btn-xs commentReply" data-mid="4228" data-id="${id}" data-source="${source}">回复</span>
+            {{if status==0}}
+            <span class="badge btn btn-xs commentUpdate" data-status="1" data-id="${id}">恢复</span>
+            {{else status==1}}
+            <span class="badge btn btn-xs commentUpdate" data-status="0" data-id="${id}" style="background-color:red">删除</span>
+            {{/if}}
+        </td>
+        <td>${time}</td>
+        <td>${reply_status}</td>
+        <td>${audit_status}</td>
+        <td>
+            {{if audit_status=="未审核"}}
+            <span class="badge btn btn-xs commentAudit" data-status="1" data-id="${id}" style="background-color:blue">通过</span>/
+            <span class="badge btn btn-xs commentAudit" data-status="2" data-id="${id}" style="background-color:red">不通过</span>
+            {{else audit_status=="审核通过"}}
+            <span class="badge btn btn-xs commentAudit" data-status="2" data-id="${id}" style="background-color:red">不通过</span>
+            {{else audit_status=="审核未通过"}}
+            <span class="badge btn btn-xs commentAudit" data-status="1" data-id="${id}" style="background-color:blue">通过</span>
+            {{/if}}
+        </td>
+  </tr>
+    <tr>
+    <td></td>
+    <td colspan ="7" id="showMember_${statement_id}">
+      <table class="table table-striped table-condensed table-responsive memberList" style="table-layout:fixed">
+        <thead>
+        <tr>
+            <th style="width: 170px"></th>
+            <th ></th>
+            <th style="width: 170px"></th>
+        </tr>
+        </thead>
+        <tbody>
+          {{each(i,v) item}}
+            <tr>
+              <td>【${sourceName}】回复【${rootName}】</td>
+              <td>
+              ${v.content}
+                {{if status==0}}
+                <span class="badge btn btn-xs commentUpdate" data-status="1" data-id="${id}">恢复</span>
+                {{else status==1}}
+                <span class="badge btn btn-xs commentUpdate" data-status="0" data-id="${id}" style="background-color:red">删除</span>
+                {{/if}}
+              </td>
+              <td>${time}</td>
+              <td>${audit_status}</td>
+              <td>
+                    {{if audit_status=="未审核"}}
+                    <span class="badge btn btn-xs commentAudit" data-status="1" data-id="${id}" style="background-color:blue">通过</span>/
+                    <span class="badge btn btn-xs commentAudit" data-status="2" data-id="${id}" style="background-color:red">不通过</span>
+                    {{else audit_status=="审核通过"}}
+                    <span class="badge btn btn-xs commentAudit" data-status="2" data-id="${id}" style="background-color:red">不通过</span>
+                    {{else audit_status=="审核未通过"}}
+                    <span class="badge btn btn-xs commentAudit" data-status="1" data-id="${id}" style="background-color:blue">通过</span>
+                    {{/if}}
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</script>
+<!--导出记录-->
+<script id="importtmpl" type="text/x-jquery-tmpl">
+<tr>
+        <td>
+        {{each(i,v) pics}}
+            {{if v}}
+              ${v}|
+            {{/if}}
+        {{/each}}
+        </td>
+        <td>【${sourceName}】说：</td>
+        <td>
+            ${content}
+        </td>
+        <td>${time}</td>
+        <td>${reply_status}</td>
+        <td>${audit_status}</td>
+  </tr>
+    <tr>
+    <td></td>
+    <td colspan ="7" id="showMember_${statement_id}">
+      <table class="table table-striped table-condensed table-responsive memberList" style="table-layout:fixed">
+        <thead>
+        <tr>
+            <th style="width: 170px"></th>
+            <th ></th>
+            <th style="width: 170px"></th>
+        </tr>
+        </thead>
+        <tbody>
+          {{each(i,v) item}}
+            <tr>
+              <td>【${sourceName}】回复【${rootName}】</td>
+              <td>
+              ${v.content}
+              </td>
+              <td>${time}</td>
+              <td></td>
+              <td>${audit_status}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>
+<script>
+    //初始化时间快件
+    $(".start_date").datetimepicker({
+        step: 30,
+        lang: 'ch'
+    });
+    $(".end_date").datetimepicker({
+        step: 30,
+        lang: 'ch'
+    })
+    var pathname = window.location.pathname;
+    var key = pathname.substring(pathname.length-16,pathname.length);
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            var data = $("#form_detail_form").serializeArray();
+            data.push({name:"key",value:key});
+            data.push({name:"page",value:page});
+            writeList(data);
+        }
+    };
+
+    //默认加载
+    writeList({key:key});
+    $(document).on('click','.search_button',function () {
+        var data = $("#form_detail_form").serializeArray();
+        options.currentPage=1;
+        data.push({name:"key",value:key});
+        writeList(data);
+
+    });
+
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        $.get('/admin/enroll/forum/comment', data, function (result) {
+            if (result.code == 200) {
+                console.log(result.message.list)
+                $("#formDataTable tbody").empty('');
+                $.each(result.message.list, function (i, v) {
+                    v.createdAt = (+new Date( v.createdAt )).dateInfo('Y年M月D日 h:m')
+                });
+                $("#inittmpl")
+                    .tmpl(result.message.list)
+                    .appendTo("#formDataTable tbody");
+                options.totalPages = Math.ceil(result.message.pagecount);
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    }
+    //更新评论状态
+    $(document).on('click','.commentUpdate',function () {
+        var data=$(this).data()
+        $.post('/admin/enroll/forum/comment/update',{id:data.id,status:data.status},function (result) {
+            if(result.code==200){
+//                writeList({key:key});
+                var data = $("#form_detail_form").serializeArray();
+                options.currentPage=1;
+                data.push({name:"key",value:key});
+                writeList(data);
+            }
+        })
+    });
+    //学员回复
+    $(document).on('click','.commentReply',function () {
+        var data=$(this).data();
+        data.key=key;
+        swal({
+                title: "评论回复!",
+                text: "请输入回复内容:",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                cancelButtonText: "取消",
+                confirmButtonText: "确认!",
+                animation: "slide-from-top",
+                inputPlaceholder: "回复内容"
+            },
+            function(inputValue){
+                if (inputValue === false) return false;
+
+                if (inputValue === "") {
+                    swal.showInputError("你需要填写内容!");
+                    return false
+                }
+                data.content=inputValue;
+                $.post('/admin/enroll/forum/comment/create',data,function (result) {
+                    if(result.code==200){
+//                        writeList({key:key});
+                        var data = $("#form_detail_form").serializeArray();
+                        options.currentPage=1;
+                        data.push({name:"key",value:key});
+                        writeList(data);
+                    }
+                })
+            });
+    });
+    //审核通过、不通过
+    $(document).on('click','.commentAudit',function () {
+        var data=$(this).data()
+        $.post('/admin/enroll/forum/commentAudit',{id:data.id,audit_status:data.status},function (result) {
+            if(result.code==200){
+//                writeList({key:key});
+                var data = $("#form_detail_form").serializeArray();
+                options.currentPage=1;
+                data.push({name:"key",value:key});
+                writeList(data);
+            }
+        })
+    });
+    function exportData(obj) {
+        var data = $("#form_detail_form").serializeArray();
+        data.push({name:"key",value:key});
+        console.log(data)
+        $.get('/admin/enroll/forum/comment_export', data, function (result) {
+            if (result.code == 200) {
+                console.log(result.message.exportDataList)
+                $("#allDataTable tbody").empty('');
+                $.each(result.message.exportDataList, function (i, v) {
+                    v.created_at = (+new Date( v.created_at)).dateInfo('Y年M月D日 h:m')
+                });
+                $("#importtmpl")
+                    .tmpl(result.message.exportDataList)
+                    .appendTo("#allDataTable tbody");
+                var aTag = $('<a download="论坛评论回复记录.xls" href="#" onclick="return ExcellentExport.excel(this, \'allDataTable\',\'论坛评论回复记录\');">导出</a>')
+                    .appendTo('body').get(0).click();
+            } else {
+                effect.error('请求失败')
+            }
+        })
+    }
+</script>

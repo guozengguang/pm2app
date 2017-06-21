@@ -1,0 +1,260 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<div ng-controller="HotelRecordController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="example" class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>提交时间</th>
+                                            <th>参加活动</th>
+                                            <th>报名人数</th>
+                                            <th>房型/数量</th>
+                                            <th>床位数量</th>
+                                            <th>预算费用</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .service('HotelRecordService', function ($http) {
+                this.update = function (data) {
+                    delete data.updated_at;
+                    delete data.created_at;
+                    delete data.deleted_at;
+                    delete data.Rooms;
+                    return $http({
+                        url: '/admin/hotel/update',
+                        method: 'POST',
+                        data: data
+                    })
+                }
+            })
+            .controller('HotelRecordController', function ($scope, $filter, $compile, HotelRecordService) {
+                //初始化datatables
+                var table = $('#example').DataTable({
+                    "ajax": {
+                        "url": "/admin/hotel/order/list",
+                        "dataSrc": 'result.list'
+                    },
+                    "columns": [
+                        {
+                            "data": "created_at"
+                        },
+                        {"data": "HotelActivity"},
+                        {"data": "human_count"},
+                        {"data": "room_count"},
+                        {"data": "room_bed"},
+                        {"data": "price"},
+                        {"data": "state"},
+                        {"data": "id"}
+                    ],
+                    "aaSorting": [
+                        [0, "desc"]
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "render": function (data, type, row) {
+                                return $filter('date')(data, 'y-m-d');
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 1,
+                            "render": function (data, type, row) {
+                                return data.title
+                            }
+                        },
+                            //HotelActivity.title
+                        {
+                            "bSortable": false,
+                            "targets": 3,
+                            "render": function (data, type, row) {
+                                data = JSON.parse(data);
+                                var html = '';
+                                _.forEach(data, function (v) {
+                                    html += '<p>' + v.name + '/' + v.count +  '</p>'
+                                });
+                                return html
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 4,
+                            "render": function (data, type, row) {
+                                data = JSON.parse(data);
+                                var html = '';
+                                _.forEach(data, function (v) {
+                                    html += '<p>' + v.name + '/' + v.bed +  '</p>'
+                                });
+                                return html
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 6,
+                            "render": function (data, type, row) {
+                                var html = '';
+                                switch (+data){
+                                    case 0:
+                                        html = '<span class="label label-default">未审核</span>';
+                                        break;
+                                    case 1:
+                                        html = '<span class="label label-danger">已拒绝</span>';
+                                        break;
+                                    case 2:
+                                        html = '<span class="label label-success">审核通过</span>';
+                                        break;
+                                }
+                                return html;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 7,
+                            "render": function (data, type, row) {
+                                return '<a href="/hotel/order/detail?id=' + data+ '" class="btn btn-info">查看详细</a>';
+                            }
+                        }
+                    ],
+                    "createdRow": function (row, data, index) {
+                        $compile(angular.element(row).contents())($scope);
+                    },
+                    "oLanguage": {
+                        "sUrl": "/table_language.json"
+                    },
+                    "dom": 'Bfrtip',
+                    "buttons": [
+                        'excel'
+                    ],
+                    "deferRender": true,
+                    "initComplete": function () {
+                        var api = this.api();
+                        api.columns().indexes().flatten().each( function ( i ) {
+                            if(i !== 6){
+                                return false
+                            }
+                            var column = api.column( i );
+                            var select = $('<select class="form-control">' +
+                                    '<option value="">-选择状态-</option>' +
+                                    '</select>')
+                                    .appendTo( $(column.header()).empty() )
+                                    .on( 'change', function () {
+                                        var val = $.fn.dataTable.util.escapeRegex(
+                                                $(this).val()
+                                        );
+                                        column
+                                                .search( val ? '^'+val+'$' : '', true, false )
+                                                .draw();
+                                    } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                                var html = '';
+                                switch (+d){
+                                    case 0:
+                                        html = '未审核';
+                                        break;
+                                    case 1:
+                                        html = '已拒绝';
+                                        break;
+                                    case 2:
+                                        html = '审核通过';
+                                        break;
+                                }
+                                select.append( '<option value="'+html+'">'+html+'</option>' )
+                            } );
+                        } );
+                    }
+                });
+            });
+</script>

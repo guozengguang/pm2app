@@ -1,0 +1,424 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+    .modal-body{ padding: 0;}
+    .table.table-hover{
+        margin-bottom: 0;
+    }
+    .table.table-hover td:first-child{
+        width: 120px;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<script src="/javascripts/js/excellentexport.min.js"></script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="table" class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>申请人</th>
+                                            <th>联系方式</th>
+                                            <th>分院</th>
+                                            <th>企业名称</th>
+                                            <th>职务</th>
+                                            <th>申请时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-controller="GoodManageController" id="detail" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">{{ detail.name }}</h4>
+            </div>
+            <div class="modal-body">
+                <table id="detail_table" class="table table-hover">
+                    <tr>
+                        <td class="info">姓名</td>
+                        <td>{{ detail.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">手机号</td>
+                        <td>{{ detail.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">其他联系方式</td>
+                        <td>{{ detail.contact }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">分院名称</td>
+                        <td>{{ detail.branch }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">企业名称</td>
+                        <td>{{ detail.enterprise }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">职务</td>
+                        <td>{{ detail.position }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">企业介绍</td>
+                        <td>{{ detail.introduce }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">业务介绍</td>
+                        <td>{{ detail.business }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">商业模式</td>
+                        <td>{{ detail.mode }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info">资产规模</td>
+                        <td>{{ detail.asset }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a id="export" download="good_project.xls" onclick="return ExcellentExport.excel(this, 'detail_table', 'good_project');" class="btn btn-info">导出</a>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms').controller('GoodManageController', function ($scope) {
+        /* 初始化 datatable */
+        var table = $('#table').DataTable({
+            "ajax": {
+                "url": "/admin/enroll/good_project/list",
+                "dataSrc": 'result',
+            },
+            "columns": [
+                {"data": "id"},
+                {"data": "name"},
+                {"data": "phone"},
+                {"data": "branch"},
+                {"data": "enterprise"},
+                {"data": "position"},
+                {"data": "created_at"},
+                {"data": "state"},
+                {"data": "state"}
+            ],
+            "aaSorting": [
+                [7, "desc"]
+            ],
+            "columnDefs": [
+                {
+                    "targets": 1,
+                    "render": function (data, type, row) {
+                        return '<a href="javascript: void 0;" class="show_detail btn btn-link">'+ data+'</a>';
+                    }
+                },
+                {
+                    "targets": 6,
+                    "render": function (data, type, row) {
+                        return data ? moment(data).format('YYYY-MM-DD') : '';
+                    }
+                },
+                {
+                    "targets": 7,
+                    "render": function (data, type, row) {
+                        var result = '';
+                        switch (+data) {
+                            case 0:
+                                result = '不通过';
+                                break;
+                            case 1:
+                                result = '待审核';
+                                break;
+                            case 2:
+                                result = '审核通过';
+                                break;
+                            case 3:
+                                result = '已发网络宣传邀请';
+                                break;
+                            case 4:
+                                result = '宣传资料已提交';
+                                break;
+                            case 5:
+                                result = '已发路演材料邀请';
+                                break;
+                            case 6:
+                                result = '路演材料已经提交';
+                                break;
+                            case 7:
+                                result = '已经邀请参加路演';
+                                break;
+                            case 8:
+                                result = '未参加路演';
+                                break;
+                            case 9:
+                                result = '已参加路演';
+                                break;
+                        }
+                        return result;
+                    }
+                },
+                {
+                    "targets": 8,
+                    "render": function (data, type, row) {
+                        var html = '<div class="btn-group" role="group" aria-label="">',
+                                reject = '<a data-id="' + row.id + '" class="reject btn btn-danger btn-sm glyphicon glyphicon-remove" title="不通过"></a>',
+                                resolve = '<a data-id="' + row.id + '" class="resolve btn btn-success btn-sm glyphicon glyphicon-ok" title="通过"></a>',
+                                propaganda_download = '<a href="' + row.propaganda + '" download="' + row.id + '" class="propaganda_download btn btn-info btn-sm glyphicon glyphicon-download-alt" title="下载宣传材料">&ensp;宣传材料</a>',
+
+                                send_propaganda = '<a data-id="' + row.phone + '" data-name="' + row.name + '" class="send_propaganda btn btn-info btn-sm glyphicon glyphicon-send" title="邀请提交宣传材料">&ensp;宣传材料</a>',
+                                send_again_propaganda = '<a data-id="' + row.phone + '" data-name="' + row.name + '" class="send_again_propaganda btn btn-warning btn-sm glyphicon glyphicon-send" title="再次邀请提交宣传材料">&ensp;宣传材料(再次)</a>',
+                                roadshow_download = '<a href="' + row.roadshow + '" download="' + row.id + '" class="roadshow_download btn btn-primary btn-sm glyphicon glyphicon-download-alt" title="下载路演材料">&ensp;路演材料</a>',
+
+                                send_roadshow = '<a data-id="' + row.phone + '" data-name="' + row.name + '" class="send_roadshow btn btn-info btn-sm glyphicon glyphicon-send" title="邀请路演">&ensp;邀请路演</a>',
+                                send_again_roadshow = '<a data-id="' + row.phone + '" data-name="' + row.name + '" class="send_again_roadshow btn btn-warning btn-sm glyphicon glyphicon-send" title="再次邀请路演">&ensp;邀请路演(再次)</a>',
+
+                                send_roadshow_file = '<a data-id="' + row.phone + '" data-name="' + row.name + '" class="send_roadshow_file btn btn-primary btn-sm glyphicon glyphicon-send" title="邀请提供路演材料">&ensp;路演材料</a>',
+                                send_again_roadshow_file = '<a data-id="' + row.phone + '" data-name="' + row.name + '" class="send_again_roadshow_file btn btn-warning btn-sm glyphicon glyphicon-send" title="再次邀请提供路演材料">&ensp;路演材料(再次)</a>',
+
+                                already_roadshow = '<a data-id="' + row.id + '" class="already_roadshow btn btn-success btn-sm glyphicon glyphicon-ice-lolly" title="已路演">&ensp;已路演</a>',
+                                not_roadshow = '<a data-id="' + row.id + '" class="not_roadshow btn btn-danger btn-sm glyphicon glyphicon-ice-lolly-tasted" title="未路演">&ensp;未路演</a>';
+                        switch (+data) {
+                            case 0: // 不通过
+                            case 9: // 已参加路演
+                                break;
+                            case 1: // 待审核
+                                html += reject + resolve;
+                                break;
+                            case 2: // 审核通过，可以邀请提交宣传材料
+                                html += send_propaganda;
+                                break;
+                            case 3: // 已经邀请提交宣传材料，可以再次邀请
+                                html += send_again_propaganda;
+                                break;
+                            case 4: // 宣传材料已经提交， 可以邀请提交路演材料
+                                html += propaganda_download + send_roadshow_file;
+                                break;
+                            case 5: // 已经邀请提交路演材料，可以再次邀请
+                                html += propaganda_download + send_again_roadshow_file;
+                                break;
+                            case 6: // 路演材料已经提交， 可以邀请参加路演。
+                                html += propaganda_download + roadshow_download + send_roadshow + already_roadshow + not_roadshow;
+                                break;
+                            case 7: // 已经邀请参加路演，可以再次邀请
+                                html += propaganda_download + roadshow_download + send_again_roadshow + already_roadshow + not_roadshow;
+                                break;
+                            case 8: // 未参加路演，可以再次邀请
+                                html += propaganda_download + roadshow_download + send_again_roadshow + already_roadshow + not_roadshow;
+                                break;
+                        }
+                        return html + '</div>';
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sUrl": "/table_language.json"
+            },
+            "sDom": 'Bfrtip',// lfrtip
+            "sScrollX": "50%",
+            "buttons": [
+                'excel'
+            ],
+            "deferRender": true,
+            "fnDrawCallback": function () {
+            }
+        })
+                .on('click', '.reject', function () {
+                    state($(this).data('id'), 0); //未路演
+                })
+                .on('click', '.resolve', function () {
+                    state($(this).data('id'), 2); //未路演
+                })
+                .on('click', '.send_propaganda', function () {
+                    state($(this).data('id'), 3);
+                    sms($(this).data('id'), 158129 ,[$(this).data('name'),'我是地址']); // 邀请提交宣传资料
+                })
+                .on('click', '.send_again_propaganda', function () {
+                    sms($(this).data('id'), 158131 ,[$(this).data('name'),'我是地址']); // 再次提交宣传资料
+                })
+                .on('click', '.send_roadshow', function () {
+                    state($(this).data('id'), 7);
+                    sms($(this).data('id'), 158134 ,[$(this).data('name'),'我是地址']); // 邀请路演
+                })
+                .on('click', '.send_again_roadshow', function () {
+                    sms($(this).data('id'), 158134 ,[$(this).data('name'),'我是地址']); // 再次邀请路演
+                })
+                .on('click', '.send_roadshow_file', function () {
+                    state($(this).data('id'), 5);
+                    sms($(this).data('id'), 158132 ,[$(this).data('name'),'我是地址']); // 邀请提交路演资料
+                })
+                .on('click', '.send_again_roadshow_file', function () {
+                    sms($(this).data('id'), 158133 ,[$(this).data('name'),'我是地址']);// 再次邀请提供路演材料
+                })
+                .on('click', '.already_roadshow', function () {
+                    state($(this).data('id'), 9); //已路演
+                })
+                .on('click', '.not_roadshow', function () {
+                    state($(this).data('id'), 8); //未路演
+                })
+                .on('click', '.btn-link', function () {
+                    $(this).data('id');
+                    console.log(table.data());
+                })
+                .on('click', '.show_detail',function () {
+                    var $this = $(this);
+                    var parent = $this.parents('tr');
+                    if (parent.hasClass('selected') ) {
+                        parent.removeClass('selected');
+                    }
+                    else {
+                        table.$('tr.selected').removeClass('selected');
+                        parent.addClass('selected');
+                        $scope.$apply(function () {
+                            var data = table.row('.selected').data();
+                            data.asset = asset(data.asset);
+                            $scope.detail = data
+                        });
+                        $('#detail').modal('show');
+                    }
+                });
+        function sms(id, template, data) {
+            $.ajax({
+                url: '/admin/sms',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    phone: id,
+                    template: template,
+                    data: data
+                },
+                success: function (result) {
+                    if(result.code == 200){
+                        table.ajax.reload();
+                        swal('成功','短信发送成功', 'success');
+                    }else {
+                        swal('失败',result.message, 'error')
+                    }
+                },
+                error: function (err) {
+                    swal('失败',JSON.stringify(err), 'error')
+                }
+            })
+        }
+        function state(id, state) {
+            $.ajax({
+                url: '/admin/enroll/good_project/state',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    id: id,
+                    state: state
+                },
+                success: function () {
+                    if(result.code == 200){
+                        table.ajax.reload();
+                    }else {
+                        swal('失败',result.message, 'error')
+                    }
+                },
+                error: function (err) {
+                    swal('失败',JSON.stringify(err), 'error')
+                }
+            })
+        }
+        function asset(data) {
+            var text = '';
+            switch (+data){
+                case 1: text = '1000万元以下'; break;
+                case 10: text = '1000万元-5000万元'; break;
+                case 20: text = '5000万元-1亿元'; break;
+                case 30: text = '1亿元-10亿元'; break;
+                case 40: text = '10亿元以上'; break;
+            }
+            return text;
+        }
+    })
+</script>

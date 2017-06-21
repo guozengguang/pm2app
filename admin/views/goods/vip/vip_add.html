@@ -1,0 +1,223 @@
+<% include ../../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<script type="text/javascript" src="/javascripts/js/bootstrap.autocomplete.js"></script>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>添加新学员</b></div>
+            <div class="panel-body" style="padding:15px 0">
+              <form id="vip_form">
+                <div class="col-md-12" style="padding:0 0 0 15px">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="uc_userphone" class="control-label">学员手机<span>*</span></label>
+                      <input type="text" name="uc_userphone" placeholder="输入手机号" class="form-control" id="userphone" data-provide="autocomplete" autocomplete="off" required data-bv-trigger="blur" data-bv-notempty-message='必填项目' pattern="^[1][0-9]{10}$" data-bv-regexp-message='请输入正确手机号'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="goodsid" class="control-label">选择课程<span>*</span></label>
+                      <select name="goodsid" class="form-control input-sm">
+                        <%item.forEach(function(node,index){%>
+                        <option value="<%=node.goodsid%>"><%=node.goods_name%></option>
+                        <%})%>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="uc_areaid" class="control-label">选择学区<span>*</span></label>
+                      <select name="uc_areaid" class="form-control" id="area" required data-bv-trigger="blur" data-bv-notempty-message='选择校区'>
+                        <option value="" selected="selected">--学区--</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="uc_calssroomid" class="control-label">选择地区<span>*</span></label>
+                      <select name="uc_calssroomid" class="form-control" id="calssroom" required data-bv-trigger="blur" data-bv-notempty-message='选择地区'>
+                        <option value="" selected="selected">--地区--</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="m_name" class="control-label">学员名称<span>*</span></label>
+                      <input type="text" name="m_name" placeholder="学员名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="m_email" class="control-label">学员邮箱<span></span></label>
+                      <input type="text" name="m_email" placeholder="学员邮箱" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="m_url" class="control-label">公司网址<span></span></label>
+                      <input type="text" name="m_url" placeholder="公司网址" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="m_place" class="control-label">公司地址<span></span></label>
+                      <input type="text" name="m_place" placeholder="公司地址" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="m_company" class="control-label">公司名称<span></span></label>
+                      <input type="text" name="m_company" placeholder="公司名称" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="m_position" class="control-label">公司职务<span></span></label>
+                      <input type="text" name="m_position" placeholder="公司职务" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="uc_status" class="control-label">状态</label>
+                      <select name="uc_status" class="form-control">
+                        <!--<option value="0">未缴费</option>-->
+                        <option value="1" selected>缴费</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="uc_remark" class="control-label">备注</label>
+                      <textarea name="uc_remark" class="form-control" rows="10"></textarea>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    var area=[],roomclass=[],areaid=[],roomclassid=[];
+    //验证提交
+    $('#vip_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      var data=$('#vip_form').serializeArray();
+      var uc_calssroomname=$('#calssroom').find("option:selected").text();
+      var uc_areaname=$('#area').find("option:selected").text();
+      data.push({name:'uc_calssroomname',value:uc_calssroomname});
+      data.push({name:'uc_areaname',value:uc_areaname});
+      console.log(data)
+      $.post("/admin/vip_create",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/student';
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    //联动
+    $.get('/admin/area_classroom',function(result){
+      if (result.code==200){
+        list=result.message.list;
+        list.forEach(function(item,i){
+          //名称数组
+          area[i]=[];
+          area[i].push(item.area_city);
+          roomclass[i]=[];
+          roomclass[i].push(item.area_city);
+          //数值数组
+          areaid[i]=[];
+          areaid[i].push(item.areaid);
+          roomclassid[i]=[];
+          roomclassid[i].push(item.areaid);
+          if(item.Classrooms){
+            item.Classrooms.forEach(function(node,j){
+              roomclass[i].push(node.classroom_name);
+              roomclassid[i].push(node.classroom);
+            })
+          }
+        });
+        var province = document.getElementById('area');
+        var city     = document.getElementById('calssroom');
+        for(var key in area) {
+          var provinceOption = document.createElement('option');
+          provinceOption.value =areaid[key];
+          provinceOption.text = area[key];
+          province.options.add(provinceOption);
+        }
+        function showChild(current, child, childArr,childArrid) {
+          var currentValue = current.value;
+          var count = childArr.length;
+          child.length = 1;
+          for(var i = 0; i < count; i++) {
+            if(currentValue == childArrid[i][0]) {
+              for(var j = 1; j < childArrid[i].length; j++) {
+                var childOption = document.createElement('option');
+                childOption.value = childArrid[i][j];
+                childOption.text = childArr[i][j];
+                child.options.add(childOption);
+              }
+            }
+          }
+        }
+        province.onchange = function() {
+          showChild(province, city, roomclass,roomclassid);
+        }
+      }
+    });
+    //带入存在会员的数据
+    $("#userphone").on('blur',function(){
+      var phone=$(this).val()
+      $.get('/admin/students_ajax', {phone: phone}, function(result){
+        var info={};
+        if(result.code==200){
+          info=result.message.list[0]?result.message.list[0]:{}
+        }
+        infoClass(info)
+      });
+    })
+/**
+    //模糊匹配
+    $("#userphone").autocomplete ({
+      source:function(query,process){
+        var parameter = {m_phone: query};
+        $.get('/admin/students_ajax', parameter, function(result){
+          if(result.message.list.length>0){
+            return process(result.message.list);
+          }else {
+            infoClass()
+          }
+        });
+      },
+      formatItem:function(item){
+        var titie=item.m_name?item.m_name:'';
+        return item.m_phone+" - "+titie;
+      },
+      setValue:function(item){
+        var content=item.m_name+'|'+item.m_email+'|'+item.m_url+'|'+item.m_position+'|'+item.m_company+'|'+item.m_place;
+        return {'data-value':item.m_phone,'real-value':content};
+      },
+      delay:30,
+      items:20
+    }).on('change',function(){
+      var m=$(this).attr('real-value');
+      infoClass(m)
+    });
+ **/
+    function infoClass(m){
+      $('[name="m_name"]').val(m.m_name);
+      $('[name="m_email"]').val(m.m_email);
+      $('[name="m_url"]').val(m.m_url);
+      $('[name="m_position"]').val(m.m_position);
+      $('[name="m_company"]').val(m.m_company);
+      $('[name="m_place"]').val(m.m_place);
+    }
+  })
+</script>
+<% include ../../inc/footer.html%>

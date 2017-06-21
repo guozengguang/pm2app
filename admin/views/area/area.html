@@ -1,0 +1,133 @@
+<% include ../inc/head.html%>
+<script type="text/javascript" src="/javascripts/js/campus.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="/admin/area_add_render"><span class="glyphicon glyphicon-plus"></span> 新增</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <div class="form-group">
+              <select  class="form-control input-sm" id="getArea" name="area_name">
+                <option value="">全部学区</option>
+                <%area.forEach(function(item,index){%>
+                <option value="<%=item.area_name%>" ><%=item.area_name%></option>
+                <%})%>
+              </select>
+            </div>
+            <div class="input-group">
+              <input type="text" name="classroom_name" placeholder="分院名称" class="form-control input-sm">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-danger btn-sm search">
+                  <span class="glyphicon glyphicon-search"></span>
+                </button>
+              </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:80px" >图片</th>
+          <th style="width:180px" >学院名称</th>
+          <th>学区地点</th>
+          <th style="width:180px">学区城市</th>
+          <th style="width:180px">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        areaList({page:page})
+      }
+    };
+
+    //请求用户
+    $('#getArea').on('change',function(){
+      var data=$('.search-form').serializeArray();
+      areaList(data);
+    });
+    $('.search').on('click',function(){
+      var data=$('.search-form').serializeArray();
+      areaList(data);
+    });
+    //默认加载
+    areaList();
+    function areaList(data){
+      effect.show();
+      $.get('/admin/area_list',data,function(result){
+        if(result.code==200){
+          $('table tbody').empty();
+          $('#inittmpl')
+              .tmpl(result.message.list)
+              .appendTo('table tbody');
+//          options.totalPages=result.message.pagecount;
+//          if (options.totalPages > 0) {
+//            $('#page').bootstrapPaginator(options);
+//          } else {
+//            $('#page').empty();
+//          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    }
+    $(document).on('click','.classroomDel',function () {
+      var data=$(this).data()
+      $.post('/admin/area_delete',data,function (result) {
+        if(result.code==200){
+          areaList();
+        }
+      })
+    })
+  })
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>
+    <img class="img-circle" src="<%=aly%>/${classroom_pics}" width="45" height="45">
+    </td>
+    <td> <a href="/admin/area_edit_render?classroom=${classroom}">${classroom_name}</a></td>
+    <td>${area_name}</td>
+    <td>${classroom_area_city}</td>
+    <td>
+      {{if classroom_status==0}}
+      <a class="btn btn-info btn btn-xs classroomDel" data-status="1" data-id="${classroom}"> app不显示</a>
+      {{else}}
+      <a class="btn btn-danger btn btn-xs classroomDel" data-status="0" data-id="${classroom}"> app显示</a>
+      {{/if}}
+      <a href="/admin/area/manage?classroom=${classroom}"> <span class="label label-primary">人员管理</span></a>
+    </td>
+  </tr>
+</script>
+<% include ../inc/footer.html%>

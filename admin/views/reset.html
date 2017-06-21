@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title><%=title%></title>
+<link rel='stylesheet'  href='/stylesheets/css/logo_bootstrap.css' type='text/css' media='all' />
+<link rel='stylesheet' href='/stylesheets/css/icons.css ' type='text/css' media='all' />
+
+<link rel='stylesheet' href='/stylesheets/css/logo_style.css' type='text/css' media='all' />
+
+	<style>
+		::-webkit-input-placeholder  {
+			color:#ffffff !important;
+		}
+	</style>
+ 
+</head>
+	<body class="registered user-registered">
+		<div class="login-box">
+			
+		  <div class="loginbg"> </div>
+		  <div class="login-form">
+		  	<h3>找回密码</h3>
+			<form>
+			  <div class="form-group">
+			    <!--label for="company">公司名</label-->
+			    <input type="text" class="form-control" name="phone" placeholder="手机号">
+			  </div>
+				<div class="form-group">
+					<!--label for="company">公司名</label-->
+					<input type="text" class="form-control" name="user" placeholder="登录名">
+				</div>
+			  <div class="form-group">
+			  <div class="input-group">
+				  <input type="text" class="form-control" name="code" placeholder="验证码" style="width: 40%">
+				  <input type="button" class="btn btn-link getCode" style="width: 45%;margin:8px -8px 0 0;float: right" value="获取验证码">
+			  </div>
+			  </div>
+
+			  <label for="password1">登录密码设置(6-18位，必须包含一个大写字母，一个小写字母,一个数字)</label>
+			  <div class="form-group">
+			    <input type="password" class="form-control" name="password1" placeholder="输入新的登录密码">
+			  </div>
+			  <div class="form-group">
+			    <input type="password" class="form-control" name="password2" placeholder="确认登录密码">
+			  </div>
+				<span style="color: red" class="text-error"></span>
+			  <button type="button" class="btn btn-info go_submit">确认修改</button>
+              <a class="btn btn-link" href="/login" >返回登录</a>
+			</form>
+		  </div>
+		</div>
+		<script type='text/javascript' src='/javascripts/js/jquery.min.js'></script>
+		<script>
+			var wait=60;
+			function time(o) {
+				if (wait == 0) {
+					o.removeAttribute("disabled");
+					o.value="获取验证码";
+					wait = 60;
+				} else {
+					o.setAttribute("disabled", true);
+					o.value="重新发送(" + wait + ")";
+					wait--;
+					setTimeout(function() {
+								time(o)
+							},
+							1000)
+				}
+			}
+			$(function () {
+				$('.getCode').click(function () {
+					var than=this
+					var phone=$('input[name="phone"]').val();
+					var user=$('input[name="user"]').val();
+					if(!phone){
+						$(".text-error").html('手机号码为空')
+						window.setTimeout(function () { $('.text-error').text('') }, 2000);
+						return
+					}
+					$.post('/reset_code',{phone:phone,user:user},function (result) {
+						console.log(result)
+						if(result.code==200){
+							time(than)
+						}else {
+							$(".text-error").html(result.message)
+							window.setTimeout(function () { $('.text-error').text('') }, 2000);
+						}
+					})
+				});
+				$('.go_submit').click(function () {
+					var than=this
+					var phone=$('input[name="phone"]').val();
+					var user=$('input[name="user"]').val();
+					var code=$('input[name="code"]').val();
+					var password1=$('input[name="password1"]').val();
+					var password2=$('input[name="password2"]').val();
+					if(!phone){
+						$(".text-error").html('手机号码为空')
+						window.setTimeout(function () { $('.text-error').text('') }, 2000);
+						return
+					}
+					if(password1!=password2){
+						$(".text-error").html('两次密码不一致')
+						window.setTimeout(function () { $('.text-error').text('') }, 2000);
+						return
+					}
+					$.post('/reset_password',{phone:phone,user:user,code:code,password:password1},function (result) {
+						if(result.code==200){
+							location.href = '/login';
+						}else {
+							$(".text-error").html(result.message)
+							window.setTimeout(function () { $('.text-error').text('') }, 2000);
+						}
+					})
+				});
+			})
+		</script>
+	</body>
+</html>

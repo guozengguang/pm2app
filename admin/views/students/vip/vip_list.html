@@ -1,0 +1,144 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="pull-left">
+        <ul class="list-inline">
+          <li><a href="/admin/vip_add"><span class="glyphicon glyphicon-plus"></span>新建</a></li>
+        </ul>
+      </div>
+      <div class="pull-right">
+        <form class="form-inline search-form">
+          <div class="input-group">
+            <input type="text" name="stime" placeholder="开始时间" class="form-control input-sm input_date">
+          </div>
+          <div class="input-group">
+            <input type="text" name="etime" placeholder="结束时间" class="form-control input-sm input_date">
+          </div>
+          <div class="form-group">
+            <input type="text" name="m_name" placeholder="姓名" class="form-control input-sm"/>
+          </div>
+          <div class="input-group">
+            <input type="text" name="m_phone" placeholder="手机号码" class="form-control input-sm">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-danger btn-sm search">
+                <span class="glyphicon glyphicon-search"></span>
+              </button>
+            </span>
+          </div>
+        </form>
+      </div>
+      <div class="clearfix"></div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th style="width:80px">头像</th>
+          <th>用户名称</th>
+          <th style="width:180px">手机号</th>
+          <th style="width:160px">公司名称</th>
+          <th style="width:180px">职务</th>
+          <th style="width:120px" class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    $(".input_date").datetimepicker({
+      lang:'ch',
+      step:30
+    });
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.search-form').serializeArray();
+        data.push({name:'type',value:'0'});
+        data.push({name:'page',value:page});
+        writeList(data)
+      }
+    };
+    //默认加载
+    writeList({type:'0'});
+    $('.search').on('click',function(){
+      var data=$('.search-form').serializeArray();
+      data.push({name:'type',value:'0'});
+      options.currentPage=1;
+      writeList(data);
+    });
+    //更新
+    $(document).on('click','.update',function () {
+      var data=$(this).data()
+      $.post('/admin/students_update',{mid:data.id,m_vip:data.status},function (result) {
+        if(result.code==200){
+          var data=$('.search-form').serializeArray();
+          data.push({name:'type',value:'0'});
+          options.currentPage = 1
+          writeList(data);
+        }
+      })
+    })
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/students_ajax',data,function(result){
+        if(result.code==200){
+          $("table tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("table tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+    <td><img class="img-circle" {{if m_pics}}src="<%=aly%>/${m_pics}"{{/if}} width="45" height="45" ></td>
+    <td>${m_name}</td>
+    <td>${m_phone}</td>
+    <td>${m_company}</td>
+    <td>${m_position}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-danger btn btn-xs" href="/admin/vip_edit?mid=${mid}"> 编辑</a>
+      <a class="btn btn-info btn btn-xs" href="/admin/vip_enterprise?mid=${mid}"> 企业</a>
+      {{if m_vip==0}}
+      <a class="btn btn-success btn btn-xs update" data-status="1" data-id="${mid}">设置发起人</a>
+      {{else m_vip==1}}
+      <a class="btn btn-danger btn btn-xs update" data-status="0" data-id="${mid}">取消发起人</a>
+      {{/if}}
+    </div>
+    </td>
+  </tr>
+</script>
+<% include ../../inc/footer.html%>

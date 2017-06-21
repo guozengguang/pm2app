@@ -1,0 +1,252 @@
+<% include ../../inc/head.html%>
+<script src="http://cdn.bootcss.com/plupload/2.1.7/plupload.full.min.js"></script>
+<script src="/javascripts/js/pinyin_dict_notone.js"></script>
+<script src="/javascripts/js/pinyinUtil.js"></script>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>添加新员工</b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <form id="stu_form">
+                                <div class="col-md-3" style="padding:0">
+                                    <div class="well">
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_phone" class="control-label">员工手机<span>*</span></label>
+                                            <input pattern="^[1][0-9]{10}$" data-bv-regexp-message='请输入正确手机号'
+                                                   type="text" name="m_phone" placeholder="输入手机号" class="form-control"
+                                                   required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_level" class="control-label">员工部门<span>*</span></label>
+                                            <select name="m_level" class="form-control">
+                                                <%level.forEach(function(item,index){%>
+                                                <option value="<%=item.id%>" <%if(item.status==1){%>selected<%}%>><%=item.name%></option>
+                                                <%})%>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_sex" class="control-label">性别<span>*</span></label>
+                                            <select name="m_sex" class="form-control">
+                                                <option value="男" selected="selected">男</option>
+                                                <option value="女">女</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_pics" class="control-label">个人照片</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="m_pics" placeholder="上传照片" class="form-control"
+                                                       readonly>
+                                                <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+
+                          <span>上传</span>
+                                                        <input id="addImg" type="file" name="files[]" accept="image/*">
+                                                        </span>
+                                                        </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="progress" style="width: 100%;">
+                                                <div class="progress-bar" style="width: 0%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="thumbnail">
+                                                <img src="" id="m_pics_img">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9" style="padding:0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_name" class="control-label">员工姓名<span>*</span></label>
+                                                    <input type="text" name="m_name" placeholder="员工名称"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                    <input type="hidden" name="m_type" value="10">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_email" class="control-label">员工邮箱<span></span></label>
+                                                    <div class="row">
+                                                        <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8">
+                                                            <input type="text" name="m_email" placeholder="员工邮箱"
+                                                                   class="form-control">
+                                                        </div>
+                                                        <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+                                                            <button id="join" type="button"
+                                                                    class="btn btn-info btn-sm pull-right">注册邮箱
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_position"
+                                                           class="control-label">公司职务<span></span></label>
+                                                    <input type="text" name="m_position" placeholder="公司职务"
+                                                           class="form-control">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_order" class="control-label">序号<span></span></label>
+                                                    <input type="text" name="m_order" placeholder="序号"
+                                                           class="form-control">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <label for="m_desc" class="control-label">个人简介<span></span></label>
+                                                    <textarea name="m_desc" rows="10" class="form-control"></textarea>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <div class="">
+                                                        <button type="submit" class="btn btn-danger btn-submit">提交
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+//    setcampus('province','city');
+        //验证提交
+        $('#stu_form').bootstrapValidator().on('success.form.bv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target),
+                    validator = $form.data('bootstrapValidator');
+            var data = $('#stu_form').serializeArray();
+            $.post("/admin/staff/create", data, function (result) {
+                if (result.code == 200) {
+                    effect.success(function () {
+                        location.href = '/admin/staff_list'
+                    })
+                } else {
+                    swal('失败', result.message, 'error');
+                }
+            })
+        });
+        newupload('addImg', 'm_pics', function (err, result) {
+            if (err) {
+                effect.error(err);
+            } else {
+                $('input[name="' + result.src + '"]').val(result.message.name);
+                $("#" + result.src + "_img").attr("src", result.message.url);
+            }
+        });
+    })
+
+    var ali = document.createElement('iframe');
+    ali.id = 'ali_mail';
+    ali.src = 'http://mail.geju.com';
+    ali.style.visibility = 'hidden';
+    document.body.appendChild(ali);
+
+
+    window.addEventListener('message', function (e) {
+        var message = e.data.split(' ');
+        var event = message[0];
+        var data = message[1];
+        switch (event) {
+            case 'result'://返回结果
+                console.log('result', data);
+                if (data.indexOf('成功') !== -1) {
+                    swal("成功", data, "success");
+                } else {
+                    swal("失败", data, "error");
+                }
+                break;
+            case 'validate_code':
+                data = JSON.parse(data);
+                swal({
+                    title: "请输入验证码",
+                    text: "根据图片输入验证码",
+                    type: "input",
+                    closeOnConfirm: true,
+                    animation: "slide-from-top",
+                    inputPlaceholder: "验证码",
+                    imageUrl: data.src
+                }, function (inputValue) {
+                    if (inputValue === false) return false;
+                    if (inputValue === "") {
+                        swal.showInputError("您必须输入验证码");
+                        return false;
+                    }
+                    $('#ali_mail')[0].contentWindow.postMessage('code ' + inputValue, '*');
+                });
+                break;
+        }
+    }, false);
+
+
+    $(document).on('click', '.sa-icon.sa-custom', function () {
+        console.log(1);
+        $('#ali_mail')[0].contentWindow.postMessage('change_code', '*');
+    })
+
+
+    $('#join').on('click', function () {
+        swal({
+            title: "提示",
+            text: "需要<a href='http://files.geju.com/external/Mailbox.crx' target='_blank'>安装chrome插件</a>，注册时间大概需要2s-15s,请不要关闭页面",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#31b0d5",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: true,
+            html: true
+        }, function () {
+            var name = $('input[name="m_name"]').val();
+            var email = $('input[name="m_email"]');
+            var email_value = email.val();
+            name = $.trim(name);
+            var users = {
+                name: name,
+                account: undefined
+            };
+            if (/\S/.test(email_value)) {
+                users.account = email_value.split('@')[0];
+            } else {
+                if (!/\S/.test(name)) {
+                    swal("错误", "姓名不能为空", "error")
+                    return false;
+                }
+                if (/\s/.test(name)) {
+                    swal("错误", "姓名不能包含空白字符", "error")
+                    return false;
+                }
+                users.account = pinyinUtil.getPinyin(name, '', false, false);
+                email.val(users.account + '@geju.com');
+            }
+            console.log(1);
+            document.getElementById('ali_mail').contentWindow.postMessage('talk_account ' + JSON.stringify(users), '*');
+        });
+    })
+
+
+</script>
+<% include ../../inc/footer.html%>

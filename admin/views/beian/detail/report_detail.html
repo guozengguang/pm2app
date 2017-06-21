@@ -1,0 +1,292 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%=title%></b></div>
+                        <div class="panel-body" style="padding:15px 0" ng-controller="reportControl">
+                            <form class="form-horizontal" role="form">
+                                <fieldset ng-disabled="{{btnEnabled}}">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_name">学员姓名 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_name" class="form-control" id="m_name" name="m_name" placeholder="学员姓名"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_phone">学员电话 :</label>
+                                                 <div class="col-sm-8" style="margin-left: -20px;">
+                                                     <input type="text" ng-model="item.m_phone" class="form-control" id="m_phone" name="m_phone" placeholder="学员电话" disabled/>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="goods_name">所报课程 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.goods_name" class="form-control" id="goods_name" name="goods_name" placeholder="所报课程" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="classroom_name">所属分院 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.classroom_name" class="form-control" style="width:80%;" id="classroom_name" name="classroom_name" placeholder="所属分院" disabled/>
+                                                    <a ng-show="flag==1" href="javascript:void(0)" data-id="{{item.en_uid}}" class="setClassRoom"> <span class="label label-danger" style="float: right;margin-top: -32px;line-height: 24px;font-size:12px;"><%=branchName%></span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                    <label class="col-sm-4 control-label" for="en_time">时间 :</label>
+                                                    <div class="col-sm-8" style="margin-left: -20px;">
+                                                        <input type="text" ng-model="item.time" class="form-control" id="en_time" name="en_time" placeholder="时间" disabled/>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label" for="m_company">公司名称 :</label>
+                                                    <div class="col-sm-8" style="margin-left: -20px;">
+                                                        <input type="text" ng-model="item.m_company" class="form-control" id="m_company" name="m_company" placeholder="公司名称"/>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_card">身份证号 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_card" class="form-control" id="m_card" name="m_card" placeholder="身份证号" maxlength="18"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="m_position">公司职务 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.m_position" class="form-control" id="m_position" name="m_position" placeholder="公司职务"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="statusDesc">学员状态 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.statusDesc" class="form-control" id="statusDesc" name="statusDesc" placeholder="学员状态" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="en_reference">推荐人姓名 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.en_reference" class="form-control" id="en_reference" name="en_reference" placeholder="推荐人姓名"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="clerk">招生老师归属 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.clerk" class="form-control" id="clerk" name="clerk" placeholder="招生老师归属" disabled style="width:80%"/>
+                                                    <a ng-show="flag==1" href="javascript:void(0)" data-id="{{item.en_uid}}" data-clerk="{{item.clerk_phone}}" data-name="{{item.m_name}}" data-phone="{{item.m_phone}}" class="setClerk">
+                                                        <span class="label label-success" style="float:right;margin-top:-32px;line-height: 24px;font-size: 12px;">修改归属</span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label" for="en_channel">渠道来源 :</label>
+                                                <div class="col-sm-8" style="margin-left: -20px;">
+                                                    <input type="text" ng-model="item.en_channel" class="form-control" id="en_channel" name="en_channel" placeholder="渠道来源" disabled/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="en_desc">备注说明 :</label>
+                                                <div class="col-sm-10" style="margin-left:-20px;">
+                                                    <textarea type="text" ng-model="item.en_desc" class="form-control" id="en_desc" name="en_desc" placeholder="备注说明" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="en_desc">操作详情 :</label>
+                                                <div class="col-sm-10" style="margin-left:-20px;">
+                                                    <div id="remarkDesc"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group" align="center" ng-show="flag == 1">
+                                                <button class="btn btn-sm btn-danger" style="display: block;width: 35%;" ng-click="updateReport();">立即提交</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //报备转院
+    $(document).on('click',".setClassRoom",function () {
+        var data=$(this).data()
+        swal({
+            title: "选择变更的分院",
+            text: '<select class="form-control" id="reportRoom">\
+            <%calssRoom.forEach(function(node,index){%>\
+              <option value="<%=node.classroom_name%>,<%=node.classroom%>"><%=node.classroom_name%></option>\
+                      <%})%>\
+            </select>',
+            html: true,
+            showCancelButton: true,
+            cancelButtonText: "取消",
+            confirmButtonText: "确认!",
+            animation: "slide-from-top",
+        },function(){
+            var info=$("#reportRoom").val().split(',')
+            var appElement = document.querySelector('[ng-controller=reportControl]');
+            var $scope = angular.element(appElement).scope();
+            if(!$scope.pushData){
+                $scope.pushData = [];
+            }
+            $scope.pushData.forEach(function (node,index) {
+                if("ClassRoomInfo" == node.name){
+                    $scope.pushData.splice(index,1)
+                }
+            })
+            $scope.pushData.push({name:'ClassRoomInfo',value:{name:info[0],classroom:info[1],uid:data.id}});
+            console.log($scope.pushData)
+            var roomSelected = $("#reportRoom").find("option:selected").text();
+            $("#classroom_name").val(roomSelected)
+        });
+    });
+    //修改归属
+    $(document).on('click',".setClerk",function () {
+        var data=$(this).data()
+        swal({
+            title: "选择指派的招生老师",
+            text: '<select class="form-control" id="reportClerk">\
+            <%list.forEach(function(node,index){%>\
+              <option value="<%=node.mid%>,<%=node.classroom%>,<%=node.m_name%>"><%=node.m_name%>(<%=node.classroom_name%>)</option>\
+                      <%})%>\
+            </select>',
+            html: true,
+            showCancelButton: true,
+            cancelButtonText: "取消",
+            confirmButtonText: "确认!",
+            animation: "slide-from-top",
+        },function(){
+            var info=$("#reportClerk").val().split(',')
+            var appElement = document.querySelector('[ng-controller=reportControl]');
+            var $scope = angular.element(appElement).scope();
+            if(!$scope.pushData){
+                $scope.pushData = [];
+            }
+            $scope.pushData.forEach(function (node,index) {
+                if("ClerkInfo" == node.name){
+                    $scope.pushData.splice(index,1)
+                }
+            })
+            $scope.pushData.push({name:'ClerkInfo',value:{mid:info[0],classroom:info[1],name:info[2],uid:data.id,clerk:data.clerk,phone:data.phone,mname:data.name}});
+            console.log($scope.pushData)
+            $("#clerk").val(info[2])
+        });
+    });
+</script>
+<script>
+    angular.module("cms")
+        .service('reportService',function ($http) {
+            this.dataFormat=function (data) {
+//                console.log(data)
+                return JSON.parse(data.replace(/&#34;/ig,'"').replace(/\s+/g, "").replace(/<\/?.+?>/g,"").replace(/[\r\n]/g, ""))
+            },
+                this.push=function (data) {
+                    return $http({
+                        url: '/admin/beian/detail/updateReport',
+                        method: 'POST',
+                        data: data
+                    })
+                }
+        })
+        .controller('reportControl',function ($scope,reportService,$log) {
+            $scope.remarkList=reportService.dataFormat('<%=remarkList%>')
+            $scope.remarkDesc = "";
+            angular.forEach($scope.remarkList, function (v, i, list) {
+//                console.log(v,i,list)
+                $scope.remarkDesc += "提交者:"+v.create+" 内容:"+v.content+"<br/>";
+            });
+            $("#remarkDesc").html($scope.remarkDesc)
+
+            $scope.item=reportService.dataFormat('<%=item%>')//学员详情
+            $scope.item.time=$scope.item.time.substr(0,10) + " " +  $scope.item.time.substr(10);
+            $scope.flag = $scope.item.flag;
+            if($scope.flag == 2){
+                $scope.btnEnabled=true;
+            }else {
+                $scope.btnEnabled=false;
+            }
+            $scope.updateReport = function () {
+                if(!$scope.pushData){
+                    $scope.pushData = [];
+                }
+                $scope.pushData.forEach(function (node,index) {
+                    if("baseInfo" == node.name){
+                        $scope.pushData.splice(index,1)
+                    }
+                })
+                $scope.pushData.push({name:'baseInfo',value:{
+                    en_uid:$scope.item.en_uid,
+                    en_mid:$scope.item.en_mid,
+                    m_name:$scope.item.m_name,
+                    m_company:$scope.item.m_company,
+                    m_card:$scope.item.m_card,
+                    m_position:$scope.item.m_position,
+                    en_reference:$scope.item.en_reference,
+                    en_desc:$scope.item.en_desc
+                }});
+                console.log($scope.pushData)
+
+                reportService.push($scope.pushData).success(function (result) {
+                    if(result.code==200){
+                        swal({
+                            title: "操作成功",
+                            text: "修改成功",
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        window.location.href="/admin/beian/list";
+                    }else {
+                        swal({
+                            title: "提示",
+                            text: result.message,
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+            }
+        });
+</script>
+<% include ../../inc/footer.html%>

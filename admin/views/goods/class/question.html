@@ -1,0 +1,163 @@
+<% include ../../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            <li><a href="javascript:void (0)" class="showQrcode"><span class="glyphicon glyphicon-qrcode"> </span> 互动二维码</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+            <div class="input-group">
+              <input type="text" name="classroom_name" placeholder="分院名称" class="form-control input-sm">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-danger btn-sm search">
+                  <span class="glyphicon glyphicon-search"></span>
+                </button>
+              </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th>内容</th>
+          <th style="width:180px">提问者</th>
+          <th style="width:180px">票数</th>
+          <th style="width:180px">分院</th>
+          <th style="width:180px" class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+$(function(){
+  var classid=location.search.substr(9);
+  //分页初始值
+  var options = {
+    currentPage: 1,//当前页数
+    totalPages: 0,//总页数
+    numberOfPages: 12,//做多显示page页
+    bootstrapMajorVersion: 1,//版本
+    alignment: "center",
+    onPageClicked: function (e, originalEvent, type, page) {
+      if (page > options.totalPages) {
+        options.currentPage = options.totalPages;
+      } else {
+        options.currentPage = page;
+      }
+      var data=$('.search-form').serializeArray();
+      data.push({name:'page',value:page})
+      data.push({name:'classid',value:classid})
+      writeList(data)
+    }
+  };
+  //默认加载
+   writeList({classid:classid});
+  $('.search').on('click',function(){
+    var data=$('.search-form').serializeArray();
+    data.push({name:'classid',value:classid})
+    options.currentPage=1;
+    writeList(data);
+  });
+  //删除
+  $(document).on('click','.quDel',function(){
+    var questionid=$(this).data('id');
+    $.post('/admin/class/question_update',{questionid:questionid,question_status:0},function(result){
+      if(result.code==200){
+        effect.success(function(){
+          writeList({classid:classid});
+        })
+      }
+    })
+  })
+  //上墙
+  $(document).on('click','.quUp',function(){
+    var questionid=$(this).data('id');
+    $.post('/admin/class/question_update',{questionid:questionid,question_isupscreen:1},function(result){
+      if(result.code==200){
+        effect.success(function(){
+          writeList({classid:classid});
+        })
+      }
+    })
+  })
+  //写列表ajax
+  function writeList(data){
+    effect.show();
+    $.get('/admin/class/question_list',data,function(result){
+      if(result.code==200){
+        $("table tbody").empty('');
+        $("#inittmpl")
+            .tmpl(result.message.list)
+            .appendTo("table tbody");
+        options.totalPages=result.message.pagecount;
+        $('.questionpopover').popover(options);
+        if (options.totalPages > 0) {
+          $('#page').bootstrapPaginator(options);
+        } else {
+          $('#page').empty();
+        }
+        effect.hide();
+      }else{
+        effect.hide();
+        effect.error('请求失败')
+      }
+    })
+  };
+  //提问二维码
+  $('.showQrcode').on('click',function () {
+    $("#detail").modal('show');
+  })
+  console.log('<%-url%>')
+  $('#myCode').qrcode({
+    text:"<%-url%>"
+  });
+});
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${question_title}</td>
+    <td>${m_name}</td>
+    <td>${question_votes}</td>
+    <td>${classroom_name}</td>
+    <td class="text-center">
+      <a class="btn btn-info btn-xs quDel" data-id="${questionid}" href="javascript:void(0)">删除</a>
+      {{if question_isupscreen==0}}
+        <a class="btn btn-danger btn-xs quUp" data-id="${questionid}" href="javascript:void(0)">上墙</a>
+      {{/if}}
+    </td>
+  </tr>
+</script>
+<!-- 详情model -->
+<div class="modal fade" id="detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          <h3 class="panel-title">提问码:<%-url%></h3>
+        </h5>
+      </div>
+      <div class="modal-body" id="content">
+        <div style="overflow: auto;max-height:800px;text-align: center">
+          <div id="myCode"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../../inc/footer.html%>

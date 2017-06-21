@@ -1,0 +1,175 @@
+<% include ../inc/head.html%>
+<script src="//cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.css"></script>
+<script src="//cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.min.css"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                            <%if(locals.current_user_roles.r_permission.indexOf('1401')>=0 || locals.current_user_roles.r_permission===""){%>
+                                <li><a id="excel_export" href="javascript:void 0;"><span class="glyphicon glyphicon-download"></span> 导出Excel </a></li>
+                            <%}%>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    学员姓名:
+                                    <div class="">
+                                        <input id="member_name" name="name" type="text" class="form-control" placeholder="学员姓名">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3">
+                                    手机号码:
+                                    <div class="">
+                                        <input id="member_phone" name="phone" type="text" class="form-control" placeholder="手机号码">
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-3">
+                                    推荐人:
+                                    <div class="input-group">
+                                        <input name="reference" type="text" class="form-control" placeholder="推荐人">
+                                        <span class="input-group-btn">
+                                            <button class="search_button btn btn-default" type="button">查询</button>
+                                        </span>
+                                    </div><!-- /input-group -->
+                                </div><!-- /.col-lg-4 -->
+                            </div><!-- /.row -->
+                            <hr class="ke-hr">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>姓名</th>
+                                            <th>手机号码</th>
+                                            <th>企业名称</th>
+                                            <th>职位</th>
+                                            <th>省份</th>
+                                            <th>城市</th>
+                                            <th>推荐人</th>
+                                            <th>报名日期</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                    <div id="page"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% include ../inc/footer.html%>
+<script>
+    /* 过滤对象 */
+    var filter_data = {
+        name: '',//姓名
+        phone: '',//手机号
+        reference: ''//推荐人
+    };
+    var filter_button = {
+        $buttons: null,
+        init:function ($buttons) {
+            this.$buttons = $buttons;
+            this.Event();
+        },
+        Event: function () {
+            this.$buttons.on('click',function (e) {
+                var target = e.currentTarget || e.target;
+                var input = $(target).parent().siblings('input');
+                filter_data.name = $('#member_name').val();
+                filter_data.phone = $('#member_phone').val();
+                var name = input.attr('name');
+                filter_data[name] = input.val();
+                writeList({ filter: filter_data });
+            })
+        }
+    };
+    filter_button.init($('.search_button'));
+</script>
+<script>
+    //分页初始值
+    var options = {
+        currentPage: 1,//当前页数
+        totalPages: 0,//总页数
+        numberOfPages: 12,//做多显示page页
+        bootstrapMajorVersion: 1,//版本
+        alignment: "center",
+        onPageClicked: function (e, originalEvent, type, page) {
+            if (page > options.totalPages) {
+                options.currentPage = options.totalPages;
+            } else {
+                options.currentPage = page;
+            }
+            writeList({
+                page: page,
+                filter: filter_data
+            })
+        }
+    };
+    //默认加载
+    writeList({ filter: filter_data });
+    //写列表ajax
+    function writeList(data) {
+        effect.show();
+        for(var key in data.filter){
+            if(!data.filter[key]){
+                delete data.filter[key];
+            }
+        }
+        $.get('/enroll/branch/info', data, function (result) {
+            if (result.code == 200) {
+                $("table tbody").empty('');
+//                $.each(result.result.rows, function (i, v) {
+//                    v.createdAt = (+new Date( v.createdAt )).dateInfo('Y年M月D日 h:m')
+//                });
+                $("#inittmpl")
+                        .tmpl(result.result.rows)
+                        .appendTo("table tbody");
+                options.totalPages = Math.ceil(result.result.count / 12);
+                if (options.totalPages > 0) {
+                    $('#page').bootstrapPaginator(options);
+                } else {
+                    $('#page').empty();
+                }
+                effect.hide();
+            } else {
+                effect.hide();
+                effect.error('请求失败')
+            }
+        })
+    }
+    /* 导出EXCEL */
+    $('#excel_export').on('click',function () {
+        window.open('/enroll/branch/info/excel?' + $.param({filter: filter_data}))
+    })
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${id}</td>
+    <td>${name}</td>
+    <td>${phone}</td>
+    <td>${enterprise}</td>
+    <td>${position}</td>
+    <td>${province}</td>
+    <td>${city}</td>
+    <td>${reference}</td>
+    <td>${moment($data.createdAt).format('YYYY年MM月DD日 HH:mm:ss')}</td>
+  </tr>
+</script>

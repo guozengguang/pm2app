@@ -1,0 +1,390 @@
+<% include ../inc/head.html%>
+<style>
+    .tree li.parent_li>span:hover, .tree li.parent_li>span:hover+ul li span {
+        background:none;
+        border:0px solid #94a0b4;
+        /*color:;*/
+    }
+    .column_selected{
+        background-color: rgba(73, 183, 70, 0.74902)
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="pull-right">
+                        <form class="form-inline search-form">
+                            <div class="form-group form-group-sm">
+                                <select name="cm_status" class="form-control" id="cm_status">
+                                    <option value="3">全部</option>
+                                    <option value="0">未上架</option>
+                                    <option value="1">已上架</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="media_title" placeholder="媒资标题"
+                                       class="form-control input-sm" id="media_title">
+                                <input type="hidden" name="column_id"/>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-danger btn-sm search">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="col-md-3">
+                    <!-- 树形代碼 -->
+                    <div id="tree" class="tree ">
+                    </div>
+                    <!-- 树形代碼 -->
+                </div>
+                <div class="col-md-9">
+                    <table id="table_list" class="table table-striped table-condensed">
+                        <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>标题</th>
+                            <th style="width:80px">媒资类型</th>
+                            <th style="width:60px">浏览量</th>
+                            <th style="width:100px">创建时间</th>
+                            <th style="width: 40px">状态</th>
+                            <th style="width:80px" class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div id="page"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    /* 树形菜单 开始 */
+    var column = {
+        $dom: null,
+        init: function (id) {
+            this.$dom = $('#' + id);
+            this.getData();
+        },
+        getData: function () {
+            var self = this;
+            $.get('/admin/column_list', function (result) {
+                if (result.code == 200) {
+                    self.rebuild(result.message.list)
+                }
+            })
+        },
+        rebuild: function rebuild(list) {//格式化数据
+            list.forEach(function (v, i) {
+                var column_path = v.column_path;
+                var lastIndex = column_path.lastIndexOf(',');
+                if (lastIndex > 0) {
+                    var id = column_path.slice(lastIndex + 1);//parent_id
+                    list.forEach(function (item) {
+                        if (item.columnid == id) {
+                            if (item.children) {
+                                item.children.push(v);
+                            } else {
+                                item.children = [v];
+                            }
+                        }
+                    })
+
+                }
+            });
+            _.remove(list, function (n) {
+                return n.column_path != '0';
+            });
+            var html = this.create_elements(list);
+            this.$dom.html(html);//渲染dom
+            this.init_tree();//绑定事件
+        },
+        create_elements: function (list) {
+            var html = '<ul>';
+            $.each(list, function () {
+                html += '<li id="column_'+ (this.columnid) +'" class="parent_li" ' + (this.column_level != 1 ? 'style="display: none;"' : '') + '>' +
+                        '<span id="' + this.column_level +
+                        '" class="column_click" name="' + this.columnid  +
+                        '">' +
+                        (this.children ? '<i class="icon-calendar glyphicon glyphicon-minus"></i>' : '') + this.column_title + '</span>' +
+                        '<label class="choose pull-right">' +
+                        '<input style="display: none" value="' + this.columnid + '" style="vertical-align: text-bottom;" type="checkbox" >&emsp;</label>';
+                if (this.children) {
+                    html += column.create_elements(this.children);
+                }
+                html += '</li>';
+            });
+            html += '</ul>';
+            return html;
+        },
+        init_tree: function () {
+            var treeBody = $('.tree li.parent_li > span').parent('li.parent_li').find(' > ul > li');
+            treeBody.show('fast');
+            //默认选中第一个二级栏目
+            $("#column_3 .column_click").trigger('click');
+            treeBody.attr('title', 'Collapse this branch').find(' > i').addClass('glyphicon-minus').removeClass('glyphicon-plus')
+            $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
+            //给一级栏目添加展开和收缩事件
+            $('.tree li.parent_li > span').on('click', function (e) {
+                var children = $(this).parent('li.parent_li').find(' > ul > li');
+                if (children.is(":visible")) {
+                    children.hide('fast');
+                    $(this).attr('title', 'Expand this branch').find(' > i').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+                } else {
+                    children.show('fast');
+                    $(this).attr('title', 'Collapse this branch').find(' > i').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+                }
+//                e.stopPropagation();
+            });
+            $('.choose').on('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+    };
+    column.init('tree');
+    /* 树形菜单 结束 */
+    $(document).on('click', '.column_click', function () {
+        if($(this).attr('id') == '1'){
+            return false;
+        }
+//        $(this).parent().css('background-color','rgba(73, 183, 70, 0.75)').siblings().css('background-color','');
+        $(this).parent().addClass("column_selected").siblings().removeClass("column_selected");
+        var columnid = $(this).attr('name');
+        var data = {};
+        data.media_title = $("#media_title").val();
+        data.columnid = columnid;
+        data.cm_status = $("#cm_status option:selected").attr('value');
+        options.currentPage = 1;
+        fetchData(data);
+    });
+</script>
+<script>
+
+</script>
+<script>
+    $(function () {
+        //分页初始值
+        var options = {
+            currentPage: 1,//当前页数
+            totalPages: 0,//总页数
+            numberOfPages: 12,//做多显示page页
+            bootstrapMajorVersion: 1,//版本
+            alignment: "center",
+            onPageClicked: function (e, originalEvent, type, page) {
+                if (page > options.totalPages) {
+            options.currentPage = options.totalPages;
+        } else {
+            options.currentPage = page;
+        }
+        var data = $('.search-form').serializeArray();
+        var columnid = $(".column_selected").find('.column_click').attr('name');
+        data.push({name:"columnid",value:columnid});
+        data.push({name:"page",value:page});
+        writeList(data)
+    }
+        };
+        //默认加载
+        writeList();
+        $('.search').on('click', function () {
+            var data = $('.search-form').serializeArray();
+            var columnid = $(".column_selected").find('.column_click').attr('name');
+            data.push({name:"columnid",value:columnid});
+            options.currentPage = 1;
+            writeList(data);
+        });
+        //写列表ajax
+        function writeList(data) {
+            effect.show();
+            fetchData(data);
+        };
+
+        //ajax fetchData
+        function fetchData(data) {
+            $.get('/admin/media_list', data, function (result) {
+//                console.log(result.message.list);
+                if (result.code == 200) {
+                    $("table tbody").empty('');
+                    $("#inittmpl")
+                        .tmpl(result.message.list)
+                        .appendTo("table tbody");
+                    options.totalPages = result.message.pagecount;
+                    if (options.totalPages > 0) {
+                        $('#page').bootstrapPaginator(options);
+                    } else {
+                        $('#page').empty();
+                    }
+                    bindButton();
+                    effect.hide();
+                } else {
+                    effect.hide();
+                    effect.error('请求失败')
+                }
+            });
+        };
+        window.fetchData = fetchData;//对外输出方法
+        window.options = options;
+        /* 表格用事件 */
+//        $(document).on('click','#table_list tbody tr',function (e) {
+//            var that = $(this);
+//            that.siblings().removeClass('badge-danger').find('.online').hide();
+//            if(that.hasClass('badge-danger')){
+//                that.removeClass('badge-danger');
+//                that.find('.online').hide();
+//                change_check(this.dataset.id , false);
+//            }else {
+//                that.addClass('badge-danger');
+//                that.find('.online').show();
+//                change_check(this.dataset.id , true)
+//            }
+//        });
+        /* 动态改变左侧checkbox */
+        var tree = $('#tree'),li,checkbox,cache = false;
+        function change_check(id, boolean) {
+            li = tree.find('li');
+            checkbox = $('#tree').find('input[type="checkbox"]');
+            checkbox.attr('checked',false).prop('checked',false);
+            if(id){
+                var arr = id.split('-'),selector='';
+                $.each(arr,function () {
+                    selector += '#column_' +  this + ',';
+                });
+                li.removeClass('badge-danger');
+                if(boolean){
+                    $(selector.slice(0,-1))
+                            .find('>label>input[type="checkbox"]')
+                            .attr('checked',true)
+                            .prop('checked',true);
+                }else {
+                    checkbox.attr('checked',false).prop('checked',false);
+                }
+            }
+        }
+    });
+    /* 模板用取值函数 */
+    function concat_string(list, prop) {
+        var arr = [];
+        $.each(list,function () {
+            if(!this.deletedAt){
+                arr.push(this[prop]);
+            }
+        });
+        return arr.join('-')
+    }
+    /* 模板用取值函数 */
+    function bindButton() {
+        $('.online').off('click').on('click',function (e) {
+            e.stopPropagation();
+            var online = +this.dataset.online;
+            var id = this.dataset.id;
+            var that = $(this);
+            if(online){//上架
+                online_offline(id)
+            }else {//下架
+                online_offline(id,true)
+            }
+        })
+    }
+    /* 上架请求 */
+    function online_offline(id,bol) {
+        var arr = [],checked;
+        if(!id){
+            effect.error('请选择媒资');
+        }
+        if(bol){
+            ajax(id,arr,true);
+        }else {
+            checked = $('#tree').find('input[type="checkbox"]:checked');
+            checked.each(function (dom) {
+                arr.push(Number(this.value));
+            });
+            if(arr.length === 0){
+                effect.error('请选择栏目');
+                return false;
+            }
+            ajax(id,arr);
+        }
+    }
+    var loading ;
+    function ajax(id,arr,bol) {
+        if(loading){return false;}
+        loading = true;
+        $.post('/admin/online',{id:id,column:arr},function (result) {
+            loading = false;
+            if(result.code == 200){
+                effect.success('操作成功');
+            }
+            if(bol){
+                location.reload();
+            }
+        })
+    }
+
+    //上下架方法 create by guozengguang
+    function publish(flag,cmid){
+        if(flag == '上架'){
+            ajaxPublish(cmid,1);
+        }else if(flag == '下架'){
+            ajaxPublish(cmid,0);
+        }
+    };
+
+    //ajax 上下架
+    function ajaxPublish(id,flag) {
+        $.post('/admin/online',{id:id,flag:flag},function (result) {
+//            loading = false;
+            if(result.code == 200){
+                console.log(result);
+                effect.success(result.message);
+                location.reload();
+            }
+
+
+//            if (result.code == 200) {
+//                effect.success(function () {
+//                    location.href = '/admin/media'
+//                })
+//            } else {
+//                effect.error(result.message)
+//            }
+
+        })
+    }
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+    <tr data-id="${ concat_string($data,'columnid')  }">
+        <td>${index}</td>
+        <td>${media_title}</td>
+        <td>${media_type}</td>
+        <td>${media_clickcount}</td>
+        <td>${media_pushtime}</td>
+        <td style="width:52px">${cm_status}</td>
+        <td class="text-center">
+            <button class="btn btn-info" type="button" onclick="publish('${buttonName}','${cmid}')">${buttonName}</button>
+            <!--<a class="btn btn-inline btn-danger btn-sm online" data-id="${mediaid}" data-online="1" style="display: none;"> 提交 </a>-->
+            <!--<a class="btn btn-inline btn-danger btn-sm online" data-id="${mediaid}" data-online="0" style="display: none;"> 所有栏目下架 </a>-->
+        </td>
+    </tr>
+</script>
+<% include ../inc/footer.html%>
+<!--
+<div class="btn-group">
+                <button type="button" class="btn btn-default btn btn-xs">操作选项</button>
+                <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="btn btn-inline online" data-id="${mediaid}"> 上架 </a></li>
+                </ul>
+            </div>
+-->

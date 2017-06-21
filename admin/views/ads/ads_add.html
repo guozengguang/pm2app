@@ -1,0 +1,157 @@
+<% include ../inc/head.html%>
+<script type="text/javascript" src="/javascripts/js/bootstrap.autocomplete.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>添加广告位</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="ads_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="pi_stime" class="control-label">开始时间<span>*</span></label>
+                  <input type="text" name="pi_stime" placeholder="选择开始时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="pi_etime" class="control-label">结束时间<span>*</span></label>
+                  <input type="text" name="pi_etime" placeholder="选择结束时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="pi_img" class="control-label">展示图图<span><small>建议规格1156*442</small></span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" name="pi_img" placeholder="上传展示图图" class="form-control" readonly>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="progress" style="width: 100%;">
+                    <div class="progress-bar" style="width: 0%;">  
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <img src=""  id="pi_img_img">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="pi_type" class="control-label">类型<span>*</span></label>
+                        <select name="pi_type" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                          <%placesitemtype.forEach(function(item){%>
+                          <option value="<%=item.pit_id%>"><%=item.pit_name%></option>
+                          <%})%>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="p_id" class="control-label">位置<span>*</span></label>
+                      <select name="p_id" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                        <option value="0">首页顶部轮播</option>
+                        <option value="1">首页课程预告</option>
+                        <option value="2">首页模块广告</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="pi_name" class="control-label">名称<span>*</span></label>
+                      <input type="text" name="pi_name" placeholder="名称" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="pi_val" class="control-label">值<span>*<small>(课程产品可通过关键字匹配)</small></span></label>
+                      <input id="pi_val" data-provide="autocomplete" autocomplete="off" type="text" name="pi_val" placeholder="值" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="pi_sort" class="control-label">排序<span>*</span></label>
+                      <input type="text" name="pi_sort" placeholder="排序" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //时间
+    $(".input_date").datetimepicker({
+      step:1,
+      lang:'ch',
+    });
+    //验证提交
+    $('#ads_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      var type=$('select[name="pi_type"]').val()
+      var data=$('#ads_form').serializeArray();
+      $.post("/admin/ads_create",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/ads'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+
+    //上传图片
+    newupload('addImg','pi_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    $("#pi_val").autocomplete ({
+      source:function(query,process){
+        $.get('/admin/ads_autocomplete', {vi_val: query}, function(result){
+          return process(result.message.list);
+        });
+      },
+      formatItem:function(item){
+        return item.class_name+'-------（类型：'+item.type+'）';
+      },
+      setValue:function(item){
+        return {'data-value':item.classid,'real-value':item.classid};
+      },
+      delay:500,
+      items:20
+    })
+  })
+</script>
+<% include ../inc/footer.html%>

@@ -1,0 +1,268 @@
+<% include ../inc/head.html%>
+
+<div ng-controller="ApplyRoomController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li>
+                                <a href="javascript:history.go(-1)">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>返回
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <div class="col-md-12">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="hotel" class="col-sm-2 control-label">请选择酒店</label>
+                                        <div class="col-sm-10">
+                                            <select
+                                                    ng-model="hotel"
+                                                    ng-change="hotel_change(hotel)"
+                                                    ng-options="hotel as hotel.name for hotel in hotels"
+                                                    id="hotel" name="hotel" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <hr class="ke-hr">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="apply_room" name="apply_room">
+                                        <table id="example" class="table table-striped table-bordered" cellspacing="0"
+                                               width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th>房型</th>
+                                                <th>房间数</th>
+                                                <th>剩余房间</th>
+                                                <th>申请房间数量</th>
+                                                <th>单间</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="room in current_hotel.Rooms">
+                                                <td>
+                                                    {{ room.name }}
+                                                </td>
+                                                <td>
+                                                    {{ room.count }}
+                                                </td>
+                                                <td>
+                                                    {{ room.left }}
+                                                </td>
+                                                <td>
+                                                    <div ng-class="{
+                                                    'has-error': apply_room.apple_count_{{ $index }}.$error.max || apply_room.apple_count_{{ $index }}.$error.min
+                                                    }" class="form-group">
+                                                        <input ng-model="room.applied"
+                                                               class="form-control" type="number"
+                                                               min="0" max="{{ room.left }}"
+                                                               id="apple_count" name="apple_count_{{ $index }}"
+                                                               placeholder="请填写申请房间数量">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {{ room.price }}
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <td colspan="5">
+                                                    <button ng-disabled="apply_room.$invalid" ng-click="add_room()"
+                                                            class="btn btn-success">添加
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </form>
+                                </div>
+                                <div class="col-md-12">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>酒店名称</th>
+                                                <th>类型/数量</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="selected in selected_room">
+                                                <td> {{ selected.name }} </td>
+                                                <td>
+                                                    <p  ng-repeat="room in selected.Rooms">
+                                                        {{ room.name }} / {{ room.applied }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td rowspan="2">
+                                                    <button ng-disabled="!selected_room.length" ng-click="submit()" class="btn btn-success">提交</button>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .service('ApplyRoomService', function ($http, staticService) {
+                this.hotels = function () {
+                    return $http({
+                        url: '/admin/hotel/list',
+                        method: 'GET'
+                    })
+                };
+
+                this.submit = function (data) {
+                    return $http({
+                        url :'/admin/hotel/activity/apply',
+                        method: 'post',
+                        data: {
+                            activity: staticService.query.id,
+                            hotel: data
+                        }
+                    })
+                };
+                this.applies = function () {
+                    return $http({
+                        url: '/admin/hotel/activity/applies',
+                        method: 'GET',
+                        params: {
+                            id: staticService.query.id
+                        }
+                    })
+                }
+                this.intakeroom = function (data){
+                    return $http({
+                        url: '/admin/hotel/intake',
+                        method: 'GET',
+                        params: {
+                            id: data
+                        }
+                    })
+                }
+            })
+            .controller('ApplyRoomController', function ($scope, $compile, ApplyRoomService) {
+                ApplyRoomService.hotels().success(function (result) {
+                    $scope.hotels = result.result.list;
+                });
+                ApplyRoomService.applies().success(function (result) {
+                    $scope.selected_room = result.result;
+                    //已经选择的酒店
+                });
+                $scope.current_hotel = {};
+                $scope.hotel_change = function (data) {
+                    $scope.current_hotel = angular.copy(data);
+
+                    ApplyRoomService.intakeroom($scope.current_hotel.id).success(function (result) {
+                        result = JSON.parse(JSON.stringify(result.result));
+                        _.forEach($scope.current_hotel.Rooms, function (room) {
+                            if(result.list.length){
+                                _.forEach(result.list, function (room_r) {
+                                    //console.info(room_r)
+                                    if(room_r.name == room.name){
+                                        room.left = room.count - room_r.applied
+                                    }
+                                })
+                            }else{
+                                room.left = room.count
+                            }
+
+                        })
+                    });
+                };
+                /* 选择的房间数据 */
+                //$scope.selected_room = [];
+                $scope.add_room = function () {
+                    var data = angular.copy($scope.current_hotel),
+
+                            i = 0,
+                            len = $scope.selected_room.length;
+                    //console.info(data)
+                    _.remove(data.Rooms, function (n) {
+                        return !n.applied
+                    });
+                    for( ;i < len; i++ ){
+                        var value = $scope.selected_room[i];
+                        if(value.id === data.id){
+                            //$scope.selected_room[i] = data;
+                            var _rooms = $scope.selected_room[i].Rooms;
+                            //console.info(data.Rooms)
+                            _.forEach(data.Rooms,function(room){
+                                var has = false;
+                                _.forEach(_rooms,function(_room){
+                                    //console.info(_room)
+                                    if(room.name == _room.name){
+                                        var k = _room.applied + room.applied;
+
+                                        if(k > room.count){
+                                            has = true;
+                                            return false;
+                                        }
+                                        _room.applied  = k;
+                                        has = true;
+                                        //break;
+                                    }
+                                })
+                                if(!has){
+                                    _rooms.push(room);
+                                }
+                            })
+                            $scope.selected_room[i].Rooms = _rooms;
+
+                            return false;
+                        }
+                    }
+                    if(data.Rooms.length){
+                        $scope.selected_room.push(data);
+                    }
+
+                };
+
+                $scope.submit = function () {
+                    ApplyRoomService.submit($scope.selected_room).success(function (result) {
+                        swal("成功!", "", "success");
+                        location.replace('/hotel/activity/manage');
+                    });
+                };
+                $scope.delete_activity = function (event, id, name) {
+                    swal({
+                        title: "确定删除 " + name + " ?",
+                        text: "",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        animation: "slide-from-top",
+                        closeOnConfirm: true,
+                        html: false
+                    }, function () {
+                        HotelManageService.delete_activity(id).success(function () {
+                            table.row($(event.target).parents('tr')).remove().draw(false);
+                        })
+                    });
+                };
+            });
+</script>

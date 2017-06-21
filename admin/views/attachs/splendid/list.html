@@ -1,0 +1,125 @@
+<% include ../../inc/head.html%>
+<script src="https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.js"></script>
+<script type="text/javascript" src="/javascripts/js/masonry.js"></script>
+<link rel="stylesheet" href="http://g.alicdn.com/de/prismplayer/1.4.7/skins/default/index-min.css" />
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="/admin/splendid_add"><span class="glyphicon glyphicon-plus"></span>新建</a></li>
+            <li><small style="color: red"></small></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-hover table-striped table-condensed" id="initTable">
+        <thead>
+        <tr>
+          <th style="width:50px">#</th>
+          <th >标题</th>
+          <th style="width:120px">描述</th>
+          <th style="width:120px">排序</th>
+          <th style="width:120px">视频路径</th>
+          <th style="width:60px">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    var prdid=0;
+    var type=20;
+    writeList({id:prdid,type:type});
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/class/video_list_ajax',data,function(result){
+        console.log(result)
+        if(result.code==200){
+          $("#initTable tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#initTable tbody");
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //视频模仿
+    $(document).on('click','.Play',function(){
+      $("#modal").modal('show');
+      var source=$(this).data('path')
+      //播放器设置
+      var player = new prismplayer({
+        id: "J_prismPlayer", // 容器id
+        source: source,  // 视频url 支持互联网可直接访问的视频地址
+        autoplay: true,      // 自动播放
+        width: "100%",       // 播放器宽度
+        height: "400px"      // 播放器高度
+      });
+    })
+    $(document).on('click','.prdDel',function(){
+      var data=$(this).data();
+      $.post('/admin/class/video_update',{id:data.prdattachid},function(result){
+        if(result.code==200){
+          effect.success(function(){
+            writeList({id:prdid,type:type});
+          });
+        }else{
+          effect.error();
+        }
+      })
+    })
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<tr>
+  <td>${index}</td>
+  <td>
+    <a href="/admin/splendid_deit?id=${prdattachid}">${prd_auther}</a>
+  </td>
+  <td>
+    ${prd_title}
+  </td>
+  <td>
+    ${prd_desc}
+  </td>
+  <td>
+  <a href="javascript:void(0)" data-path='${attach_path}' class="Play">${source_attach_path}</a>
+  </td>
+  <td>
+  <button class="btn btn-success btn-xs prdDel" data-prdattachid='${prdattachid}'>删除</button>
+  </td>
+</tr>
+</script>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          视频预览
+        </h5>
+      </div>
+      <div class="modal-body">
+        <div class="prism-player" id="J_prismPlayer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../../inc/footer.html%>

@@ -1,0 +1,269 @@
+<% include ../../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<link rel="stylesheet" href="http://g.alicdn.com/de/prismplayer/1.4.7/skins/default/index-min.css" />
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>新增推荐视频</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="prd_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="prd_pics" class="control-label">选择视频<span></span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="hidden" class="form-control input-sm" name="attachid"  placeholder="id" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <input type="text" name="path" placeholder="路径" class="form-control input-sm"  readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <span class="input-group-btn">
+                    <span class="btn btn-danger fileinput-button btn-sm addVideo">
+                        <span>选择</span>
+                    </span>
+                  </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="prd_pics" class="control-label">视频封面图<span>*</span></label>
+                  <div class="input-group input-group-sm">
+                    <input type="text" name="prd_pics" placeholder="展示图" class="form-control" readonly required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+                          <span>上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="progress" style="width: 100%;">
+                    <div class="progress-bar" style="width: 0%;">  
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <div class="thumbnail">
+                    <img src=""  id="prd_pics_img">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-12">
+                      <label for="prd_auther" class="control-label">标题<span>*</span></label>
+                      <input type="text" name="prd_auther" placeholder="标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                      <input type="hidden" name="prdid" value="0" placeholder="标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                      <input type="hidden" name="prd_type" value="20" placeholder="标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="prd_title" class="control-label">标签<span>*</span></label>
+                      <input type="text" name="prd_title" placeholder="标签" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="prd_desc" class="control-label">排序<span>*</span></label>
+                      <input type="text" name="prd_desc" placeholder="排序" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div id="group_editor">
+                        <label for="prd_content" class="control-label">详细介绍</label>
+                        <textarea id="prd_content" name="prd_content" value='' style="width:100%;height:320px;" class="setEditor"></textarea>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //验证提交
+    $('#prd_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+          validator = $form.data('bootstrapValidator');
+      $("#prd_content").val(editor[0].html())
+      var data=$('#prd_form').serializeArray();
+      $.post("/admin/class/video_create",data,function(result){
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/splendid'
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+
+    //上传图片
+    newupload('addImg','prd_pics',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+
+    //添加视频
+    $('.addVideo').on('click', function(event) {
+      $("#modal_video").modal('show');
+      writeListVideo({});
+    });
+    //添加讲师
+    $(document).on('click', '.addToVideo', function(event) {
+      var data=$(this).data()
+      $('input[name="attachid"]').val(data.attachid)
+      $('input[name="path"]').val(data.path)
+      $("#modal_video").modal('hide');
+    });
+    //搜索
+    $('#video_find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      options.currentPage=1;
+      writeListVideo(data);
+    });
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.select_form').serializeArray();
+        data.push({name:'type',value:1});
+        data.push({name:'page',value:page});
+        writeListVideo(data)
+      }
+    };
+    //写列表ajax
+    function writeListVideo(data){
+      effect.show();
+      $.get('/admin/attach_list',data,function(result){
+        if(result.code==200){
+          $(".video tbody").empty('');
+          $("#inittmplvideo")
+                  .tmpl(result.message.list)
+                  .appendTo(".video tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //视频模仿
+    $(document).on('click','.Play',function(){
+      $("#modal").modal('show');
+      var source=$(this).data('path')
+      //播放器设置
+      var player = new prismplayer({
+        id: "J_prismPlayer", // 容器id
+        source: source,  // 视频url 支持互联网可直接访问的视频地址
+        autoplay: true,      // 自动播放
+        width: "100%",       // 播放器宽度
+        height: "400px"      // 播放器高度
+      });
+    })
+  })
+</script>
+<script id="inittmplvideo" type="text/x-jquery-tmpl">
+<tr>
+  <td><a href="javascript:void(0)" data-path='${attach_path}' class="Play"> ${attach_title}</td>
+  <td class="text-center">
+  <span class="btn-group">
+  <button class="btn btn-info btn-xs addToVideo" data-attachid='${attachid}' data-path='${source_attach_path}' >添加</button>
+  </span>
+  </td>
+</tr>
+</script>
+<div class="modal fade" id="modal_video" tabindex="-10" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择视频
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <input type="text" name="attach_title" class="form-control input-sm" placeholder="视频名称" />
+              <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="video_find">查询</span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed video">
+          <thead>
+          <tr>
+            <th >视频名称</th>
+            <th style="width:80px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="page"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          视频预览
+        </h5>
+      </div>
+      <div class="modal-body">
+        <div class="prism-player" id="J_prismPlayer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../../inc/footer.html%>

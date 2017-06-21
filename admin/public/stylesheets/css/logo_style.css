@@ -1,0 +1,78 @@
+/**---------LOGIN页--------**/
+
+.login{background-attachment: scroll; background-color: #fff;  background-position: center top, center center; background-repeat: repeat, no-repeat; background-size: auto auto, cover; color: #fff; height:100%; padding:28px;}
+
+.user-login{background-image: url("../../images/bg/1380961451846.jpg"); }
+
+.auditor-login{background-image: url("../../images/bg/1350317278502.jpg"); }
+
+
+
+.login p{ position: absolute; }
+.login p img{ width: 60%; max-width: 320px;}
+
+.login .login-box { width: 320px;  margin: 11% auto;  }
+
+.user-login .login-box .loginbg{ width: 100%;  width: 316px; background: rgba(0, 0, 0, 0.4); min-height: 380px; position: absolute; z-index: 10; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.6);}
+.auditor-login .login-box .loginbg{ width: 100%;  width: 316px; background: rgba(0, 0, 0, 0.4); min-height: 350px; position: absolute; z-index: 10; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.6);}
+
+.login .login-box .login-form{width: 226px; position: absolute; z-index: 100; padding: 10px 40px 40px 40px ;}
+.login .login-box .login-form h3{ text-align: center; font-weight: 200;}
+.login .login-box .login-form label{color: #ffffff; padding-top: 6px; font-weight: 100;}
+.login .login-box .login-form input{ width: 100%; border: 0; height: 2.5em; background: url(../img/wbg.png); border-radius: 5px; color: #ffffff;}
+.login .login-box .login-form .btn-info{ width: 236px; padding: 11px; margin-top: 20px; border: 0; border-radius: 4px;}
+.login .login-box .login-form .btn-danger{width: 214px; padding: 11px; margin-top: 12px; border: 0; border-radius: 4px;}
+.login .login-box .login-form .bottom-ifnt p{text-align: center ; width: 226px;  margin-top: 60px; }
+.login .login-box .login-form .bottom-ifnt p a{color: #ffffff;  }
+.login .login-box .login-form .bottom-ifnt p  a:hover{text-decoration: none;}
+.login .login-box .login-form .bottom-ifnt p  a:focus{text-decoration: none;}
+
+.admin-login{background: url("../../images/login_bg.jpg"); height:100%;}
+.admin-login .login-box { width: 320px;  margin: 5% auto;  }
+.admin-login .login-box .loginbg{ width: 100%;  width: 316px; background: #ffffff; min-height: 400px; position: absolute; z-index: 10; border-radius: 12px;  }
+.admin-login .login-box .login-form{width: 226px; position: absolute; z-index: 100; padding: 10px 40px 40px 40px ;}
+.admin-login .login-box .login-form .login-logo{ width: 100px; height: 100px; border-radius: 50%; background: #ffffff; padding: 8px; position: absolute; top: -60px; left: 100px;}
+
+.admin-login .login-box .login-form h4{ text-align: center; font-weight: 200; margin-top: 55px;}
+.admin-login .login-box .login-form label{color: #6666666; padding-top: 6px; font-weight: 200;}
+.admin-login .login-box .login-form input{ width: 82%;   height: 2.5em;   border-radius: 5px; color: #666666; padding-left: 42px;  }
+.admin-login .login-box .login-form input.ip-user{ background: url(../../images/user.png) left no-repeat; background-size: auto 100%;}
+.admin-login .login-box .login-form input.ip-password{ background: url(../../images/password.png) left no-repeat; background-size: auto 100%;}
+.admin-login .login-box .login-form > input[placeholder]{color: #333333 !important;}
+.admin-login .login-box .login-form .btn-info{ width: 236px; padding: 11px; margin-top: 20px; border: 0; border-radius: 4px;}
+.admin-login .login-box .login-form .btn-danger{width: 214px; padding: 11px; margin-top: 12px; border: 0; border-radius: 4px;}
+.admin-login .login-box .login-form .bottom-ifnt p{text-align: center ; width: 226px;  margin-top: 6px; }
+.admin-login .login-box .login-form .bottom-ifnt p a{color: #333333;  }
+.admin-login .login-box .login-form .bottom-ifnt p  a:hover{text-decoration: none;}
+.admin-login .login-box .login-form .bottom-ifnt p  a:focus{text-decoration: none;}
+
+
+/**---------注册页--------**/
+.registered{background-attachment: scroll; background-color: #fff;  background-position: center top, center center; background-repeat: repeat, no-repeat; background-size: auto auto, cover; color: #fff; height:100%; padding:28px;}
+
+.user-registered{background-image: url("../../images/login_bg.jpg"); }
+.registered p{ position: absolute; }
+.registered p img{ width: 60%; max-width: 320px;}
+.registered .login-box { width: 320px;  margin: 6% auto;  }
+.user-registered .login-box .loginbg{ width: 100%;  width: 316px; background: rgba(255, 255, 255, 0.8); min-height: 520px; position: absolute; z-index: 10; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.9);}
+.registered .login-box .login-form{width: 226px; position: absolute; z-index: 100; padding: 10px 40px 40px 40px ;}
+.registered .login-box .login-form h3{ text-align: center; font-weight: 200; color: #000000;}
+.registered .login-box .login-form label{color: #000000; padding-top: 6px; font-weight: 100;}
+.registered .login-box .login-form input{ width: 100%; border: 0; height: 2.5em; background:url(../../images/bbg.png); border-radius: 5px; color: #ffffff;}
+.registered .login-box .login-form .btn-info{ width: 236px; padding: 11px; margin-top: 20px; border: 0; border-radius: 4px;}
+.registered .login-box .login-form .btn-link{ width: 214px; text-align: center;}
+.registered .login-box .login-form .btn-danger{width: 236px; padding: 11px; margin-top: 12px; border: 0; border-radius: 4px;}
+.registered .login-box .login-form .bottom-ifnt{ padding-bottom: 60px;}
+.registered .login-box .login-form .bottom-ifnt p{text-align: center ; width: 226px;  margin-top: 20px; }
+.registered .login-box .login-form .bottom-ifnt p a{color: #ffffff;  }
+.registered .login-box .login-form .bottom-ifnt p  a:hover{text-decoration: none;}
+.registered .login-box .login-form .bottom-ifnt p  a:focus{text-decoration: none;}
+.registered .login-box .login-form input:placeholder{ color: #000000;}
+
+.dowlist li{ padding: 6px 0; border-bottom: 1px solid #ebebeb;  padding-left: 10px; }
+.dowlist li:first-child {border-top: 1px solid #ebebeb ;}
+.dowlist li samp{ float: right;}
+.btn-dow{ width: 100%; min-height: 40px;   margin-top: 0;}
+.btn-dow a{ float: right;}
+
+.heightauto .caroufredsel_wrapper ul li{max-width: 200px !important;}

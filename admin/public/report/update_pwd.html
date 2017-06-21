@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>格局商学学员录入管理系统 - 修改密码</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--为了防止手机号被iOS屏蔽-->
+    <meta name = "format-detection" content = "telephone=no">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font/iocns.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a href="list.html" class="btn goHome"><span class="lw lw-icon-left-open-big"> </span></a>
+            <button type="button" class="navbar-toggle btn-link collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="lw lw-icon-menu-1"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!--li><a href="#"><span class="lw lw-icon-user-1"></span> 个人中心</a></li-->
+                <li><a href="list.html"><span class="lw lw-icon-vcard"></span> 学员信息</a></li>
+                <li><a href="student_ownership_transfer.html"><span class="lw lw-icon-shuffle-1"></span> 学员归属转移</a></li>
+                <!--<li><a href="list.html"><span class="lw lw-icon-archive"></span> 报备中心</a></li>-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="lw lw-icon-user-1"></span> <span id="loginPhone"></span> <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="lw lw-icon-key"></span> 密码修改</a></a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="quit()"><span class="lw lw-icon-logout-1"></span> 退出系统</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container mb-input" style="min-height: 0px;">
+    <div class=" liuchen">
+        <img src="images/modifyPwd.jpg"/>
+    </div>
+    <!--h3 >学员信息提交</h3-->
+
+    <form class="mobile-form">
+
+        <div class="input-group">
+            <span class="input-group-addon" id="old-pwd">原密码</span>
+            <input type="password" class="form-control" name='numberID' id="oldPwd" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-addon" id="new-pwd">新密码</span>
+            <input type="password" class="form-control" name='companyName' id="newPwd" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-addon" id="new-pwd-again">再次确认新密码</span>
+            <input type="password" class="form-control" name='studentDuties' id="newPwdAgain"
+                   aria-describedby="basic-addon1">
+        </div>
+
+    </form>
+    <p class="userTishi" id="err"><span class="lw lw-icon-attention-1"></span> <span id="error"></span></p>
+</div>
+
+<div class="container footer">
+    <button type="button" class="btn btn-success btn-lg" onclick="updateLoginPwd()">确认修改</button>
+</div>
+
+<script type="text/javascript" src="js/comm.js"></script>
+<script type="text/javascript" src="js/public.js"></script>
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/util.js"></script>
+<script type="text/javascript">
+    $("#err").hide();
+    var loginPhone = $.cookie("currentUserPhone");
+    if (loginPhone == null || loginPhone == "") {
+        window.location.href = "login.html";
+    } else {
+        $("#loginPhone").html(loginPhone);
+    }
+
+    function updateLoginPwd() {
+        var oldPwd = $("#oldPwd").val();
+        var newPwd = $("#newPwd").val();
+        var newPwdAgain = $("#newPwdAgain").val();
+
+        if (oldPwd == null || oldPwd == "") {
+            $("#err").show();
+            $("#error").html("原密码不能为空！");
+        } else if (newPwd == null || newPwd == "") {
+            $("#err").show();
+            $("#error").html("新密码不能为空！");
+        } else if (newPwd != newPwdAgain) {
+            $("#err").show();
+            $("#error").html("两次密码输入不一致！");
+        } else {
+            $.ajax({
+                url: 'http://api.geju.com/business/report/change/password/' + loginPhone,
+                dataType: "json",
+                async: true,
+                data: {password: oldPwd, newPassword: newPwd, id: loginPhone},
+                type: "POST",
+                success: function (res) {
+                    if (res.code == '200') {
+                        $("#err").hide();
+                        alert("修改密码成功！");
+                        $("#oldPwd").html("");
+                        $("#newPwd").html("");
+                        $("#newPwdAgain").html("");
+                    }else if(res.code == '401'){
+                        window.location.href = "./login.html";
+                    } else {
+                        $("#err").show();
+                        $("#error").html(res.message);
+                    }
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

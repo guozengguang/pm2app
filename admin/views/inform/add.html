@@ -1,0 +1,217 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <ul class="list-inline">
+              <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            </ul>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"><b>消息推送</b></div>
+            <div class="panel-body">
+              <form id="inform_form" ng-controller="informControl">
+                <div class="row">
+                  <div class="form-group form-group-sm col-md-12">
+                    <label for="inform_type" class="control-label">类型<span></span></label>
+                    <select name="inform_type" class="form-control" ng-change="setTitle()" ng-model="typeSelect" ng-options="x.id as x.name for x in type">
+
+                    </select>
+                  </div>
+                  <div ng-show="notificsStatus" class="form-group form-group-sm col-md-12">
+                    <label for="inform_key" class="control-label">选择公告<span></span></label>
+                    <select name="inform_key" class="form-control" ng-change="setNotifics()" ng-model="notificsSelect" ng-options="x as x.name for x in notifics">
+
+                    </select>
+                  </div>
+                  <div ng-show="goodsStatus" class="form-group form-group-sm col-md-6">
+                    <label class="control-label">课程班<span></span></label>
+                    <select class="form-control" ng-change="setGoods()" ng-model="goodsSelect" ng-options="x.id as x.name for x in goods">
+
+                    </select>
+                  </div>
+                  <div ng-show="goodsStatus" class="form-group form-group-sm col-md-6">
+                    <label for="inform_key" class="control-label">课程<span></span></label>
+                    <select name="inform_key" class="form-control" ng-change="setTemplate()" ng-model="childSelect" ng-options="x as x.class_name for x in child">
+
+                    </select>
+                  </div>
+                  <div class="form-group form-group-sm col-md-12">
+                    <label for="inform_title" class="control-label">APP标题<span></span></label>
+                    <select name="inform_title" class="form-control" ng-model="titleSelect" ng-change="setTitleTemplate()" ng-options="x for x in title">
+
+                    </select>
+                  </div>
+                  <div class="form-group form-group-sm col-md-12">
+                    <label for="inform_subtitle" class="control-label">推送通知文案<span></span></label>
+                    <input type="text" name="inform_subtitle" ng-model="subTitle" placeholder="推送通知文案" class="form-control">
+                  </div>
+                  <div class="form-group form-group-sm col-md-12">
+                    <label for="inform_target" class="control-label">人员<span>为空按照约定推送，不为空按照人员id推送</span></label>
+                    <input type="text" name="inform_target" ng-model="target" placeholder="人员" class="form-control">
+                  </div>
+                  <div class="form-group form-group-sm col-md-12">
+                    <div class="">
+                      <button ng-click="push()" class="btn btn-danger btn-submit">推送</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  //提交
+  angular.module("cms")
+      .service('informService',function ($http) {
+          this.getTemplate=function (index,date) {
+            var arr=[
+              ['您好，您的课程《'+date+'》即将开讲，不要忘记哦！'],
+              ['您好，您对《'+date+'》的感受如何那？有什么收获，快来评价吧。'],
+              ['课件：您好，您的课程《'+date+'》上传了课件。','回顾：您好，您的课程《'+date+'》更新了回顾。'],
+              ['您好，思想的格局新发布了《'+date+'》课程'],
+              ['开始提问：您好，您的课程《'+date+'》可以提问啦。'],
+              [date]
+            ]
+            return arr[index]
+          },
+          this.dataFormat=function (data) {
+            return JSON.parse(data.replace(/&#34;/ig,'"'))
+          },
+          this.getGoods=function (id) {
+            return $http.get('/admin/child_ajax?goodsid='+id+'&pagesize=100')
+          },
+          this.getSubTitle=function (id,type,desc) {
+            return $http.get('/admin/inform_title?id='+id+'&type='+type+'&desc='+desc)
+          },
+          this.childFormat=function (data) {
+            return (data.length>0)?data:[{classid:0,class_name:'----不存在课程----'}]
+          },
+          this.push=function (data) {
+            return $http({
+              url: '/admin/inform_push',
+              method: 'POST',
+              data: data
+            })
+          }
+      })
+      .controller('informControl',function ($scope,informService,$log) {
+          $scope.type=informService.dataFormat('<%=type%>')//类型
+          $scope.goods=informService.dataFormat('<%=goods%>')//课程
+          $scope.notifics=informService.dataFormat('<%=notifics%>')//通知
+          $scope.typeSelect = $scope.type[0].id;
+          $scope.notificsSelect = $scope.notifics[0];
+          $scope.goodsSelect = $scope.goods[0].id;
+          $scope.key = null;
+          informService.getGoods($scope.goodsSelect).success(function (result) {
+            $scope.child = informService.childFormat(result.message.list);
+            $scope.childSelect = $scope.child[0]
+
+            $scope.title = informService.getTemplate(0,$scope.childSelect.class_name)
+            $scope.titleSelect = informService.getTemplate(0,$scope.childSelect.class_name)[0];
+
+            $scope.key=$scope.childSelect.classid
+            informService.getSubTitle($scope.key,$scope.typeSelect,$scope.titleSelect).success(function (result) {
+              $scope.subTitle=(result.message.detail)
+            })
+          });
+          $scope.setTitle = function () {
+            if($scope.typeSelect==6){
+              $scope.title = informService.getTemplate($scope.typeSelect-1,$scope.notificsSelect.name)
+              $scope.titleSelect = informService.getTemplate($scope.typeSelect-1,$scope.notificsSelect.name)[0];
+              $scope.subTitle = informService.getTemplate($scope.typeSelect-1,$scope.notificsSelect.name)[0];
+              $scope.notificsStatus=true;//公告
+              $scope.goodsStatus=false;//课程
+              $scope.key=$scope.notificsSelect.id
+            }else {
+              $scope.title = informService.getTemplate($scope.typeSelect-1,$scope.childSelect.class_name)
+              $scope.titleSelect = informService.getTemplate($scope.typeSelect-1,$scope.childSelect.class_name)[0];
+              $scope.notificsStatus=false;//公告
+              $scope.goodsStatus=true;//课程
+              $scope.key=$scope.childSelect.classid
+              informService.getSubTitle($scope.key,$scope.typeSelect,$scope.titleSelect).success(function (result) {
+                $scope.subTitle=(result.message.detail)
+              })
+            }
+          };
+          $scope.setTemplate = function () {
+            $scope.title = informService.getTemplate($scope.typeSelect-1,$scope.childSelect.class_name)
+            $scope.titleSelect = informService.getTemplate($scope.typeSelect-1,$scope.childSelect.class_name)[0];
+
+            $scope.key=$scope.childSelect.classid
+            informService.getSubTitle($scope.key,$scope.typeSelect,$scope.titleSelect).success(function (result) {
+              $scope.subTitle=(result.message.detail)
+            })
+          };
+          $scope.setTitleTemplate = function () {
+            informService.getSubTitle($scope.key,$scope.typeSelect,$scope.titleSelect).success(function (result) {
+              $scope.subTitle=(result.message.detail)
+            })
+          }
+          $scope.setNotifics = function () {
+            $scope.title = informService.getTemplate($scope.typeSelect-1,$scope.notificsSelect.name)
+            $scope.titleSelect = informService.getTemplate($scope.typeSelect-1,$scope.notificsSelect.name)[0];
+            $scope.subTitle = informService.getTemplate($scope.typeSelect-1,$scope.notificsSelect.name)[0];
+
+            $scope.key=$scope.notificsSelect.id
+          };
+          $scope.setGoods = function () {
+            informService.getGoods($scope.goodsSelect).success(function (result) {
+              $scope.child = informService.childFormat(result.message.list);
+              $scope.childSelect = $scope.child[0]
+
+              $scope.title = informService.getTemplate($scope.typeSelect-1,$scope.childSelect.class_name)
+              $scope.titleSelect = informService.getTemplate($scope.typeSelect-1,$scope.childSelect.class_name)[0];
+
+              $scope.key=$scope.childSelect.classid
+              informService.getSubTitle($scope.key,$scope.typeSelect,$scope.titleSelect).success(function (result) {
+                $scope.subTitle=(result.message.detail)
+              })
+            });
+          };
+          $scope.notificsStatus=false;//公告
+          $scope.goodsStatus=true;//课程
+          $scope.push=function () {
+            $scope.pushData={
+              inform_target:$scope.target,
+              inform_type:$scope.typeSelect,
+              inform_title:$scope.titleSelect,
+              inform_key:$scope.key,
+              inform_sub:$scope.subTitle,
+            };
+            swal({
+                title: "确认推送！",
+                text: $scope.titleSelect,
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确认!",
+                cancelButtonText: "取消!",
+                closeOnConfirm: true
+              },
+              function(){
+                informService.push($scope.pushData).success(function (result) {
+                  if(result.code==200){
+                    swal({
+                      title: "推送成功",
+                      text: "成功人数：【" +result.message.success+ "】失败人数：【" +result.message.error +"】",
+                      timer: 2000,
+                      showConfirmButton: false
+                    });
+                  }
+                })
+              });
+
+          }
+      })
+
+</script>
+<% include ../inc/footer.html%>

@@ -1,0 +1,279 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <script>
+
+      angular.module("cms")
+              .service('manageService',function ($http) {
+                this.dataFormat=function (data) {
+                  return JSON.parse(data.replace(/&#34;/ig,'"'))
+                },
+                this.push=function (data) {
+                  return $http({
+                    url: '/admin/inform_push',
+                    method: 'POST',
+                    data: data
+                  })
+                },
+                this.list=function (data) {
+                  return $http({
+                    url: '/admin/students_ajax',
+                    method: 'GET',
+                    params: data
+                  })
+                },
+                this.save=function (data) {
+                  return $http({
+                    url: '/admin/branch_manage_push',
+                    method: 'POST',
+                    data: data
+                  })
+                },
+                this.banchList=function (data) {
+                  return $http({
+                    url: '/admin/branch_manage_list',
+                    method: 'get',
+                    params: data
+                  })
+                },
+                this.del=function (data) {
+                  return $http({
+                    url: '/admin/branch_manage_del',
+                    method: 'POST',
+                    data: data
+                  })
+                }
+              })
+              .controller('manageControl',function ($scope,manageService,$log) {
+                $scope.findData={
+                  type:4
+                };
+                var options = {
+                  currentPage: 1,//当前页数
+                  totalPages: 0,//总页数
+                  numberOfPages: 12,//做多显示page页
+                  bootstrapMajorVersion: 1,//版本
+                  alignment: "center",
+                  onPageClicked: function (e, originalEvent, t, page) {
+                    if (page > options.totalPages) {
+                      options.currentPage = options.totalPages;
+                    } else {
+                      options.currentPage = page;
+                    }
+                    $scope.findData.page=page;
+                    $scope.add()
+                  }
+                };
+                $scope.type=manageService.dataFormat('<%=type%>')//类型
+                $scope.goods=manageService.dataFormat('<%=goods%>')//课程
+                $scope.typeSelect = $scope.type[0];
+                $scope.goodsSelect = $scope.goods[0];
+                $scope.goodsStatus = false;
+                $scope.Member = {};
+                $scope.banchList = {};
+                $scope.setTitle = function () {
+                  if($scope.typeSelect.id == 3 || $scope.typeSelect.id == 4){
+                    $scope.goodsStatus = true;
+                  }else{
+                    $scope.goodsStatus = false
+                  }
+                };
+                $scope.add=function () {
+                  $("#modal").modal('show');
+                  manageService.list($scope.findData).success(function (result) {
+                    $scope.Member=result.message.list;
+                    angular.forEach($scope.Member,function (node,index) {
+                      if(node.m_pics){
+                        node.m_pics="<%=aly%>/"+node.m_pics
+                      }
+                    })
+                    options.totalPages=result.message.pagecount;
+                    if (options.totalPages > 0) {
+                      $('#page').bootstrapPaginator(options);
+                    } else {
+                      $('#page').empty();
+                    }
+                  })
+                };
+                $scope.find=function () {
+                  options.currentPage=1;
+                  $scope.add();
+                };
+                $scope.addMember = function (data) {
+                  $scope.manageData={
+                    classroom:'<%=item.classroom%>',
+                    type:$scope.typeSelect.id,
+                    goods:$scope.goodsSelect.id,
+                    mid:data.mid
+                  };
+                  swal({
+                            title: "确认添加！",
+                            text: '设置 '+data.m_name+' 为 <%=item.classroom_name%> '+$scope.typeSelect.name,
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "确认!",
+                            cancelButtonText: "取消!",
+                            closeOnConfirm: true
+                          },
+                          function(){
+                            manageService.save($scope.manageData).success(function (result) {
+                              swal({
+                                title: "设置成功",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                              });
+                              weriteList()
+                              $("#modal").modal('hide');
+                            })
+                          });
+                };
+                $scope.delMember = function (data) {
+                  swal({
+                      title: "确认删除！",
+                      text: '移除 <%=item.classroom_name%> '+data.type_name +' '+data.m_name,
+                      showCancelButton: true,
+                      confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "确认!",
+                      cancelButtonText: "取消!",
+                      closeOnConfirm: true
+                    },
+                    function(){
+                      manageService.del({
+                        id:data.id
+                      }).success(function (result) {
+                        swal({
+                          title: "删除成功",
+                          timer: 2000,
+                          type: "success",
+                          showConfirmButton: false
+                        });
+                        weriteList()
+                      })
+                    });
+                };
+                function weriteList() {
+                  manageService.banchList({classroom:'<%=item.classroom%>'}).success(function (result) {
+                    $scope.banchList=result.message.list;
+                  })
+                }
+                weriteList()
+              })
+
+    </script>
+    <div class="main" ng-controller="manageControl">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b><%=item.classroom_name%>-----管理</b></div>
+        <div class="panel-body" style="padding:15px 0">
+          <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h5 class="modal-title">
+                    选择{{typeSelect.name}}
+                  </h5>
+                </div>
+                <div class="modal-body">
+                  <form class="form-inline select_form" style="margin-bottom:15px;" >
+                    <div class="form-group form-group-sm">
+                      <div class="input-group input-group-sm">
+                        <input type="text" ng-model="findData.m_name" class="form-control input-sm" placeholder="姓名" />
+                        <span class="input-group-btn">
+                          <span type="button" class="btn btn-danger" ng-click="find()">查询</span>
+                        </span>
+                      </div>
+                    </div>
+                  </form>
+                  <table class="table table-striped table-condensed">
+                    <thead>
+                    <tr>
+                      <th style="width:80px">头像</th>
+                      <th style="width:80px">姓名</th>
+                      <th style="width:180px">简介</th>
+                      <th style="width:120px" class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="x in Member">
+                        <td><img class="img-circle" src="{{x.m_pics}}" width="45" height="45" ></td>
+                        <td>{{x.m_name}}</td>
+                        <td>{{x.m_desc}}</td>
+                        <td class="text-center">
+                          <div class="btn-group">
+                            <a class="btn btn-info btn btn-xs" ng-click="addMember(x)"> 添加{{typeSelect.name}}</a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div id="page"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+            <label for="inform_type" class="control-label sr-only">类型<span></span></label>
+            <select name="inform_type" class="form-control" ng-change="setTitle()" ng-model="typeSelect" ng-options="x as x.name for x in type">
+
+            </select>
+          </div>
+          <div ng-show="goodsStatus" class="col-md-4 col-lg-4 col-sm-4 col-xs-4" style="margin-bottom:0px">
+            <label class="control-label sr-only">课程班<span></span></label>
+            <select class="form-control" ng-change="setGoods()" ng-model="goodsSelect" ng-options="x as x.name for x in goods">
+
+            </select>
+          </div>
+          <div class="col-md-4 text-center">
+            <button ng-click="add()" class="btn btn-info btn-sm btn-submit">添加{{typeSelect.name}}</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">人员列表</div>
+        <div class="panel-body">
+          <table class="table table-striped table-condensed">
+            <thead>
+            <tr>
+              <th style="width:80px">头像</th>
+              <th>姓名</th>
+              <th style="width:180px">身份</th>
+              <th style="width:120px">课程班</th>
+              <th style="width:120px" class="text-center">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="x in banchList">
+              <td><img class="img-circle" src="{{x.m_pics}}" width="45" height="45" ></td>
+              <td>{{x.m_name}}</td>
+              <td>{{x.type_name}}</td>
+              <td>{{x.goods_name}}</td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <a class="btn btn-info btn btn-xs" ng-click="delMember(x)"> 删除{{x.type_name}}</a>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

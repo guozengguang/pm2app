@@ -1,0 +1,462 @@
+<% include ../inc/head.html%>
+<script src="/javascripts/js/clipboard.min.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html %>
+        </div>
+        <div class="main">
+            <div>
+                <div class="pull-left" style="line-height:28px;">
+                    <ul class="list-inline">
+                        <li><a href="/newenroll/newenroll_add"><span class="glyphicon glyphicon-plus"></span>新建</a></li>
+                        <li><a href="#" class="modifyEnroll"><span class="glyphicon glyphicon-alert"></span>修改</a></li>
+                        <li><a href="#" class="deleteEnroll"><span class="glyphicon glyphicon-remove"></span>删除</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pull-right">
+                    <form class="form-inline search-form">
+                        <div class="form-group form-group-sm" style="margin-right:4px;">
+                            <input type="text" name="creater" placeholder="创建人姓名"
+                                   class="form-control">
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <input type="text" name="jz_name" placeholder="简章名称"
+                                   class="form-control">
+                        </div>
+
+                        <div class="form-group form-group-sm">
+                            <select class="form-control" id="project_select" name="project_type" onchange="isOtherCourse(this)">
+                                <option value="">全部</option>
+                                <option value="0">课程</option>
+                                <!--<option value="1">活动</option>-->
+                                <option value="2">其他</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group form-group-sm" name="class_name_div" style="display: none">
+                            <select class="form-control" id="courseSelect" name="course_name" style="width:124px;">
+
+                            </select>
+                        </div>
+                        <div class="form-group form-group-sm" name="activity_name_div"  style="display: none">
+                            <select name="activity_name" id="activitySelect" class="form-control" style="width:124px;">
+                                <option value="-1" selected>
+                                    --请选择活动--
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <button type="button" class="btn btn-danger  search">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <table class="table table-striped table-condensed table-responsive">
+                <thead>
+                <tr>
+                    <th style="width: 5%;text-align: center;"><input id="checkAll" type="checkbox"
+                                                                     style="width: 14px;height: 14px;"></th>
+                    <th style="width: 4%;text-align: center;">序号</th>
+                    <th style="width: 7%;text-align: center;">项目名称</th>
+                    <th style="width: 7%;text-align: center;">简章名称</th>
+                    <th style="width: 7%;text-align: center;">生成日期</th>
+                    <th style="width: 7%;text-align: center;">修改日期</th>
+                    <th style="width: 8%;text-align: center;">创建人姓名</th>
+                    <th style="width: 4%;text-align: center;">状态</th>
+                    <th style="width: 56%;text-align: center;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <div id="page"></div>
+        </div>
+    </div>
+</div>
+<div id="myModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">请扫描或者保存二维码</h4>
+            </div>
+            <div id="qrcode" class="modal-body" style="text-align: center">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myAdModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalTitle">宣传图</h4>
+            </div>
+            <div id="adimg_body" class="modal-body" style="text-align: center">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+//    var codeURL = "http://www.geju.com/activity/friends/enrolment-form.html?id=";
+//    var codeURL = "http://www.geju.com/listname/bmname.html?id=";
+    //选择单个checkBox框的时候 要去掉全选的checkBox的选中状态
+    function clickSubBox(e) {
+        var $subs = $("input[name='subBox']");
+        $("#checkAll").prop("checked", $subs.length == $subs.filter(":checked").length ? true : false);
+    }
+    //判断是否是选择其他课程 如何是就显示输入其他课程的输入框
+    function isOtherCourse(e) {
+        //如果选择的是其他
+        if (e.selectedOptions[0].innerHTML == "其他") {
+            $("div[name='class_name_div']").hide();
+            $("div[name='activity_name_div']").hide();
+//            $("div[name='qt_jz_name']").show();
+        } else if (e.selectedOptions[0].innerHTML == "课程"){
+            $("div[name='activity_name_div']").hide();
+//            $("div[name='qt_jz_name']").hide();
+            $("div[name='class_name_div']").show();
+        }else if (e.selectedOptions[0].innerHTML == "活动"){
+//            $("div[name='qt_jz_name']").hide();
+            $("div[name='class_name_div']").hide();
+            $("div[name='activity_name_div']").show();
+        }
+    }
+    $(function () {
+        //初始化课程列表(项目)
+        initGoodList();
+        //加载可用活动列表
+//        initActivity();
+        function initGoodList() {
+            $.get("/production/list", function (result) {
+                insertGoodDom($("#courseSelect"), result.result.list);
+            })
+        }
+        function initActivity() {
+            $.get("/admin/hotel/activity/newenroll/hotel_activity_list", function (result) {
+//            console.log(result)
+                insertActivityDom($("#activitySelect"), result.result.list);
+            })
+        }
+
+        function insertActivityDom($dom, data) {
+            var html = "<option value='' selected>--请选择活动--</option>";
+//            var html = "<option value='' selected>全部</option>";
+            $.each(data, function (i, v) {
+                html += '<option value="' + v.id + '"> ' + v.title + ' </option>';
+            });
+            $dom.html(html);
+        }
+
+        function insertGoodDom($dom, data) {
+            var html = "<option value='' selected>--请选择课程--</option>";
+//            var html = "<option value='' selected>全部</option>";
+            $.each(data, function (i, v) {
+                html += '<option value="' + v.goodsid + '"> ' + v.goods_name + ' </option>';
+            });
+            $dom.html(html);
+        }
+
+
+        //分页初始值
+        var options = {
+            currentPage: 1,//当前页数
+            totalPages: 0,//总页数
+            numberOfPages: 12,//最多显示page页
+            bootstrapMajorVersion: 1,//版本
+            alignment: "center",
+            onPageClicked: function (e, originalEvent, type, page) {
+                if (page > options.totalPages) {
+                    options.currentPage = options.totalPages;
+                } else {
+                    options.currentPage = page;
+                }
+                var data = $('.search-form').serializeArray();
+                data.push({name: "page", value: page});
+                writeList(data);
+            }
+        };
+        //默认加载
+        writeList();
+        //写列表ajax
+        function writeList(data) {
+            effect.show();
+            $.get('/newenroll/newenroll_list', data, function (result) {
+                if (result.code == 200) {
+                    $("table tbody").empty('');
+                    var dataArr = result.message.list;
+                    if (dataArr.length > 0) {
+                        $("table tbody").empty('');
+                        $.each(dataArr, function (index, value) {
+                            var mainHtml = getMainBodyHtml(index, value);
+                            $("table tbody").html(mainHtml);
+                        });
+                    }
+                    //分页
+                    options.totalPages = result.message.pagecount;
+                    if (options.totalPages > 0) {
+                        $('#page').bootstrapPaginator(options);
+                    } else {
+                        $('#page').empty();
+                    }
+                    effect.hide();
+                } else {
+                    effect.hide();
+                    effect.error('请求失败');
+                }
+            })
+        };
+        //搜索
+        $('.search').on('click', function () {
+            var data = $('.search-form').serializeArray();
+            options.currentPage = 1;
+            var project_type = $("#project_select option:selected").attr("value");
+            var course_name = "";
+            if(project_type == "0"){
+                course_name = $("#courseSelect option:selected").attr("value");
+            }else if(project_type == "1"){
+                course_name = $("#activitySelect option:selected").attr("value");
+            }else if(project_type == "2"){
+                course_name = "-2";
+            }
+            _.remove(data, function (n) {//返回被删除的元素
+                return n.name == "activity_name" || n.name == "course_name";//删除name为en_fee的元素
+            });
+            data.push({name:"course_name",value:course_name});
+//            console.log(data);
+            writeList(data);
+        });
+
+        function getGoodsNameById(thisId, type) {
+//            console.log(type,'type')
+            var courseName = "";
+            if (thisId == -2) {
+                return "其他";
+            }
+            if (type == "0") {
+                $.ajax({
+                    type: "get",
+                    url: "/production/list",
+                    async: false,
+                    data: "",
+                    dataType: "json",
+                    success: function (result) {
+                        var data = result.result.list;
+                        $.each(data, function (i, v) {
+                            if (v.goodsid == thisId) {
+                                courseName = v.goods_name;
+                            }
+                        });
+                    }
+                });
+            }
+
+            if (type == "1") {
+                $.ajax({
+                    type: "get",
+                    url: "/admin/hotel/activity/newenroll/hotel_activity_list",
+                    async: false,
+                    data: "",
+                    dataType: "json",
+                    success: function (result) {
+                        var data = result.result.list;
+                        $.each(data, function (i, v) {
+                            if (v.id == thisId) {
+                                courseName = v.title;
+                            }
+                        });
+                    }
+                });
+            }
+            return courseName;
+        }
+
+        function getMainBodyHtml(index, value) {
+
+            var mainHtml = $("table tbody").html();
+            var status = value["enroll_status"];
+            var statusMsg = "";
+            if (status == "0") {
+                statusMsg = "下架";
+            } else {
+                statusMsg = "上架";
+            }
+
+            var courseName = getGoodsNameById(value["course_name"], value["project_type"]);
+
+            var thisAdimg_url = "http://gejubusinessbucket.oss-cn-beijing.aliyuncs.com/" + value["adimg_url"];
+            var thisHtml = "<tr>" +
+                "<td style='width:1%;text-align: center;'><input name='subBox' onclick='clickSubBox(this)' type='checkbox' style='width: 14px;height: 14px' value='" + value["newenroll_id"] + "'></td>" +
+                "<td style='width:1%;text-align: center;'>" + value["index"] + "</td>" +
+                "<td style='width:11%;text-align: center;'>" + courseName + "</td>" +
+                "<td style='width:9%;text-align: center;'>" + value["jz_name"] + "</td>" +
+                "<td style='width:14%;text-align: center;'>" + value["create_date"] + "</td>" +
+                "<td style='width:14%;text-align: center;'>" + value["update_date"] + "</td>" +
+                "<td style='width:5%;text-align: center;'>" + value["user_nicename"] + "</td>" +
+                "<td style='width:3%;text-align: center;'>" + statusMsg + "</td>" +
+                "<td style='width:42%;text-align: center;'>" +
+                "<a href='#'> <span class='label label-primary copySpan' data-id='" + value["newenroll_id"] +
+                "' value='" + value["code_url"] + value["newenroll_id"] + "' data-clipboard-action='copy' data-clipboard-text='" + value["code_url"] + value["newenroll_id"] + "'>复制网址</span></a>" +
+                "<a href='#'> <span class='label label-primary qrcodeSpan' data-id='" + value["newenroll_id"] +
+                "' value='" + value["code_url"] + value["newenroll_id"] + "'>二维码</span></a>" +
+                "<a href='#'> <span class='label label-primary adimgSpan' value='" + thisAdimg_url + "'>宣传图</span></a>";
+            var statusStr = "";
+            if (value["enroll_status"] == "1") {
+                statusStr = "<a href='#' value='" + value["newenroll_id"] + "' status='" + value["enroll_status"] + "' class='upOrdown'> <span class='label label-primary'>下架</span></a>";
+            } else {
+                statusStr = "<a href='#' value='" + value["newenroll_id"] + "' status='" + value["enroll_status"] + "' class='upOrdown'> <span class='label label-primary'>上架</span></a>";
+            }
+            thisHtml += statusStr;
+            var showDetailsStr = "<a href='/newenroll/template_detaillist?id=" + value["template_typename"] + "&newenroll_id=" + value["newenroll_id"] + "' style='margin-left: 6px'><span class='label label-primary showDetailSpan'>查看明细</span></a>";
+            thisHtml += showDetailsStr;
+            var footStr = "</td></tr>";
+            thisHtml += footStr;
+            mainHtml += thisHtml;
+            return mainHtml;
+        }
+
+        function FormatDate(strTime) {
+            var date = new Date(strTime);
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            if (hour < 10) {
+                hour += "0";
+            }
+            if (minute < 10) {
+                minute = "0" + minute;
+            }
+            if (second < 10) {
+                second += "0";
+            }
+            return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hour + ":" + minute + ":" + second;
+        }
+
+    });
+
+    $(function () {
+        $("#checkAll").bind("click", function () {
+            $("[name='subBox']:checkbox").prop("checked", this.checked);
+        });
+
+//        $("input[name='subBox']").click(function () {
+//            var $subs = $("input[name='subBox']");
+//            $("#checkAll").prop("checked", $subs.length == $subs.filter(":checked").length ? true : false);
+//        });
+//        $("input[name='subBox']").on('click',function () {
+//            var $subs = $("input[name='subBox']");
+//            $("#checkAll").prop("checked", $subs.length == $subs.filter(":checked").length ? true : false);
+//        });
+
+
+        /* 复制 */
+        new Clipboard('.copySpan').on('success', function (e) {
+            effect.success('复制成功');
+        }).on('error', function (e) {
+            effect.error('复制失败');
+        });
+
+        /* 二维码 */
+        $(document).on('click', '.qrcodeSpan', function () {
+            var url = $(this).attr("value");
+            if (url) {
+                $('#qrcode').html('').qrcode(url);
+                $('#myModal').modal();
+            }
+        });
+        /* 宣传图 */
+        $(document).on('click', ".adimgSpan", function () {
+            var adimg_url = $(this).attr("value");
+            if (adimg_url) {
+                $("#adimg_body").html("<img src='" + adimg_url + "' width='260px'>");
+                $("#myAdModal").modal();
+            }
+        });
+
+        /* 上架下架 */
+        $(document).on('click', '.upOrdown', function () {
+            var index = $(this).attr("value");
+            var status = $(this).attr("status");
+            var msgStatus = "";
+            if (status == "1") {
+                msgStatus = "下架";
+            } else {
+                msgStatus = "上架";
+            }
+            $.post('/newenroll/upordown_enroll', {index: index, status: status}, function (result) {
+                if (result.code == 200) {
+                    swal(msgStatus + "成功", "", "warning")
+                    location.reload();
+                } else {
+                    swal(msgStatus + "失败", "", "warning")
+                }
+            })
+        });
+
+        //删除
+        $(document).on('click', '.deleteEnroll', function () {
+            var $subs = $("[name=subBox]:checkbox");
+            var deleStr = "";
+
+            var $checkedSubs = $subs.filter(":checked");
+
+            if ($checkedSubs.length > 0) {
+                $.each($checkedSubs, function (index, value) {
+                    deleStr += value["value"] + "$";
+                });
+                swal({
+                    title: "您确定要删除吗？",
+                    showCancelButton: true,
+                    closeOnConfim: true,
+                    cancelButtonText: "取消",
+                    confirmButtonText: "确定",
+                    animation: "slide-from-top",
+                    inputPlaceholder: "请输入新的排序"
+                }, function () {
+                    $.post('/newenroll/delete_enroll', {deleStr: deleStr}, function (result) {
+                        if (result.code == 200) {
+                            swal("删除成功", "", "warning")
+                            location.reload();
+                        } else {
+                            swal("删除失败", "", "warning")
+                        }
+                    })
+                });
+            } else {
+                swal("请选择要删除的项");
+            }
+        });
+
+        //修改
+        $(document).on('click', '.modifyEnroll', function () {
+            var $subs = $("[name=subBox]:checkbox");
+            var checkedSubs = $subs.filter(":checked");
+            if (checkedSubs.length == 0) {
+                swal("请选择要编辑的项");
+                return;
+            } else if (checkedSubs.length > 1) {
+                swal("请选择一项操作");
+                return;
+            } else {
+                //跳转到编辑页面
+                var $subs = $("input[name='subBox']");
+                var $checkedSub = $subs.filter(":checked")[0];
+                location.href = "/newenroll/newenroll_edit?id=" + $checkedSub.value;
+            }
+        });
+    });
+</script>
+<% include ../inc/footer.html %>

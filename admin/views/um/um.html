@@ -1,0 +1,240 @@
+<% include ../inc/head.html%>
+<div class="container-fluid" ng-controller="UMController">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>友盟推送</b>
+                            <small>友盟规定一分钟最多可以请求３次</small>
+                        </div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <form id="notifics_form" action="/admin/um" method="post">
+                                <div class="col-md-12" style="padding:0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="title"
+                                                           class="control-label">标题<span>*</span></label>
+                                                    <input ng-model="form.title" id="title" value="" type="text" name="title" placeholder="标题"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="subtitle"
+                                                           class="control-label">副标题<span><sub>ios展示 android不展示</sub></span></label>
+                                                    <input ng-model="form.subtitle" id="subtitle" value="" type="text" name="subtitle" placeholder="标题"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="describe" class="control-label">描述<span><sub>仅友盟后台展示</sub></span></label>
+                                                    <input ng-model="form.describe" id="describe" value="" type="text" name="describe" placeholder="描述"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="content" class="control-label">内容<span>* <sub>消息正文</sub></span></label>
+                                                    <input ng-model="form.content" id="content" value="" type="text" name="content" placeholder="内容"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="type" class="control-label">导航类型<span><sub>导航位置</sub></span></label>
+                                                    <input ng-model="form.type" id="type" value="" type="text" name="content" placeholder="内容"
+                                                           class="form-control" required data-bv-trigger="blur"
+                                                           data-bv-notempty-message='必填项目'>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <label for="select_t"
+                                                           class="control-label">导航类型<span></span></label>
+                                                    <br>
+                                                    <select id="select_t" name="type" class="btn pull-left">
+                                                        <option value="0">无</option>
+                                                        <option value="10">首页</option>
+                                                        <option value="31">课程详情</option>
+                                                        <option value="32">问题及投票</option>
+                                                        <option value="33">问题及投票</option>
+                                                        <option value="33">问题及投票</option>
+                                                        <option value="33">问题及投票</option>
+                                                    </select>
+                                                    <!--<select id="select_c_2" name="cid" class="btn pull-left" style="">
+                                                        <option value="0" selected>&#45;&#45;选择课程推送&#45;&#45;</option>
+                                                    </select>
+                                                    <span class="pull-left" style="line-height: 35px;padding: 0 10px;">
+                                                        或
+                                                    </span>-->
+                                                    <input id="key" value="" type="text" name="key"
+                                                           placeholder="请输入导航链接KEY值"
+                                                           class="form-control" data-bv-trigger="blur"
+                                                           data-bv-notempty-message='请输入导航链接KEY值'
+                                                           style="width: 20%;height: 35px;display: none;">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <label for="time" class="control-label">推送时间<span>*</span></label>
+                                                    <input id="time" type="text" name="time" placeholder="选择推送时间"
+                                                           class="form-control input_date" required
+                                                           data-bv-trigger="blur" data-bv-notempty-message='必填项目'
+                                                           value="">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12 clearfix">
+                                                    <ul id="students_list" class="list-group">
+                                                    </ul>
+                                                </div>
+                                                <div id="form_group"
+                                                     class="form-group form-group-sm col-md-12 clearfix">
+                                                    <div class="btn-group" data-toggle="buttons">
+                                                        <label class="btn btn-success active" id="multiple">
+                                                            <input type="radio" name="options"
+                                                                   autocomplete="off" checked value="0">
+                                                            全部
+                                                        </label>
+                                                        <label class="btn btn-success" id="simple">
+                                                            <input type="radio" name="options"
+                                                                   autocomplete="off" value="1">
+                                                            单独
+                                                        </label>
+                                                        <label class="btn btn-success" id="group">
+                                                            <input type="radio" name="options"
+                                                                   autocomplete="off" value="2">
+                                                            群组
+                                                        </label>
+                                                        <label class="btn btn-success" id="lesson">
+                                                            <input type="radio" name="options"
+                                                                   autocomplete="off" value="2">
+                                                            课程
+                                                        </label>
+                                                    </div>
+                                                    <select id="select" name="group" class="btn btn-success"
+                                                            style="display: none">
+                                                        <option value="0" selected>--选择群组推送--</option>
+                                                    </select>
+                                                    <select id="select_c" name="cid" class="btn btn-success"
+                                                            style="display: none">
+                                                        <option value="0" selected>--选择课程推送--</option>
+                                                    </select>
+                                                    <div class="pull-right">
+                                                        <button type="submit" class="btn btn-danger btn-submit">提交
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 弹出框 -->
+<!-- 视频model -->
+<div class="modal fade" id="modal_tea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title">
+                    选择推送
+                </h5>
+            </div>
+            <div class="modal-body">
+                <form id="search_from" class="form-inline select_form" style="margin-bottom:15px;">
+                    <div class="form-group form-group-sm">
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="keyword" name="keyword" value="" class="form-control input-sm"
+                                   placeholder="姓名"/>
+                            <span class="input-group-btn">
+                                <span type="button" class="btn btn-danger" id="tea_find">查询</span>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <table id="table" class="table table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th style="width:80px">学员昵称</th>
+                        <th style="width:180px">联系方式</th>
+                        <th style="width:120px" class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div id="page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${m_name}</td>
+    <td>${m_phone}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs trueInfo" data-name="${m_name}" data-phone="${m_phone}">添加</a>
+    </div>
+    </td>
+  </tr>
+
+</script>
+<script id="inittmp2" type="text/x-jquery-tmpl">
+    <li class="list-group-item clearfix">
+        <input type="hidden" name="students" value="${phone}">${name}
+        <button class="btn btn-danger pull-right delete_button" type="button">删除</button>
+    </li>
+
+</script>
+<script>
+    $(".input_date").datetimepicker({
+        lang: 'ch',
+        step: 30
+    });
+    angular.module('cms')
+            .service('UMService', function ($http) {
+                this.lesson = function () {
+                    return $http({
+                        url: '/admin/lesson/list',
+                        method: 'get',
+                        //params
+                        //data: data
+                    });
+                };
+                this.group = function () {
+                    return $http({
+                        url: '/admin/group/list',
+                        method: 'get',
+                        //params
+                        //data: data
+                    });
+                };
+                this.student = function () {
+                    return $http({
+                        url: '/admin/members/list',
+                        method: 'get',
+                        //params
+                        //data: data
+                    });
+                }
+
+            })
+            .controller('UMController', function ($scope) {
+
+            });
+
+</script>
+<% include ../inc/footer.html%>

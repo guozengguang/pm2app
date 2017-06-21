@@ -1,0 +1,366 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+
+          </ul>
+        </div>
+        <div class="pull-right">
+          <form class="form-inline search-form">
+
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <form id="home_form">
+        <div class="well" style="padding: 10px;margin-bottom: 0px">
+          <div class="row">
+            <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3">
+              <label for="home_type" class="sr-only">类型<span>*</span></label>
+              <select name="home_type" class="form-control" style="min-width: 100%">
+                <%item.forEach(function(node){%>
+                <option value="<%=node.id%>"><%=node.name%></option>
+                <%})%>
+              </select>
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3" style="margin-bottom:0px">
+              <label for="home_title" class="sr-only">模块标题<span>*</span></label>
+              <input type="text" name="home_title" placeholder="模块标题" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3" style="margin-bottom:0px">
+              <label for="home_sort" class="sr-only">描述<span>*</span></label>
+              <input type="text" name="home_sort" placeholder="排序" class="form-control" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+            </div>
+            <div class="col-md-3 text-center">
+              <button type="submit" class="btn btn-info btn-sm btn-submit">新增模块</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="easy-tree">
+
+      </div>
+
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    var currentId=null
+    //树形结构的关合
+    $('.easy-tree').delegate('li.parent_li > span >a', 'click', function (e) {
+      var children = $(this).parent('span').parent('li.parent_li').find(' > ul > li');
+      if (children.is(':visible')) {
+        children.hide('fast');
+        $(this).prev()
+                .css('transform', 'rotate(0deg)')
+        currentId=null
+      } else {
+        children.show('fast');
+        $(this).prev()
+                .css('transform', 'rotate(90deg)')
+        currentId=$(this).data('id')
+      }
+      console.log(currentId)
+      e.stopPropagation();
+    });
+    writeList()
+    //请求用户
+    function writeList(data){
+      $.get('/admin/home_list',data,function(result){
+        console.log(result)
+        if(result.code==200){
+          $.each(result.message.list,function (index,node) {
+            node.id=currentId
+          })
+          $('.easy-tree').empty();
+          $('#inittmpl')
+              .tmpl(result.message.list)
+              .appendTo('.easy-tree');
+        }else{
+          effect.error('请求失败')
+        }
+      })
+    }
+    //新增项目
+    formValidator()
+    function formValidator() {
+      $('#home_form').bootstrapValidator().on('success.form.bv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target),
+                validator = $form.data('bootstrapValidator');
+        var data=$('#home_form').serializeArray();
+        $.post("/admin/home_create",data,function(result){
+          if(result.code==200){
+            $("input[name='home_title']").val('')
+            $("input[name='home_sort']").val('')
+            $("#home_form").data('bootstrapValidator').destroy();
+            $('#home_form').data('bootstrapValidator', null);
+            formValidator();
+            writeList()
+          }else{
+            effect.error(result.message)
+          }
+        })
+      });
+    }
+
+    //子项分页
+    var itemType=null;
+    var itemId=null;
+    var modalOptions = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > modalOptions.totalPages) {
+          modalOptions.currentPage = modalOptions.totalPages;
+        } else {
+          modalOptions.currentPage = page;
+        }
+        modalList({page:page,type:itemType,id:itemId})
+      }
+    };
+    //子项模块
+    $(document).on('click','.itemModal',function(){
+      var data=$(this).data();
+      itemType=data.type;
+      itemId=data.id;
+      modalList({type:itemType,id:itemId})
+      $('#myModal').modal('show')
+    });
+    //子模块删除
+    $(document).on('click','.delItem',function(){
+      var data=$(this).data();
+      var self=this;
+      $.post('/admin/home_item_update',{subitem_status:0,subitem_id:data.id,subitem_title:data.title},function (result) {
+        if(result.code==200){
+          if($(self).parent('li').siblings('li').length>0){
+            $(self).parent('li').remove()
+          }else {
+            writeList()
+          }
+        }else {
+          effect.error(result.message)
+        }
+      })
+    });
+    //模块删除
+    $(document).on('click','.delModal',function(){
+      var data=$(this).data();
+      var self=this;
+      $.post('/admin/home_update',{home_status:0,home_id:data.id,home_title:data.title},function (result) {
+        if(result.code==200){
+          $(self).parent('span').parent('span').parent('li').parent('ul').remove()
+        }else {
+          effect.error(result.message)
+        }
+      })
+    });
+    //子模块更新排序
+    $(document).on('click','.updateItem',function(){
+      var data=$(this).data();
+      swal({
+        title: "修改模块排序!",
+        text: "请输入新的排序:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        animation: "slide-from-top",
+        inputPlaceholder: "请输入新的排序" }, function(inputValue){
+        if (!inputValue) return false;
+        var content=inputValue;
+        $.post('/admin/home_item_update',{subitem_sort:content,subitem_id:data.id,subitem_title:data.title},function (result) {
+          if(result.code==200){
+            writeList()
+          }else {
+            effect.error(result.message)
+          }
+        })
+      });
+    });
+    //模块更新排序
+    $(document).on('click','.updateModal',function(){
+      var data=$(this).data();
+      swal({
+        title: "修改模块排序!",
+        text: "请输入新的排序:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        animation: "slide-from-top",
+        inputPlaceholder: "请输入新的排序" }, function(inputValue){
+        if (!inputValue) return false;
+        var content=inputValue;
+        $.post('/admin/home_update',{home_sort:content,home_id:data.id,home_title:data.title},function (result) {
+          if(result.code==200){
+            writeList()
+          }else {
+            effect.error(result.message)
+          }
+        })
+      });
+    });
+    //模块更新标题
+    $(document).on('click','.updateModalTitle',function(){
+      var data=$(this).data();
+      swal({
+        title: "修改模块标题!",
+        text: "请输入模块标题:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        animation: "slide-from-top",
+        inputPlaceholder: "请输入新的排序" }, function(inputValue){
+        if (!inputValue) return false;
+        var content=inputValue;
+        $.post('/admin/home_update',{home_id:data.id,home_title:content},function (result) {
+          if(result.code==200){
+            writeList()
+          }else {
+            effect.error(result.message)
+          }
+        })
+      });
+    });
+    function modalList(data) {
+      $.get('/admin/home_item',data,function (result) {
+        console.log(result)
+        if(result.code==200){
+          $('.modalTable tbody').empty();
+          $('#modaltmpl')
+                  .tmpl(result.message.list)
+                  .appendTo('.modalTable tbody')
+          modalOptions.totalPages=result.message.pagecount;
+          if (modalOptions.totalPages > 0) {
+            $('#modalPage').bootstrapPaginator(modalOptions);
+          } else {
+            $('#modalPage').empty();
+          }
+        }else {
+          effect.error('请求失败')
+        }
+      })
+    }
+    $('#myModal').on('hidden.bs.modal', function (e) {
+      itemType=null;
+      itemId=null;
+      $('.modalTable tbody').empty();
+      modalOptions.currentPage=1
+    })
+    //新增子项目
+    $(document).on('click','.addItem',function(){
+      var data=$(this).data();
+      data.home=itemId;
+      var sort=$("#row_"+data.id).val();
+      if(!sort){
+        return effect.error('排序为空')
+      }
+      data.sort=sort
+      $.post("/admin/home_item_create",data,function(result){
+        if(result.code==200){
+          writeList()
+          $('#myModal').modal('hide')
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+  })
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <ul>
+    {{if Item.length>0}}
+      <li class="parent_li">
+        <span>
+          <span class="glyphicon glyphicon-play"></span>
+    {{else}}
+      <li>
+        <span>
+          <span class="glyphicon glyphicon-minus"></span>
+    {{/if}}
+
+      <a href="javascript: void(0);" data-id="${home_id}">${home_title} ---------- ${home_sort}</a>
+      <span class="pull-right">
+        <a href="javascript:void(0)" class="delModal" data-id="${home_id}" data-title="${home_title}" "> <span class="label label-danger">删除模块</span></a>
+        <a href="javascript:void(0)" class="updateModal" data-id="${home_id}" data-title="${home_title}" "> <span class="label label-primary">调整排序</span></a>
+        <a href="javascript:void(0)" class="updateModalTitle" data-id="${home_id}" data-title="${home_title}" "> <span class="label label-danger">修改标题</span></a>
+        {{if home_type==5}}
+           <a href="/admin/area"> <span class="label label-info">链接到分院管理</span></a>
+        {{else home_type==7}}
+           <a href="/admin/splendid"> <span class="label label-info">链接到视频管理</span></a>
+        {{else}}
+           <a href="javascript:void(0)" class="itemModal" data-id="${home_id}" data-type="${home_type}"> <span class="label label-info">新增子项</span></a>
+        {{/if}}
+      </span>
+    </span>
+
+    {{if Item.length>0}}
+        <ul>
+           {{each(i,item) Item}}
+             <li style="{{if home_id!=id}}display: none;{{/if}}">
+              ${item.subitem_title} ---------- ${item.subitem_sort}
+              <a href="javascript:void(0)" class="pull-lift updateItem" data-id="${item.subitem_id}" data-title="${item.subitem_title}" "> <span class="label label-primary">调整排序</span></a>
+              <a href="javascript:void(0)" class="pull-lift delItem" data-id="${item.subitem_id}" data-title="${item.subitem_title}" "> <span class="label label-danger">删除子项</span></a>
+             </li>
+          {{/each}}
+        </ul>
+      </li>
+    {{else}}
+      </li>
+    {{/if}}
+  </ul>
+</script>
+<script id="modaltmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+    <td>
+    ${name}
+    </td>
+    <td  class="text-center"> <input type="text" id="row_${id}" class="form-control input-xs"/></td>
+    <td  class="text-center">
+        <a href="javascript:void(0)"><span class="btn btn-sm btn-info addItem" data-id="${id}" data-title=${name}>添加</a>
+    </td>
+  </tr>
+</script>
+<!-- Modal -->
+<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">模块</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-condensed modalTable">
+          <thead>
+          <tr>
+            <th style="width:50px">#</th>
+            <th >标题</th>
+            <th style="width:120px"  class="text-center">排序</th>
+            <th style="width:120px"  class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="modalPage"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

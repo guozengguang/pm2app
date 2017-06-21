@@ -1,0 +1,339 @@
+<% include ../inc/head.html%>
+<script src="/javascripts/js/excellentexport.min.js"></script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <script>
+        angular.module("cms")
+            .service('columnService',function ($http) {
+                this.roomDataFormat=function (data) {
+                    return JSON.parse(data.replace(/&#34;/ig,'"'))
+                };
+                this.goodsDataFormat=function (data) {
+                    return JSON.parse(data.replace(/&#34;/ig,'"'))
+                }
+                this.push = function (data) {
+                    return $http({
+                        url:'/admin/caiwu/ajax',
+                        method:'GET',
+                        data:data
+                    })
+                };
+            })
+            .controller('columnControl',function ($scope,columnService,$log) {
+                $scope.room=columnService.roomDataFormat('<%=roomList%>')//分院
+                $scope.goods=columnService.goodsDataFormat('<%=goodsList%>')//分院
+//                $scope.roomSelect = $scope.column[0].columnid.toString();
+                $scope.roomSelect = "0";
+                $scope.goodsSelect = "0";
+            })
+    </script>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <a download="缴费数据订单.xls" href="#" onclick="return ExcellentExport.excel(this, 'allDataTable', '缴费数据订单');" class="search_button btn btn-danger pull-right">导出</a>
+        </div>
+        <div class="pull-right" ng-controller="columnControl">
+          <form class="form-inline search-form">
+            <div class="form-group form-group-sm">
+              <label for="roomSelected" class="sr-only">分院选择<span>*</span></label>
+              <select class="form-control"  ng-model="roomSelect" name="classroom">
+                <option value="0">全部</option>
+                <option value="{{room.classroomid}}" ng-repeat="room in room">{{room.classroom_name}}</option>
+              </select>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="goodsSelected" class="sr-only">课程选择<span>*</span></label>
+              <select class="form-control"  ng-model="goodsSelect" name="goodsid">
+                <option value="0">全部</option>
+                <option value="{{goods.goodsid}}" ng-repeat="goods in goods">{{goods.goods_name}}</option>
+              </select>
+            </div>
+            <div class="form-group form-group-sm">
+              <label for="status" class="sr-only">审核状态<span>*</span></label>
+              <select class="form-control"  name="status">
+                <option value="all">全部</option>
+                <option value="0">未审核</option>
+                <option value="1">审核失败</option>
+                <option value="2">审核成功</option>
+                <option value="3">重新提交</option>
+                <option value="-1">已删除</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <div class="form-group form-group-sm">
+                <input type="text" name="start_time" placeholder="到账开始时间"
+                       class="form-control start_date">
+              </div>
+              -
+              <div class="form-group form-group-sm">
+                <input type="text" name="end_time" placeholder="到账结束时间"
+                       class="form-control end_date">
+              </div>
+              <span class="input-group-btn">
+                                    <button type="button" class="btn btn-danger btn-sm search">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-striped table-condensed" style="margin-top: 15px;" id="commonTable">
+        <thead>
+        <tr>
+          <th style="width:10px">#</th>
+          <th style="width:40px">学员姓名</th>
+          <th style="width:45px">所报课程</th>
+          <th style="width:40px">所属分院</th>
+          <th style="width:180px">缴费方式</th>
+          <th style="width:60px">缴费金额</th>
+          <th style="width:180px">到账时间</th>
+          <th style="width:80px">审核状态</th>
+          <th style="width:80px" class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <table class="table table-striped table-condensed" style="margin-top: 15px;display: none;" id="allDataTable">
+        <thead>
+        <tr>
+          <th style="width:10px">#</th>
+          <th style="width:40px">学员姓名</th>
+          <th style="width:45px">所报课程</th>
+          <th style="width:40px">所属分院</th>
+          <th style="width:180px">缴费方式</th>
+          <th style="width:60px">缴费金额</th>
+          <th style="width:180px">到账时间</th>
+          <th style="width:80px">审核状态</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+      //初始化时间快件
+      $(".start_date").datetimepicker({
+          step: 30,
+          lang: 'ch'
+      });
+      $(".end_date").datetimepicker({
+          step: 30,
+          lang: 'ch'
+      })
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, type, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data = $('.search-form').serializeArray();
+        data.push({name:"page",value:page});
+        writeList(data);
+      }
+    };
+    //默认加载
+    writeList({});
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/caiwu/ajax',data,function(result){
+        if(result.code==200){
+          $("table tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#commonTable tbody");
+
+          $("#inittmplExport")
+                .tmpl(result.message.exportDataList)
+                .appendTo("#allDataTable tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //click search
+      $('.search').on('click', function () {
+          var data = $('.search-form').serializeArray();
+          options.currentPage = 1;
+          console.log(data);
+          writeList(data);
+      });
+    $(document).on('click','.check',function () {
+      var data=$(this).data();
+      $.get("/admin/caiwu/detail/"+data.id,function(result){
+        console.log(result)
+        $("#detail").modal('show');
+        $("#content").empty('');
+        $("#detailtmpl")
+                .tmpl(result.message.detail)
+                .appendTo("#content");
+        //时间
+        $(".input_date").datetimepicker({
+          step:15,
+          lang:'ch',
+        });
+      })
+    });
+    function setError(e) {
+      $('input[name="'+e+'"]').parent('div').addClass('has-error')
+      $('input[name="'+e+'"]').focus()
+    }
+    $(document).on('click','.examine',function () {
+      var data=$(this).data();
+      var etime=$('input[name="etime"]').val();
+      var desc=$('input[name="desc"]').val();
+      var statusDesc='不通过'
+      if(data.status==1){
+        statusDesc='通过'
+      }
+      if(etime=='' && data.status==1){
+        setError('etime')
+        return $("#errMessage").html('请选择对账时间')
+      }
+
+        if(data.status !=1 && desc==''){
+            setError('desc')
+            return $("#errMessage").html('审核备注不能为空')
+        }
+
+      swal({
+        title: "确认审核",
+        text: '对账审核 【'+statusDesc+'】',
+        html: true,
+        showCancelButton: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确认!",
+        animation: "slide-from-top",
+      },function(){
+        $.post('/admin/caiwu/examine',{status:data.status,id:data.id,etime:etime,desc:desc},function(result){
+          if(result.code==200){
+            swal({   title: "成功",   text: "操作成功",   timer: 1000,   showConfirmButton: false });
+            writeList();
+          }else {
+            swal({   title: "失败",   text: result.message,   timer: 1000,   showConfirmButton: false });
+          }
+        })
+        $("#detail").modal('hide');
+      });
+    })
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+    <td>${m_name}</td>
+    <td>${goods_name}</td>
+    <td>${classroom_name}</td>
+    <td>${method}</td>
+    <td>${en_fee}</td>
+    <td>${etime}</td>
+    <td>${statusDesc}</td>
+    <td class="text-center">
+       <a href="javascript:void(0)" data-id="${id}" class="check"> <span class="label label-success">详情</span></a>
+
+    {{if status==0 || status==3}}
+    {{/if}}
+    </td>
+  </tr>
+</script>
+<!--打印的table模板-->
+<script id="inittmplExport" type="text/x-jquery-tmpl">
+  <tr>
+    <td>${index}</td>
+    <td>${m_name}</td>
+    <td>${goods_name}</td>
+    <td>${classroom_name}</td>
+    <td>${method}</td>
+    <td>${en_fee}</td>
+    <td>${etime}</td>
+    <td>${statusDesc}</td>
+  </tr>
+</script>
+<!-- 详情model -->
+<div class="modal fade" id="detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          订单详情
+        </h5>
+      </div>
+      <div class="modal-body" id="content">
+
+      </div>
+    </div>
+  </div>
+</div>
+<script id="detailtmpl" type="text/x-jquery-tmpl">
+  <div class="panel panel-primary">
+    <div class="panel-heading">订单信息</div>
+    <div class="panel-body">
+      <p>流水号：【<b>${order}</b>】  缴费方式: 【<b>${method}</b>】  缴费时间 ： 【<b>${stime}</b>】  订单金额 ：【<b>${fee}</b>】</p>
+      <div class="">
+        <label for="etime"> 到账时间 <small style="color:red">若是通过对账时间必选 *</small></label>
+        <input type="text" name="etime" placeholder="到账时间" class="form-control input_date" value="${etime}">
+      </div>
+      <div for="item" style="margin-top:10px;margin-bottom:10px"> 缴费凭证：</div>
+      {{each(i,p) pics}}
+      <a href="${aly}/${p}" target="_blank"><img src="${aly}/${p}" height="150px" width="150px" class="img-thumbnail"></a>
+      {{/each}}
+    </div>
+  </div>
+  <div class="panel panel-info">
+    <div class="panel-heading">备注信息</div>
+    <div class="panel-body">
+      <div calss="">
+        <label for="desc"> 审核备注 <small style="color:red">*</small></label>
+        <input type="text" name="desc" placeholder="新增审核备注" class="form-control" {{if status!=0 && status!=3}}disabled{{/if}}>
+      </div>
+      <br>
+      <p>历史备注:</p>
+      {{each(i,rl) remakeList}}
+        <p>提交者: 【<b>${rl.create}</b>】 内容：【<b>${rl.content}</b>】 </p>
+      {{/each}}
+    </div>
+  </div>
+  <div class="panel panel-success">
+    <div class="panel-heading">学员信息</div>
+    <div class="panel-body">
+      {{each(i,l) list}}
+        <p>学员姓名：【<b>${l.m_name}</b>】  电话: 【<b>${l.m_phone}</b>】  分院: 【<b>${l.classroom_name}</b>】  身份证 ： 【<b>${l.m_card}</b>】  报备课程 ：【<b>${l.goods_name}</b>】  缴费金额 ：【<b>${l.en_fee}</b>】</p>
+      {{/each}}
+    </div>
+  </div>
+
+  {{if status==0 || status==3}}
+  <div class="text-center">
+        <button type="button" class="btn btn-primary examine" data-id="${id}" data-status="1">通过</button>
+    <button type="button" class="btn btn-default examine" data-id="${id}" data-status="0">不通过</button>
+    <p id="errMessage"></p>
+  </div>
+  {{/if}}
+</script>
+<% include ../inc/footer.html%>

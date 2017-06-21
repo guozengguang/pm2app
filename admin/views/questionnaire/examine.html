@@ -1,0 +1,190 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="pull-left">
+                <ul class="list-inline">
+                    <li>
+                        <a href="/admin/questionnaire/add"><span class="glyphicon glyphicon-plus"></span>新建项目或者子项目</a>
+                    </li>
+                    <li>
+                        <a id="parent" style="display: none" href="/admin/questionnaire"><span
+                                class="glyphicon glyphicon-list"></span>项目列表</a>
+                    </li>
+                    <li>
+                        <a id="child" style="display: none" href="/admin/questionnaire?hierarchy=2"><span
+                                class="glyphicon glyphicon-list"></span>子项目列表</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="pull-right">
+                <!--<form class="form-inline search-form">-->
+                    <!--<div class="input-group">-->
+                        <!--<input type="text" name="m_phone" placeholder="项目名称" class="form-control input-sm">-->
+                        <!--<span class="input-group-btn">-->
+                            <!--<button type="button" class="btn btn-danger btn-sm search">-->
+                                <!--<span class="glyphicon glyphicon-search"></span>-->
+                            <!--</button>-->
+                        <!--</span>-->
+                    <!--</div>-->
+                <!--</form>-->
+            </div>
+            <div class="clearfix"></div>
+            <div class="panel panel-default">
+                <div id="parent_list" style="display: none" class="panel-heading"><b>项目列表</b></div>
+                <div id="child_list" style="display: none" class="panel-heading"><b>子项目列表</b></div>
+                <div class="panel-body" style="padding:15px 0">
+                    <table class="table table-condensed">
+                        <thead>
+                        <tr>
+                            <th style="width:60px;text-align: center">#</th>
+                            <th>名称</th>
+                            <th></th>
+                            <th style="width:160px" class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="page"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    var getSearch = (function () {
+        var args = {};
+        return function () {
+            var query = location.search.substring(1);
+            var pairs = query.split("&");
+            for (var i = 0; i < pairs.length; i++) {
+                var items = pairs[i].split('=');
+                args[items[0]] = items[1];
+            }
+            return args;
+        }
+    })();
+    if( getSearch().hierarchy ){
+        $('#parent').show();
+        $('#child_list').show();
+    }else {
+        $('#child').show();
+        $('#parent_list').show();
+    }
+
+    $(function () {
+
+        //分页初始值
+        var options = {
+            currentPage: 1,//当前页数
+            totalPages: 0,//总页数
+            numberOfPages: 12,//做多显示page页
+            bootstrapMajorVersion: 1,//版本
+            alignment: "center",
+            onPageClicked: function (e, originalEvent, type, page) {
+                if (page > options.totalPages) {
+                    options.currentPage = options.totalPages;
+                } else {
+                    options.currentPage = page;
+                }
+                var data = $('.search-form').serializeArray();
+                data.push({name: 'type', value: '10'});
+                data.push({name: 'page', value: page});
+                writeList(data)
+            }
+        };
+        //默认加载
+        writeList(getSearch());
+        $('.search').on('click', function () {
+            writeList(getSearch());
+        });
+        //写列表ajax
+        function writeList(data) {
+            effect.show();
+            $.get('/admin/questionnaire/primary/get', data, function (result) {
+                if (result.code == 200) {
+                    $("table tbody").empty('');
+                    $("#inittmpl").tmpl(result.result.list).appendTo("table tbody");
+                    options.totalPages = result.result.count;
+                    if (options.totalPages > 0) {
+                        $('#page').bootstrapPaginator(options);
+                    } else {
+                        $('#page').empty();
+                    }
+                    effect.hide();
+                } else {
+                    effect.hide();
+                    effect.error('请求失败')
+                }
+            })
+        };
+        $(document).on('click', '.delete', function () {
+            var id = $(this).data('id');
+            var name = $(this).data('name');
+            swal({
+                title: "确定删除 "+ name +" ?",
+                text: "",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                animation: "slide-from-top",
+                closeOnConfirm: false,
+                html: false
+            }, function () {
+                $.post('/admin/questionnaire/primary/delete', {
+                    id: id
+                }, function (result) {
+                    if (result.code === 200) {
+                        location.reload();
+                    } else {
+                        swal("删除失败", result.message, "warning")
+                    }
+                })
+            });
+        })
+    });
+
+
+</script>
+
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<tr style="background-color: #f5f5f5;">
+    <td style="text-align: center">${id}</td>
+    <td>${name}</td>
+    <td></td>
+    <td class="text-center">
+        <div class="btn-group">
+        {{if $data.hierarchy > 1}}
+            <a class="btn btn-primary btn-xs edit" href="/admin/questionnaire/content?id=${id}"> 关联数据</a>
+        {{/if}}
+          <a class="btn btn-info btn-xs edit" href="/admin/questionnaire/primary?id=${id}"> 编辑</a>
+          <a class="btn btn-danger btn-xs delete" data-id="${id}" data-name="${name}"> 删除</a>
+        </div>
+    </td>
+</tr>
+{{if $data.children && $data.children.length}}
+    {{each(i,item) children}}
+        <tr style="background-color: white;">
+            <td style="text-align: center;background-color: white;"></td>
+            <td><span class="label label-info">子项目</span>&emsp;${item.id}</td>
+            <td>${item.name}</td>
+            <td class="text-center">
+                <div class="btn-group">
+                  <a class="btn btn-primary btn-xs edit" href="/admin/questionnaire/content?id=${id}"> 关联数据</a>
+                  <a class="btn btn-info btn-xs edit" href="/admin/questionnaire/primary?id=${id}"> 编辑</a>
+                  <a class="btn btn-danger btn-xs delete" data-id="${id}" data-name="${name}"> 删除</a>
+                </div>
+            </td>
+        </tr>
+    {{/each}}
+{{/if}}
+
+</script>
+<% include ../inc/footer.html%>

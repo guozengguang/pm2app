@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>格局商学学员录入管理系统</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html, charset=utf-8" http-equiv="content-type">
+
+    <meta content=" width=1024, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+
+    <link type="text/css" href="css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" href="font/iocns.css" rel="stylesheet">
+    <link type="text/css" href="css/style.css" rel="stylesheet">
+    <link type="text/css" href="css/paging.css" rel="stylesheet">
+
+
+    <script type="text/javascript" src="js/comm.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/query.js"></script>
+    <script type="text/javascript" src="js/paging.js"></script>
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <!--隐藏域-->
+    <input type="hidden" id="hidden_list" value="value">
+
+
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a href="#" class="btn goHome"><span class="lw lw-icon-left-open-big"> </span></a>
+            <button type="button" class="navbar-toggle btn-link collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="lw lw-icon-menu-1"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!--li><a href="#"><span class="lw lw-icon-user-1"></span> 个人中心</a></li-->
+                <li class="active"><a href="#"><span class="lw lw-icon-vcard"></span> 学员信息</a></li>
+                <li><a href="#"><span class="lw lw-icon-shuffle-1"></span> 学员归属转移</a></li>
+                <li><a href="#"><span class="lw lw-icon-archive"></span> 报备中心</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="lw lw-icon-user-1"></span><span id="phoneSpan"></span><span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="lw lw-icon-key"></span> 密码修改</a></a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="quit()"><span class="lw lw-icon-logout-1"></span> 退出系统</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container con-list">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href="input.html" type="button" class="btn btn-info"><span class="lw lw-icon-plus-1"></span> 添加学员报备</a>
+        </div>
+        <div class="panel-body">
+            <div class="bodyTable">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>学员编号</th>
+                        <th>学员姓名</th>
+                        <th>学员电话</th>
+                        <th>时间</th>
+                        <th>学员的状态</th>
+                        <th>推荐人姓名</th>
+                        <th>学员职位</th>
+                        <th>所报课程</th>
+                        <th>所属分院</th>
+                        <th>备注说明</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="mainTbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div id="pageTool" class="btn-group" role="group" aria-label="...">
+                <!--<button type="button" class="btn btn-default"><span class="lw lw-icon-angle-double-left"></span>-->
+                <!--</button>-->
+                <!--<button type="button" class="btn btn-default">1</button>-->
+                <!--<button type="button" class="btn btn-default">2</button>-->
+                <!--<button type="button" class="btn btn-default">3</button>-->
+                <!--<button type="button" class="btn btn-default">4</button>-->
+                <!--<button type="button" class="btn btn-default">5</button>-->
+                <!--<button type="button" class="btn btn-default"><span class="lw lw-icon-angle-double-right"></span>-->
+                <!--</button>-->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+
+        //给当前用户赋电话号码值
+        $("#phoneSpan").html($.cookie("currentUserPhone"));
+
+        loadList(0, 5);
+
+        var totalCount = getListCount();
+
+        //分页初始化
+        $('#pageTool').Paging({
+            pagesize: 5, count: totalCount, callback: function (page, pagesize, pagecount) {
+//                alert('当前第 ' + page + '页,每页 ' + size + '条,总页数：' + count + '页');
+                $("#mainTbody").html("");
+                loadList(page - 1, pagesize);
+            }
+        });
+    })
+    //获取列表总数
+    function getListCount() {
+        var totalCount = 0;
+        var url = 'http://dev.geju.com/business/report/list/' + $.cookie("currentUserPhone");
+        $.ajax({
+            url: url,
+            dataType: "json",
+            async: false,
+            data: "",
+            type: "GET",
+            success: function (res) {
+                if (res.code == '200') {
+                    var list = res.result.list;
+                    totalCount = list.length;
+                }
+            }
+        });
+        return totalCount;
+    }
+    //加载列表
+    function loadList(page, pagesize) {
+        //如果当前用户未曾登录 就跳转到登录页面
+        if ($.cookie("isLogin") != "true") {
+            window.location.href = "./login.html";
+        } else {
+            //加载报备列表
+            var url = 'http://dev.geju.com/business/report/list/' + $.cookie("currentUserPhone") + "?page=" + page + "&pagesize=" + pagesize;
+            $.ajax({
+                url: url,
+                dataType: "json",
+                async: true,
+                data: "",
+                type: "GET",
+                success: function (res) {
+                    if (res.code == '200') {
+                        var list = res.result.list;
+                        //隐藏域赋值
+                        $("#hidden_list").val(list);
+                        for (i = 0; i < list.length; i++) {
+
+                            var mainHtml = $("#mainTbody").html();
+
+                            var en_uid = list[i]["en_uid"];//学员编号
+                            var m_name = list[i]["m_name"];//学员姓名
+                            var m_phone = list[i]["m_phone"];//学员电话
+                            var time = list[i]["time"];//时间
+                            var referrerName = $.cookie("currentUserName");//推荐人姓名
+                            var goods_name = list[i]["goods_name"];//所报课程
+                            var en_classroom = list[i]["classroom_name"];//所属分院
+
+                            var thisHtml = "<tr>" +
+                                    "<td>" + en_uid + "</td>" +
+                                    "<td><a href='#' style='color: blue' onclick='showDetails(" + en_uid + "," + page + ");'>" + m_name + "</a></td>" +
+                                    "<td>" + m_phone + "</td>" +
+                                    "<td>" + time + "</td>" +
+                                    "<td>学员的状态</td>" +
+                                    "<td>" + referrerName + "</td>" +
+                                    "<td>学员职位</td>" +
+                                    "<td>" + goods_name + "</td>" +
+                                    "<td>" + en_classroom + "</td>" +
+                                    "<td>备注说明</td>" +
+                                    "<td><a href='#' style='color:blue' onclick='applyModify(" + en_uid + "," + page + ")'>申请修改</a></td>" +
+                                    "</tr >";
+
+                            mainHtml += thisHtml;
+
+                            $("#mainTbody").html(mainHtml);
+                        }
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+    //展示个人详情
+    function showDetails(en_uid, page) {
+        //page为当前页面的索引值
+        window.location.href = "./memberDetails.html?uid=" + en_uid + "&page=" + page;
+    }
+    //修改页面
+    function applyModify(en_uid, page) {
+        //page为当前页面的索引值
+        window.location.href = "./input.html?uid=" + en_uid + "&page=" + page;
+    }
+    //退出系统
+    function quit() {
+        $.ajax({
+            url: 'http://dev.geju.com/business/login/quit',
+            dataType: "json",
+            async: true,
+            data: "",
+            type: "POST",
+            success: function (res) {
+                if (res.code == '200') {
+                    //清空相关的cookie
+                    //当前登录手机号和用户名
+                    $.cookie("currentUserPhone", "", {expires: 7});
+                    $.cookie("currentUserName", "", {expires: 7});
+
+                    //确定是否已经登录
+                    $.cookie("isLogin", "false", {expires: 7});
+
+                    window.location.href = "./login.html";
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+
+    }
+</script>
+</body>
+</html>

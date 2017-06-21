@@ -1,0 +1,221 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <ul class="list-inline">
+                                <li class="add"><a href="javascript:void(0)"><span class="glyphicon glyphicon-plus"></span>新建文章</a></li>
+                            </ul>
+                        </ul>
+                    </div>
+                    <div>
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active item" data-key="cc6584e45fa26ce4"><a href="#home"  data-toggle="tab">走进名企</a></li>
+                            <li class="item" data-key="bba6147df8e5672c"><a href="#profile" data-toggle="tab">金融投资会论坛</a></li>
+                            <li class="item" data-key="5ca3416f163e4977"><a href="#messages" data-toggle="tab">学员联谊</a></li>
+                            <li class="item" data-key="bf2ce57f370e90fd"><a href="#messages" data-toggle="tab">顶层设计</a></li>
+                            <li class="item" data-key="5212cbf664ff978b"><a href="#messages" data-toggle="tab">硅谷创业节</a></li>
+                            <li class="item" data-key="2e91f7b6f2ea833c"><a href="#messages" data-toggle="tab">创新论坛</a></li>
+                            <li class="item" data-key="370a74fe37b86c1a"><a href="#messages" data-toggle="tab">斯坦福精品课程</a></li>
+                            <li class="item" data-key="5fd885c3adc54265"><a href="#messages" data-toggle="tab">名企访问</a></li>
+                            <li class="item" data-key="99eb0d8389805978"><a href="#messages" data-toggle="tab">文化之旅</a></li>
+                            <li class="item" data-key="42aac317f04e1c73"><a href="#messages" data-toggle="tab">硅谷游记</a></li>
+                            <li class="item" data-key="ea1cdd9b56fb2a6c"><a href="#messages" data-toggle="tab">朋友圈</a></li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div class="panel panel-default" style="margin-top: 20px">
+                                <div class="panel-heading">文章区</div>
+                                <div class="panel-body">
+                                    <ul class="list-group" id="article">
+
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">评论区</div>
+                                <div class="panel-body">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 260px">图片</th>
+                                            <th style="width: 180px">发表者</th>
+                                            <th >内容</th>
+                                            <th style="width: 180px">发表时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="comment">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('.item').on('click',function () {
+            var data=$(this).data()
+            list(data.key)
+        });
+        list($('.item.active').data('key'))
+        function list(key) {
+            articleList(key)
+            commentList(key)
+        }
+        $('.add').on('click',function () {
+            location.href = "/admin/enroll/xtx/add?id="+$('.item.active').data('key')
+        });
+        //更新文章状态
+        $(document).on('click','.articleUpdate',function () {
+            var data=$(this).data()
+            $.post('/admin/enroll/xtx/article/update',{id:data.id,status:data.status},function (result) {
+                if(result.code==200){
+                    list($('.item.active').data('key'))
+                }
+            })
+        });
+        //更新评论状态
+        $(document).on('click','.commentUpdate',function () {
+            var data=$(this).data()
+            $.post('/admin/enroll/xtx/comment/update',{id:data.id,status:data.status},function (result) {
+                if(result.code==200){
+                    list($('.item.active').data('key'))
+                }
+            })
+        });
+        //学员回复
+        $(document).on('click','.commentReply',function () {
+            var data=$(this).data();
+            data.key=$('.item.active').data('key')
+
+            swal({
+                title: "评论回复!",
+                text: "请输入回复内容:",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                cancelButtonText: "取消",
+                confirmButtonText: "确认!",
+                animation: "slide-from-top",
+                inputPlaceholder: "回复内容"
+            },
+            function(inputValue){
+                if (inputValue === false) return false;
+
+                if (inputValue === "") {
+                    swal.showInputError("你需要填写内容!");
+                    return false
+                }
+                data.content=inputValue;
+                $.post('/admin/enroll/xtx/comment/create',data,function (result) {
+                    if(result.code==200){
+                        list($('.item.active').data('key'))
+                    }
+                })
+            });
+        });
+        function articleList(key) {
+            $.get('/admin/enroll/xtx/article',{key:key},function(result){
+                console.log(result)
+                if(result.code==200){
+                    $("#article").empty('');
+                    $("#articletmpl")
+                            .tmpl(result.message.list)
+                            .appendTo("#article");
+                }else{
+                    effect.error('请求失败')
+                }
+            })
+        }
+        function commentList(key) {
+            $.get('/admin/enroll/xtx/comment',{key:key},function(result){
+                console.log(result)
+                if(result.code==200){
+                    $("#comment").empty('');
+                    $("#commenttmpl")
+                            .tmpl(result.message.list)
+                            .appendTo("#comment");
+                }else{
+                    effect.error('请求失败')
+                }
+            })
+        }
+    })
+</script>
+<script id="articletmpl" type="text/x-jquery-tmpl">
+    <li class="list-group-item">
+        <a href="/admin/enroll/xtx/edit?id=${id}"> ${title}</a>
+        {{if status==0}}
+        <span class="badge btn btn-xs articleUpdate" data-status="1" data-id="${id}">前端显示</span>
+        {{else status==1}}
+        <span class="badge btn btn-xs articleUpdate" data-status="0" data-id="${id}" style="background-color:red">取消显示</span>
+        {{/if}}
+    </li>
+</script>
+<script id="commenttmpl" type="text/x-jquery-tmpl">
+    <tr>
+        <td>
+        {{each(i,v) pics}}
+            {{if v}}
+              <a href="${v}" target="_blank"><img class="img-rounded" src="${v}" width="45" height="45" ></a>
+            {{/if}}
+        {{/each}}
+        </td>
+        <td>【${sourceName}】说：</td>
+        <td>
+            ${content}
+            <span class="badge btn btn-xs commentReply" data-mid="4228" data-id="${id}" data-source="${source}">回复</span>
+            {{if status==0}}
+            <span class="badge btn btn-xs commentUpdate" data-status="1" data-id="${id}">恢复</span>
+            {{else status==1}}
+            <span class="badge btn btn-xs commentUpdate" data-status="0" data-id="${id}" style="background-color:red">删除</span>
+            {{/if}}
+        </td>
+        <td>${time}</td>
+  </tr>
+    <tr>
+    <td></td>
+    <td colspan ="3" id="showMember_${statement_id}">
+      <table class="table table-striped table-condensed table-responsive memberList" style="table-layout:fixed">
+        <thead>
+        <tr>
+            <th style="width: 170px"></th>
+            <th ></th>
+            <th style="width: 170px"></th>
+        </tr>
+        </thead>
+        <tbody>
+          {{each(i,v) item}}
+            <tr>
+              <td>【${sourceName}】回复【${rootName}】</td>
+              <td>
+              ${v.content}
+                {{if status==0}}
+                <span class="badge btn btn-xs commentUpdate" data-status="1" data-id="${id}">恢复</span>
+                {{else status==1}}
+                <span class="badge btn btn-xs commentUpdate" data-status="0" data-id="${id}" style="background-color:red">删除</span>
+                {{/if}}
+              </td>
+              <td>${time}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</script>
+
+<% include ../inc/footer.html%>

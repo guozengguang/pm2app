@@ -1,0 +1,118 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+            <li><small style="color: red"></small></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-hover table-striped table-condensed" id="initTable">
+        <form id='ecp_form' class="form-horizontal" method="post">
+          <thead>
+          <tr>
+            <td style="width: 180px">
+              <select name="ecp_classroomid" class="form-control input-sm">
+                <%item.forEach(function(node){%>
+                  <option value="<%=node.classroom%>"><%=node.classroom_name%></option>
+                <%})%>
+              </select>
+            </td>
+            <td>
+              <input type="text" class="form-control input-sm" name="ecp_posid"  placeholder="设备编号" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+              <input type="hidden" class="form-control input-sm" name="ecp_id">
+            </td>
+            <td class="text-center" style="width: 180px">
+              <span class="btn-group"><button class="btn btn-success btn-sm" type="submit">保存</button></span>
+            </td>
+          </tr>
+          </thead>
+        </form>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    //验证提交
+    $('#ecp_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      var data=$('#ecp_form').serializeArray();
+      $.post("/admin/classroom_pos_create",data,function(result){
+        if(result.code==200){
+          effect.success(result.message.message,function(){
+            location.reload()
+          })
+        }else{
+          effect.error(result.message)
+        }
+      })
+    });
+    //默认加载
+    writeList({});
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/classroom_pos_list',data,function(result){
+        console.log(result)
+        if(result.code==200){
+          $("#initTable tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("#initTable tbody");
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+    //修改
+    $(document).on('click','.prdEdit',function(){
+      var data=$(this).data();
+      $('select[name="ecp_classroomid"]').val(data.cid);
+      $('input[name="ecp_posid"]').val(data.pid);
+      $('input[name="ecp_id"]').val(data.id);
+    });
+    //删除
+    $(document).on('click','.prdDel',function(){
+      var data=$(this).data();
+      $.post('/admin/classroom_pos_update',{id:data.id},function(result){
+        if(result.code==200){
+          effect.success(function(){
+            writeList({});
+          });
+        }else{
+          effect.error();
+        }
+      })
+    })
+  });
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+<tr>
+  <td>${classroom_name}</td>
+  <td>${ecp_posid}</td>
+  <td class="text-center">
+  <span class="btn-group">
+  <button class="btn btn-info btn-xs prdEdit" data-id='${ecp_id}' data-cid='${ecp_classroomid}' data-pid='${ecp_posid}'>修改</button>
+  <button class="btn btn-success btn-xs prdDel" data-id='${ecp_id}'>删除</button>
+  </span>
+  </td>
+</tr>
+</script>
+<% include ../inc/footer.html%>

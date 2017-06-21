@@ -1,0 +1,260 @@
+<% include ../inc/head.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="pull-right">
+                        <form class="form-inline search-form">
+                            <div class="input-group">
+                                <input id="search_input" type="text" name="media_title" placeholder="媒资标题"
+                                       class="form-control input-sm">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-danger btn-sm search">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="col-md-3">
+                    <!-- 树形代碼 -->
+                    <div id="tree" class="tree ">
+                    </div>
+                    <!-- 树形代碼 -->
+                </div>
+                <div class="col-md-9">
+                    <table id="table_list" class="table table-striped table-condensed">
+                        <thead>
+                        <tr>
+                            <th style="width:40px">
+                                <label class="pull-right">
+                                    <input id="choose_all" style="vertical-align: text-bottom;" type="checkbox" >&emsp;
+                                </label>
+                            </th>
+                            <th>标题</th>
+                            <th style="width:100px">浏览量</th>
+                            <th style="width:180px">创建时间</th>
+                            <th style="width:180px" class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div id="page"></div>
+                    <button id="offline" class="btn btn-sm pull-left btn-danger">下架</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var filter = {
+        id: 0
+    };
+    $(function () {
+        /* 树形菜单 开始 */
+        var column = {
+            $dom: null,
+            init: function (id) {
+                this.$dom = $('#' + id);
+                this.getData();
+            },
+            getData: function () {
+                var self = this;
+                $.get('/admin/column_list', function (result) {
+                    if (result.code == 200) {
+                        self.rebuild(result.message.list)
+                    }
+                })
+            },
+            rebuild: function rebuild(list) {//格式化数据
+                list.forEach(function (v, i) {
+                    var column_path = v.column_path;
+                    var lastIndex = column_path.lastIndexOf(',');
+                    if (lastIndex > 0) {
+                        var id = column_path.slice(lastIndex + 1);//parent_id
+                        list.forEach(function (item) {
+                            if (item.columnid == id) {
+                                if (item.children) {
+                                    item.children.push(v);
+                                } else {
+                                    item.children = [v];
+                                }
+                            }
+                        })
+
+                    }
+                });
+                _.remove(list, function (n) {
+                    return n.column_path != '0';
+                });
+                //默认加载
+                filter.id = (list && list[0] && list[0].columnid) || 0;
+                writeList();
+                var html = this.create_elements(list);
+                this.$dom.html(html);//渲染dom
+                this.init_tree();//绑定事件
+            },
+            create_elements: function (list) {
+                var html = '<ul>';
+                $.each(list, function () {
+                    html += '<li class="parent_li" ' + (this.column_level != 1 ? 'style="display: none;"' : '') + '>' +
+                            '<span data-id="'+ (this.columnid) +'" title="Collapse this branch">' +
+                            (this.children ? '<i class="icon-calendar glyphicon glyphicon-plus"></i>' : '') + this.column_title + '</span>';
+                    if (this.children) {
+                        html += column.create_elements(this.children);
+                    }
+                    html += '</li>';
+                });
+                html += '</ul>';
+                return html;
+            },
+            init_tree: function () {
+                $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
+                $('.tree li.parent_li > span').on('click', function (e) {
+                    var children = $(this).parent('li.parent_li').find(' > ul > li');
+                    if (children.is(":visible")) {
+                        children.hide('fast');
+                        $(this).attr('title', 'Expand this branch').find(' > i').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+                    } else {
+                        children.show('fast');
+                        $(this).attr('title', 'Collapse this branch').find(' > i').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+                    }
+                    /* 添加点击ajax 开始 */
+                    filter.id = $(this).data('id');
+                    writeList();
+                    /* 添加点击ajax 结束 */
+                    e.stopPropagation();
+                });
+            }
+        };
+        column.init('tree');
+        /* 树形菜单 结束 */
+        //分页初始值
+        var options = {
+            currentPage: 1,//当前页数
+            totalPages: 0,//总页数
+            numberOfPages: 12,//做多显示page页
+            bootstrapMajorVersion: 1,//版本
+            alignment: "center",
+            onPageClicked: function (e, originalEvent, type, page) {
+                if (page > options.totalPages) {
+                    options.currentPage = options.totalPages;
+                } else {
+                    options.currentPage = page;
+                }
+                filter.page = page;
+                writeList()
+            }
+        };
+        var search_input = $('#search_input');
+        $('.search').on('click', function () {
+            filter.media_title = search_input.val();
+            options.currentPage = 1;
+            writeList();
+        });
+        //写列表ajax
+        function writeList() {
+            $('#choose_all').prop('checked',false);
+            effect.show();
+            $.get('/column/media', filter, function (result) {
+                if (result.code == 200) {
+                    var list = result.result && result.result.list[0] && result.result.list[0].children || [];
+                    $("table tbody").empty('');
+                    $("#inittmpl")
+                            .tmpl(list)
+                            .appendTo("table tbody");
+                    options.totalPages = result.message.pagecount;
+                    if (options.totalPages > 0) {
+                        $('#page').bootstrapPaginator(options);
+                    } else {
+                        $('#page').empty();
+                    }
+                    //bindButton();
+                    effect.hide();
+                } else {
+                    effect.hide();
+                    effect.error('请求失败')
+                }
+            })
+        }
+    });
+    /* 写列表 结束 */
+    /* 选择全部 开始 */
+    $('#choose_all').on('click',function () {
+        $('.choose>input').prop('checked',$(this).prop('checked'));
+    });
+    /* 选择全部 结束 */
+    /* 下架 开始 */
+    $('#offline').on('click',function () {
+        var arr = [];
+        $('.choose>input[type="checkbox"]:checked').each(function () {
+            arr.push(this.value);
+        });
+        if(!arr.length){
+            swal({   title: "请选择媒资!",   text: "请勾选需要下架的媒资",   timer: 1000,   showConfirmButton: true });
+            return false;
+        }
+        swal({
+            title: "确定下架?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText:"取消",
+            animation: "slide-from-top",
+            closeOnConfirm: false,
+            html: false
+        }, function(){
+            ajax(filter.id,arr);
+        });
+    });
+    var loading ;
+    function ajax(id,arr) {
+        if(loading){return false;}
+        loading = true;
+        $.post('/admin/media/offline',{id:id,medias:arr},function (result) {
+            loading = false;
+            if(result.code == 200){
+                location.reload();
+                effect.success('操作成功');
+            }
+        })
+    }
+    /* 下架 结束 */
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+    <tr data-id="${ concat_string($data.Columns,'columnid')  }">
+        <td>
+            <label class="choose pull-right">
+                <input value="${mediaid}" style="vertical-align: text-bottom;" type="checkbox" >&emsp;
+            </label>
+        </td>
+        <td>${media_title}</td>
+        <td>${media_clickcount}</td>
+        <td>${media_pushtime}</td>
+        <td class="text-center">
+            <a class="btn btn-inline btn-danger btn-sm online" data-id="${mediaid}" data-online="1" style="display: none;"> 提交 </a>
+            <a class="btn btn-inline btn-danger btn-sm online" data-id="${mediaid}" data-online="0" style="display: none;"> 下架 </a>
+        </td>
+    </tr>
+</script>
+<% include ../inc/footer.html%>
+<!--
+<div class="btn-group">
+                <button type="button" class="btn btn-default btn btn-xs">操作选项</button>
+                <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="btn btn-inline online" data-id="${mediaid}"> 上架 </a></li>
+                </ul>
+            </div>
+-->

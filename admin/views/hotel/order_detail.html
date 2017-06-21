@@ -1,0 +1,418 @@
+<% include ../inc/head.html%>
+<link rel="stylesheet" href="/stylesheets/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="/stylesheets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/stylesheets/css/buttons.bootstrap.min.css">
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0;
+    }
+
+    .dt-buttons {
+        float: left;
+    }
+
+    .dt-buttons .buttons-excel {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file_container {
+        position: relative;
+    }
+
+    .file_container input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+        left: 0;
+        top: 0;
+    }
+</style>
+<script src="/javascripts/js/jquery.dataTables.min.js"></script>
+<script src="/javascripts/js/dataTables.bootstrap.min.js"></script>
+<script src="/javascripts/js/dataTables.buttons.min.js"></script>
+<script src="/javascripts/js/buttons.flash.min.js"></script>
+<script src="/javascripts/js/aliyun-sdk.min.js"></script>
+<script src="/javascripts/js/vod-sdk-upload.min.js"></script>
+<script type="text/javascript" src="http://g.alicdn.com/de/prismplayer/1.4.7/prism-flash-min.js"></script>
+
+<div ng-controller="HotelOrderDetailController" class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b><%= title %></b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>活动报名人数</th>
+                                                <th>预定房型及数量</th>
+                                                <th>床位数</th>
+                                                <th>预算费用</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>合计</td>
+                                                <td>{{ statistics.human }}</td>
+                                                <td>
+                                                    <p ng-repeat="room in statistics.room">{{ room.name + '/' + room.count }}</p>
+                                                </td>
+                                                <td>
+                                                    <p ng-repeat="bed in statistics.bed">{{ bed.name + '/' + bed.bed }}</p>
+                                                </td>
+                                                <td>{{ statistics.price }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <table id="hotel" class="table table-striped table-bordered" cellspacing="0"
+                                               width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>性别</th>
+                                                <th>单位</th>
+                                                <th>职务</th>
+                                                <th>身份证号</th>
+                                                <th>电话号码</th>
+                                                <th>酒店名称</th>
+                                                <th>房间名称</th>
+                                                <th>价格</th>
+                                                <th>床位数</th>
+                                                <th>入住时间</th>
+                                                <th>退房时间</th>
+                                                <th>是否用餐</th>
+                                                <th>发票</th>
+                                                <th>发票抬头</th>
+                                                <th>发票用途</th>
+                                                <th>操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr></tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="panel-footing">
+                            <button ng-click="resolve()" class="btn btn-success">通过</button>
+                            <button ng-click="reject()" class="btn btn-danger">拒绝</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../inc/footer.html%>
+<script>
+    angular.module('cms')
+            .service('HotelOrderDetailService', function ($http, staticService) {
+                this.order = function () {
+                    return $http({
+                        url: '/admin/hotel/order/one',
+                        method: 'GET',
+                        params: {
+                            id: staticService.query.id
+                        }
+                    })
+                };
+                this.update = function (state, reasons) {
+                    return $http({
+                        url: '/admin/hotel/order/state',
+                        method: 'POST',
+                        data: {
+                            id: staticService.query.id,
+                            state: state,
+                            reasons: reasons
+                        }
+                    })
+                };
+                this.operator = function () {
+                    return $http({
+                        url: '/admin/hotel/order/operator',
+                        method: 'GET',
+                        params: {
+                            id: staticService.query.id
+                        }
+                    })
+                }
+            })
+            .controller('HotelOrderDetailController', function ($scope, $compile, $filter, HotelOrderDetailService , staticService) {
+                HotelOrderDetailService.order().success(function (result) {
+                    var data = result.result;
+                    console.log(data);
+                    $scope.statistics = {
+                        human: data.human_count,
+                        room: JSON.parse(data.room_count),
+                        bed: JSON.parse(data.room_bed),
+                        price: data.price,
+                    };
+                });
+                HotelOrderDetailService.operator().success(function (result) {
+                    console.log(result);
+                })
+                //初始化datatables
+                var table = $('#hotel').DataTable({
+                    "ajax": {
+                        "url": "/admin/hotel/order/detail",
+                        "dataSrc": 'result',
+                        "data": function (data) {
+                            data.id = staticService.query.id;
+                        }
+                    },
+                    "columns": [
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},//3
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "id"},
+                        {"data": "in_time"},
+                        {"data": "out_time"},
+                        {"data": "id"},//11
+                        {"data": "food"},
+                        {"data": "invoice"},
+                        {"data": "invoice_title"},
+                        {"data": "invoice_used"},
+                        {"data": "id"}
+                    ],
+                    "columnDefs": [
+                        {
+                            "bSortable": false,
+                            "targets": 0,
+                            "render": function (data, type, row) {
+                                return row.HotelHuman.name;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 1,
+                            "render": function (data, type, row) {
+                                return row.HotelHuman.sex ? '男': '女'
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 2,
+                            "render": function (data, type, row) {
+                                return row.HotelHuman.company;
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 3,
+                            "render": function (data, type, row) {
+                                return row.HotelHuman.position
+                            }
+                        },
+
+                        {
+                            "bSortable": false,
+                            "targets": 4,
+                            "render": function (data, type, row) {
+                                return row.HotelHuman.card
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 5,
+                            "render": function (data, type, row) {
+                                return row.HotelHuman.phone
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 6,
+                            "render": function (data, type, row) {
+                                return row.HotelDetail.name
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 7,
+                            "render": function (data, type, row) {
+                                return row.HotelRoom.name
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 8,
+                            "render": function (data, type, row) {
+                                return row.HotelRoom.price
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 9,
+                            "render": function (data, type, row) {
+                                return row.HotelRoom.bed
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 10,
+                            "render": function (data, type, row) {
+                                return $filter('date')(data,'y-MM-dd');
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 11,
+                            "render": function (data, type, row) {
+                                return $filter('date')(data,'y-MM-dd');
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 12,
+                            "render": function (data, type, row) {
+                                return data ? '是': '否'
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 13,
+                            "render": function (data, type, row) {
+                                return data ? '是': '否'
+                            }
+                        },
+                        {
+                            "bSortable": false,
+                            "targets": 15,
+                            "render": function (data, type, row) {
+                                switch (+data){
+                                    case 1 :
+                                        return '住宿费';
+                                    default:
+                                        return '';
+                                }
+                            }
+                        }
+                    ],
+                    "buttons": [],
+                    "createdRow": function (row, data, index) {
+                        $compile(angular.element(row).contents())($scope);
+                    },
+                    "oLanguage": {
+                        "sUrl": "/table_language.json"
+                    },
+                    "dom": 'Bfrtip',
+                    "deferRender": true,
+                    "initComplete": function () {
+                        /* 计算预算费用 */
+                        var data = table.data(),
+                                length = data.length,
+                                price = 0;
+                        data = [].slice.call(data, 0, length);
+                        var rooms = _.groupBy(data, function (value) {
+                            if(value.food){
+                                price += value.HotelDetail.meals;//计算餐费
+                            }
+                            return value.HotelRoom.name + '-_-' +
+                                    value.HotelRoom.price + '-_-' +
+                                    value.HotelRoom.bed
+                        });
+                        _.forIn(rooms, function (v, k) {
+                            var arr = k.split('-_-');
+                            /* 总价计算 开始 */
+                            price += +arr[1]; //房间费用
+                            /* 总价计算 结束 */
+                        });
+                        $scope.statistics.price = price;
+                    }
+                });
+
+                $scope.resolve = function () {
+                    HotelOrderDetailService.update(2).success(function (result) {
+                        //$scope.data.state = 1;
+                        swal("成功!", "", "success");
+                        window.history.go(-1);
+                    });
+                };
+                $scope.reject = function () {
+                    swal({
+                        title: "拒绝!",
+                        text: "请输入拒绝原因",
+                        type: "input",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        animation: "slide-from-top",
+                        inputPlaceholder: "请输入拒绝原因"
+                    },function (inputValue) {
+                        if (!/\S/.test(inputValue)){
+                            return false;
+                        }
+
+                        HotelOrderDetailService.update(1, inputValue).success(function (result) {
+                            swal("拒绝成功!", "", "success");
+                            window.history.go(-1);
+                            //$scope.data.state = -1;
+                        });
+                    });
+
+                };
+                /* 提交 */
+                $scope.submit = function () {
+                    swal({
+                        title: "确定生成订单？",
+                        text: "",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        animation: "slide-from-top",
+                        closeOnConfirm: true,
+                        html: false
+                    }, function () {
+
+                    });
+                };
+
+            });
+</script>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--为了防止手机号被iOS屏蔽-->
+    <meta name = "format-detection" content = "telephone=no">
+
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>格局商学学员录入管理系统 - 登录</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="css/style.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 140px;
+            padding-bottom: 40px;
+            background-color: #eee;
+        }
+
+        button.btn {
+            border: none;
+        }
+
+        .biaoqian {
+            width: 50%;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            float: left;
+            cursor: pointer;
+        }
+
+        #commonLoginBtn {
+            border-bottom: 2px solid #5bc0de;
+        }
+
+        #phoneLoginBtn {
+            border-bottom: 2px solid #ddd;
+        }
+    </style>
+
+    <script type="text/javascript" src="js/comm.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+</head>
+
+<body style="background: #fff;">
+
+<div class="container">
+    <form class="form-signin">
+        <h3 class="form-signin-heading">格局商学后台系统</h3>
+        <div id="changeDiv" style="height: 70px">
+            <div id="commonLoginBtn" class="biaoqian">普通登录</div>
+            <div id="phoneLoginBtn" class="biaoqian">手机登录</div>
+        </div>
+        <div id="common_mainDiv">
+            <label class="sr-only">用户名</label>
+            <input type="text" id="userName" class="form-control" placeholder="用户名" required autofocus>
+            <label for="inputPassword" class="sr-only">密码</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="登录密码" required>
+            <div class="checkbox">
+                <label>
+                    <input id="rememberPwd" type="checkbox" value="记住密码"> 记住密码
+                </label>
+            </div>
+            <button id="btnButton" class="btn btn-lg btn-primary btn-block" type="button" onclick="comm_LoginIn()">登录
+            </button>
+        </div>
+        <div id="phone_mainDiv">
+            <table>
+                <tr>
+                    <td>
+                        <input type="text" id="telePhone_Num" class="form-control" placeholder="手机号" required autofocus>
+                    </td>
+                    <td id="codeTd">
+                        <button class="btn btn-lg btn-primary" type="button" style="margin-left:10px"
+                                onclick="getCode(this)">验证码
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="password" id="telePhone_Pwd" class="form-control" placeholder="登录密码" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button id="phone_btnBtn" class="btn btn-lg btn-primary btn-block" type="button"
+                                onclick="phone_LoginIn()">登录
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+
+</div> <!-- /container -->
+<script>
+    (function (doc, win) {
+        var docEl = doc.documentElement,
+                resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                recalc = function () {
+                    var clientWidth = docEl.clientWidth < 640 ? docEl.clientWidth : 640;
+                    if (!clientWidth) return;
+                    docEl.style.fontSize = Math.floor(100 * (clientWidth / 640)) + 'px';
+                };
+        if (!doc.addEventListener) return;
+        win.addEventListener(resizeEvt, recalc, false);
+        doc.addEventListener('DOMContentLoaded', recalc, false);
+    })(document, window);
+
+    $(function () {
+
+        //默认是普通登录
+        $("#common_mainDiv").show();
+        $("#phone_mainDiv").hide();
+
+        //初始化页面的时候 判断是否点击了保存密码 如果保存了就自动写上用户名和密码
+        if ($.cookie("rmb_UserAndPwd") == "true") {
+            $("#rememberPwd").attr("checked", true);
+            $("#userName").val($.cookie("rmb_UserName"));
+            $("#inputPassword").val($.cookie("rmb_PassWord"));
+        } else {
+            $("#userName").val("");
+            $("#inputPassword").val("");
+        }
+
+        //切换普通登录和手机登录
+        $("#commonLoginBtn").click(function () {
+            $(this).css("border-bottom", "2px solid #5bc0de");
+            $("#phoneLoginBtn").css("border-bottom", "2px solid #ddd");
+            $("#common_mainDiv").show();
+            $("#phone_mainDiv").hide();
+        });
+        $("#phoneLoginBtn").click(function () {
+            $(this).css("border-bottom", "2px solid #5bc0de");
+            $("#commonLoginBtn").css("border-bottom", "2px solid #ddd");
+            $("#common_mainDiv").hide();
+            $("#phone_mainDiv").show();
+        });
+    });
+
+    //普通登录
+    function comm_LoginIn() {
+        var userName = $("#userName").val();
+        var passWord = $("#inputPassword").val();
+
+        if (userName == "" || userName == null || passWord == "" || passWord == null) {
+            alert("请输入用户名或密码!");
+            $("#userName").val("");
+            $("#inputPassword").val("");
+            $("#userName").focus();
+            return;
+        }
+
+        $.ajax({
+            url: 'http://api.geju.com/business/login/password-login',
+            dataType: "json",
+            async: true,
+            data: {phone: userName, password: passWord},
+            type: "POST",
+            success: function (res) {
+                if (res.code == '200') {
+                    //存cookie 确定是否已经登录
+                    //保存用户名和密码
+                    if ($("#rememberPwd").is(":checked")) {
+                        //存入cookie 保存7天
+                        $.cookie("rmb_UserAndPwd", "true", {expires: 7});
+                        $.cookie("rmb_UserName", userName, {expires: 7});
+                        $.cookie("rmb_PassWord", passWord, {expires: 7});
+
+                    } else {
+                        //删除cookie
+                        $.cookie("rmb_UserAndPwd", "false", {expires: 7});
+                        $.cookie("rmb_UserName", "", {expires: -1});
+                        $.cookie("rmb_PassWord", "", {expires: -1});
+                    }
+
+                    //存当前登录手机号和用户名
+                    $.cookie("currentUserPhone", res.result.phone, {expires: 7});
+                    $.cookie("currentUserName", res.result.name, {expires: 7});
+
+                    //存cookie 确定是否已经登录
+                    $.cookie("isLogin", "true", {expires: 7});
+                    window.location.href = "./list.html";
+                } else if(res.code == '401'){
+                    window.location.href = "./login.html";
+                } else {
+                    alert(res.message);
+                    $.cookie("isLogin", "false", {expires: 7});
+                    $("#userName").val('');
+                    $("#inputPassword").val('');
+                    $("#userName").focus();
+                }
+            }
+        });
+    }
+    //手机号码验证码登录
+    function phone_LoginIn() {
+        var thisTeleNum = $("#telePhone_Num").val();
+        var thisCode = $("#telePhone_Pwd").val();
+        if (thisTeleNum == "" || thisCode == "") {
+            alert("手机号或密码不能为空!");
+        }
+        else {
+            //可以登录
+            $.ajax({
+                url: 'http://api.geju.com/business/login/code-login',
+                dataType: "json",
+                async: true,
+                data: {phone: thisTeleNum, code: thisCode},
+                type: "POST",
+                success: function (res) {
+                    if (res.code == '200') {
+                        //存cookie 确定是否已经登录
+                        alert(res.result.message);
+
+                        //存当前登录手机号和用户名
+                        $.cookie("currentUserPhone", res.result.phone, {expires: 7});
+                        $.cookie("currentUserName", res.result.name, {expires: 7});
+
+                        $.cookie("isLogin", "true", {expires: 7});
+                        window.location.href = "./list.html";
+                    } else if(res.code == '401'){
+                        window.location.href = "./login.html";
+                    } else {
+                        alert(res.message);
+                    }
+                },
+
+            });
+        }
+    }
+    var countDown = 60;
+    var isSend = false;
+    var t;
+    var isExistPhone = true;
+    function getCode(e) {
+        var thisTeleNum = $("#telePhone_Num").val();
+        if (thisTeleNum == "" || thisTeleNum == null) {
+            alert("手机号不能为空");
+            return;
+        }
+        if (thisTeleNum != "" && isSend == false) {
+            $.ajax({
+                url: 'http://api.geju.com/business/login/get-code',
+                dataType: "json",
+                async: false,
+                data: {phone: thisTeleNum},
+                type: "POST",
+                success: function (res) {
+                    if (res.code == '200') {
+                        alert("您的验证码已发送到手机");
+                        isSend = true;
+                        //把验证吗存入cookie
+                    }else if(res.code == '401'){
+                        window.location.href = "./login.html";
+                    } else {
+                        isExistPhone = false;
+                        alert(res.message);
+                        return;
+                    }
+                }
+            });
+        }
+        if(isExistPhone == false){
+            return;
+        }
+        doAction(e);
+        if (countDown != -1) {
+            t = setTimeout(function () {
+                getCode(e)
+            }, 1000);
+        } else {
+            countDown = 60;
+            $("#codeTd").html("");
+            $("#codeTd").html("<button class='btn btn-lg btn-primary' type='button' style='margin-left:10px' onclick='getCode(this)'>验证码 </button>");
+        }
+    };
+
+    function doAction(e) {
+        if (countDown == -1) {
+            countDown = 60;
+            isSend = true;
+            clearTimeout(t);
+            e.setAttribute("disabled", false);
+            return;
+        } else {
+            e.setAttribute("disabled", true);
+            e.innerText = "重新发送" + countDown + "s";
+            isSend = true;
+            countDown--;
+        }
+    }
+</script>
+</body>
+</html>

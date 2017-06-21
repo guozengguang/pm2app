@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><%=title%></title>
+    <link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css" />
+    <link rel='stylesheet' href='/stylesheets/css/style.css' />
+    <link rel='stylesheet' href='/stylesheets/css/bootstrap-datetimepicker.min.css' />
+    <link rel='stylesheet' href='/stylesheets/css/bootstrapValidator.min.css' />
+    <link rel='stylesheet' href='/stylesheets/css/cropper.min.css' />
+    <link rel="stylesheet" href="/stylesheets/css/sweetalert.css">
+    <script src="/javascripts/js/sweetalert.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/bootstrapValidator.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/bootstrap-paginator.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/base64.js"></script>
+    <script type="text/javascript" src="/javascripts/js/month.js"></script>
+    <script src="http://cdn.bootcss.com/plupload/2.1.7/plupload.full.min.js"></script>
+    <script src="//cdn.bootcss.com/lodash.js/4.16.4/lodash.min.js"></script>
+    <script type="text/javascript" src="/javascripts/js/jquery.qrcode.min.js"></script>
+    <script src="/javascripts/js/angular.min.js"></script>
+    <script src="/javascripts/angular.module.js"></script>
+    <script src="/javascripts/utils.js"></script>
+</head>
+<body ng-app="cms">
+  <nav id="header" class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="#" class="logo"><img src=""> <%=locals.wwwname%> <span class="label label-danger"></span></a>
+    </div>
+    <div class="collapse navbar-collapse" id="navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#"><span class="glyphicon glyphicon-user"></span> <%=locals.current_user.user_login%></a></li>
+          <li><a href="#" data-toggle="modal" data-target="#modal_changepwd"><span class="glyphicon glyphicon-lock"></span> 修改密码</a></li>
+          <li><a href="/loginout"><span class="glyphicon glyphicon-log-out"></span> 退出</a></li>
+        </ul>
+    </div>
+  </div>
+</nav>

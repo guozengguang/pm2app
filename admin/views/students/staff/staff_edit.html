@@ -1,0 +1,155 @@
+<% include ../../inc/head.html%>
+<script src="http://cdn.bootcss.com/plupload/2.1.7/plupload.full.min.js"></script>
+<% include ../../inc/editor_mode.html%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="sidebar">
+            <% include ../../inc/left.html%>
+        </div>
+        <div class="main">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <ul class="list-inline">
+                            <li><a href="javascript:history.go(-1)"><span
+                                    class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>添加新员工</b></div>
+                        <div class="panel-body" style="padding:15px 0">
+                            <form id="stu_form">
+                                <div class="col-md-3" style="padding:0">
+                                    <div class="well">
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_phone" class="control-label">员工手机<span>*</span></label>
+                                            <input id="userphone" value="<%=item.m_phone%> " readonly type="text"
+                                                   name="m_phone" placeholder="输入手机号" class="form-control" required
+                                                   data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_level" class="control-label">员工部门<span>*</span></label>
+                                            <select name="m_level" class="form-control">
+                                                <%level.forEach(function(node,index){%>
+                                                <option value="<%=node.id%>" <%if(node.id==item.m_level){%>selected<%}%>><%=node.name%></option>
+                                                <%})%>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_sex" class="control-label">性别<span>*</span></label>
+                                            <select name="m_sex" class="form-control">
+                                                <option value="男"
+                                                <%if(item.m_sex=='男'){%>selected<%}%>>男</option>
+                                                <option value="女"
+                                                <%if(item.m_sex=='女'){%>selected<%}%>>女</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label for="m_pics" class="control-label">个人照片</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="m_pics" placeholder="上传照片" class="form-control"
+                                                       readonly>
+                                                <span class="input-group-btn">
+                      <span class="btn btn-danger fileinput-button btn-sm">
+
+                          <span>上传</span>
+                          <input id="addImg" type="file" name="files[]" accept="image/*">
+                      </span>
+                    </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="progress" style="width: 100%;">
+                                                <div class="progress-bar" style="width: 0%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="thumbnail">
+                                                <img src="<%=aly%>/<%=item.m_pics%>" id="m_pics_img">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9" style="padding:0 0 0 15px">
+                                    <div class="panel panel-danger">
+                                        <div class="panel-body">
+                                            <div class="row">
+
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_name" class="control-label">员工姓名<span>*</span></label>
+                                                    <input value="<%=item.m_name%>" type="text" name="m_name"
+                                                           placeholder="员工名称" class="form-control" required
+                                                           data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                                                    <input value="<%=item.m_type%>" type="hidden" name="m_type">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_email" class="control-label">员工邮箱<span></span></label>
+                                                    <input value="<%=item.m_email%>" type="text" name="m_email"
+                                                           placeholder="员工邮箱" class="form-control">
+                                                </div>
+
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_position"
+                                                           class="control-label">公司职务<span></span></label>
+                                                    <input value="<%=item.m_position%>" type="text" name="m_position"
+                                                           placeholder="公司职务" class="form-control">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-6">
+                                                    <label for="m_order" class="control-label">序号<span></span></label>
+                                                    <input type="text" name="m_order" placeholder="序号"
+                                                           class="form-control">
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <label for="m_desc" class="control-label">个人简介<span></span></label>
+                                                    <textarea name="m_desc" rows="10" class="form-control"><%=item.m_desc%></textarea>
+                                                </div>
+                                                <div class="form-group form-group-sm col-md-12">
+                                                    <div class="">
+                                                        <button type="submit" class="btn btn-danger btn-submit">提交
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var mid = location.search.substr(5);
+        //验证提交
+        $('#stu_form').bootstrapValidator().on('success.form.bv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target),
+                    validator = $form.data('bootstrapValidator');
+            var data = $('#stu_form').serializeArray();
+            data.push({name: 'mid', value: mid});
+            $.post("/admin/students_update", data, function (result) {
+                if (result.code == 200) {
+                    effect.success(function () {
+                        location.href = '/admin/staff_list'
+                    })
+                } else {
+                    effect.error(result.message)
+                }
+            })
+        });
+        newupload('addImg', 'm_pics', function (err, result) {
+            if (err) {
+                effect.error(err);
+            } else {
+                $('input[name="' + result.src + '"]').val(result.message.name);
+                $("#" + result.src + "_img").attr("src", result.message.url);
+            }
+        });
+    })
+</script>
+<% include ../../inc/footer.html%>

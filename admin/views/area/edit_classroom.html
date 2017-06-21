@@ -1,0 +1,376 @@
+<% include ../inc/head.html%>
+<script charset="utf-8" src="/kindeditor/kindeditor.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="/kindeditor/index.js"></script>
+<% include ../inc/editor_mode.html%>
+<div class="container-fluid">
+  <div class="row">
+    <div class="sidebar">
+      <% include ../inc/left.html%>
+    </div>
+    <div class="main">
+      <div>
+        <div class="pull-left">
+          <ul class="list-inline">
+            <li><a href="javascript:history.go(-1)"><span class="glyphicon glyphicon-chevron-left"></span>返回</a></li>
+          </ul>
+        </div>
+        <div class="pull-right">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>添加分院</b> </div>
+        <div class="panel-body" style="padding:15px 0">
+          <form id="area_form">
+            <div class="col-md-3" style="padding:0">
+              <div class="well">
+                <div class="form-group form-group-sm">
+                  <label for="logo_img" class="control-label">分院logo<span></span></label>
+                  <div class="thumbnail">
+                    <img src="<%=aly%>/<%=item.classroom_pics%>"  id="logo_img_img">
+                    <input type="hidden" name="logo_img" value="<%=item.classroom_pics%>">
+                    <input type="hidden" name="classroom_areaid" value="<%=item.classroom_areaid%>">
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="code_img" class="control-label">分院二维码<span></span></label>
+                  <div class="thumbnail">
+                    <img src="<%=aly%>/<%=item.classroom_qrcode%>"  id="code_img_img">
+                    <input type="hidden" name="code_img" value="<%=item.classroom_qrcode%>">
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  <label for="logo_banner" class="control-label">分院展示图<span></span></label>
+                  <div class="thumbnail">
+                    <img src="<%=aly%>/<%=item.classroom_banner%>"  id="logo_banner_img">
+                    <input type="hidden" name="logo_banner" value="<%=item.classroom_banner%>">
+                  </div>
+                </div>
+                <!--
+                  <div class="form-group form-group-sm">
+                    <label for="yuanzhang" class="control-label">院长<span>*</span></label>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-btn">
+                        <span class="btn btn-danger">添加</span>
+                      </span>
+                      <input type="text" class="form-control" placeholder="设置院长" id="row_y<%=item.classroom%>" value="<%=yuanzhang.m_name%>">
+                      <span class="input-group-btn addInfo" data-id="4" data-classroom="y<%=item.classroom%>">
+                        <span class="btn btn-danger">选择</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group form-group-sm">
+                    <label for="jiaowu" class="control-label">教学管理<span>*</span></label>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-btn">
+                        <span class="btn btn-danger">添加</span>
+                      </span>
+                      <input type="text" class="form-control" placeholder="设置教学管理" id="row_j<%=item.classroom%>" value="<%=jiaowu.m_name%>">
+                      <span class="input-group-btn addInfo" data-id="5" data-classroom="j<%=item.classroom%>">
+                        <span class="btn btn-danger">选择</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group form-group-sm">
+                    <label for="yunwei" class="control-label">运维<span>*</span></label>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-btn">
+                        <span class="btn btn-danger">添加</span>
+                      </span>
+                      <input type="text" class="form-control" placeholder="设置运维" id="row_yw<%=item.classroom%>" value="<%=yunwei.m_name%>">
+                      <span class="input-group-btn addInfo" data-id="7" data-classroom="yw<%=item.classroom%>">
+                        <span class="btn btn-danger">选择</span>
+                      </span>
+                    </div>
+                  </div>
+                -->
+              </div>
+            </div>
+            <div class="col-md-9" style="padding:0 0 0 15px">
+              <div  class="panel panel-danger">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="area_region" class="control-label">所属区域<span>*</span></label>
+                      <select  name="area_region" class="form-control">
+                        <option value="华东" <%if(item.area_region=='华东'){%>selected<%}%>>华东</option>
+                        <option value="华北" <%if(item.area_region=='华北'){%>selected<%}%>>华北</option>
+                        <option value="华中" <%if(item.area_region=='华中'){%>selected<%}%>>华中</option>
+                        <option value="华南" <%if(item.area_region=='华南'){%>selected<%}%>>华南</option>
+                        <option value="西南" <%if(item.area_region=='西南'){%>selected<%}%>>西南</option>
+                        <option value="西北" <%if(item.area_region=='西北'){%>selected<%}%>>西北</option>
+                        <option value="东北" <%if(item.area_region=='东北'){%>selected<%}%>>东北</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="area_city" class="control-label">学区城市</label>
+                      <input value="<%=item.area_name%>" type="text" placeholder="学区城市" class="form-control" readonly>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="area_name" class="control-label">学区城市</label>
+                      <input value="<%=item.classroom_area_city%>" type="text" placeholder="学区城市" class="form-control" readonly>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_name" class="control-label">分院名称</label>
+                      <input value="<%=item.classroom_name%>" type="text" placeholder="分院名称" class="form-control" readonly>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_time" class="control-label">建院时间<span>*</span></label>
+                      <input value="<%=item.classroom_time%>" type="text" name="classroom_time" placeholder="建院时间" class="form-control input_date" required data-bv-trigger="blur" data-bv-notempty-message='必填项目'>
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_code" class="control-label">邮编</label>
+                      <input value="<%=item.classroom_code%>" type="text" name="classroom_code" placeholder="邮编" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_address" class="control-label">分院地址</label>
+                      <input value="<%=item.classroom_address%>" type="text" name="classroom_address" placeholder="分院地址" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_address_work" class="control-label">工作地址</label>
+                      <input value="<%=item.classroom_address_work%>" type="text" name="classroom_address_work" placeholder="工作地址" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_longitude" class="control-label">经度</label>
+                      <input value="<%=item.classroom_longitude%>" type="text" name="classroom_longitude" placeholder="经度" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_coordinates" class="control-label">纬度</label>
+                      <input value="<%=item.classroom_coordinates%>" type="text" name="classroom_coordinates" placeholder="纬度" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_phone" class="control-label">招生联系电话</label>
+                      <input value="<%=item.classroom_phone%>" type="text" name="classroom_phone" placeholder="招生联系电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_email" class="control-label">招生邮箱</label>
+                      <input value="<%=item.classroom_email%>" type="text" name="classroom_email" placeholder="招生邮箱" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_telephone" class="control-label">招生电话</label>
+                      <input value="<%=item.classroom_telephone%>" type="text" name="classroom_telephone" placeholder="招生电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_phone_bus" class="control-label">商务联系电话</label>
+                      <input value="<%=item.classroom_phone_bus%>" type="text" name="classroom_phone_bus" placeholder="商务联系电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_email_bus" class="control-label">商务邮箱</label>
+                      <input value="<%=item.classroom_email_bus%>" type="text" name="classroom_email_bus" placeholder="商务邮箱" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_telephone_bus" class="control-label">商务电话</label>
+                      <input value="<%=item.classroom_telephone_bus%>" type="text" name="classroom_telephone_bus" placeholder="商务电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_phone_media" class="control-label">媒体联系电话</label>
+                      <input value="<%=item.classroom_phone_media%>" type="text" name="classroom_phone_media" placeholder="媒体联系电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_email_media" class="control-label">媒体邮箱</label>
+                      <input value="<%=item.classroom_email_media%>" type="text" name="classroom_email_media" placeholder="媒体邮箱" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-6">
+                      <label for="classroom_telephone_media" class="control-label">媒体电话</label>
+                      <input value="<%=item.classroom_telephone_media%>" type="text" name="classroom_telephone_media" placeholder="媒体电话" class="form-control">
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div id="group_editor">
+                        <label for="classroom_content" class="control-label">分院介绍</label>
+                        <textarea id="classroom_content" name="classroom_content" value='' style="width:100%;height:320px;" class="setEditor"><%=item.classroom_content%></textarea>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-sm col-md-12">
+                      <div class="">
+                        <button type="submit" class="btn btn-danger btn-submit">提交</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+  $(function(){
+    var classroom=location.search.substr(11);
+    //时间
+    $(".input_date").datetimepicker({
+      lang:'ch',
+      step:30
+    });
+    //logo
+    newupload('logo_img_img','logo_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //二维码
+    newupload('code_img_img','code_img',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //bannner
+    newupload('logo_banner_img','logo_banner',function(err,result){
+      if (err){
+        effect.error(err);
+      }else {
+        $('input[name="'+result.src+'"]').val(result.message.name);
+        $("#"+result.src+"_img").attr("src",result.message.url);
+      }
+    });
+    //提交信息
+    $('#area_form').bootstrapValidator().on('success.form.bv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target),
+              validator = $form.data('bootstrapValidator');
+      $("#classroom_content").val(editor[0].html());
+      var data=$('#area_form').serializeArray();
+      data.push({name:'classroom',value:classroom});
+      $.post("/admin/area_update",data,function(result){
+
+        if(result.code==200){
+          effect.success(function(){
+            location.href='/admin/area'
+          })
+        }else{
+          effect.error();
+        }
+      })
+    });
+
+    var type=4
+    var myid=''
+    //讲师相关   打开讲师列表
+    $('.addInfo').on('click', function(event) {
+      $("#modal").modal('show');
+      type=$(this).data('id');
+      myid=$(this).data('classroom');
+      writeList({type:4});
+    });
+    //添加讲师
+    $(document).on('click', '.trueInfo', function(event) {
+      var name=$(this).data('name');
+      var id=$(this).data('id');
+      $("#row_"+myid).val(name)
+      var data={name:name,id:id,type:type,room:classroom};
+      $.post("/admin/set_groupuser",data,function(result){
+        if(result.code==200){
+          effect.success()
+        }else{
+          effect.error();
+        }
+      })
+      $("#modal").modal('hide');
+    });
+    //搜索
+    $('#find').on('click',function(){
+      var data=$('.select_form').serializeArray();
+      data.push({name:'type',value:4});
+      options.currentPage=1;
+      writeList(data);
+    })
+    //分页初始值
+    var options = {
+      currentPage: 1,//当前页数
+      totalPages: 0,//总页数
+      numberOfPages: 12,//做多显示page页
+      bootstrapMajorVersion: 1,//版本
+      alignment: "center",
+      onPageClicked: function (e, originalEvent, t, page) {
+        if (page > options.totalPages) {
+          options.currentPage = options.totalPages;
+        } else {
+          options.currentPage = page;
+        }
+        var data=$('.select_form').serializeArray();
+        data.push({name:'type',value:4});
+        data.push({name:'page',value:page});
+        writeList(data)
+      }
+    };
+    //写列表ajax
+    function writeList(data){
+      effect.show();
+      $.get('/admin/students_ajax',data,function(result){
+        if(result.code==200){
+          $("table tbody").empty('');
+          $("#inittmpl")
+                  .tmpl(result.message.list)
+                  .appendTo("table tbody");
+          options.totalPages=result.message.pagecount;
+          if (options.totalPages > 0) {
+            $('#page').bootstrapPaginator(options);
+          } else {
+            $('#page').empty();
+          }
+          effect.hide();
+        }else{
+          effect.hide();
+          effect.error('请求失败')
+        }
+      })
+    };
+  })
+</script>
+<script id="inittmpl" type="text/x-jquery-tmpl">
+  <tr>
+    <td><img class="img-circle" {{if m_pics}}src="<%=aly%>/${m_pics}"{{/if}} width="45" height="45" ></td>
+    <td>${m_name}</td>
+    <td>${m_desc}</td>
+    <td class="text-center">
+    <div class="btn-group">
+      <a class="btn btn-info btn btn-xs trueInfo" data-name="${m_name}" data-id="${mid}"> 替换</a>
+    </div>
+    </td>
+  </tr>
+</script>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          选择院长
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form class="form-inline select_form" style="margin-bottom:15px;">
+          <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+              <input type="text" name="m_name" class="form-control input-sm" placeholder="姓名" />
+                <span class="input-group-btn">
+                <span type="button" class="btn btn-danger" id="find">查询</span>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-condensed">
+          <thead>
+          <tr>
+            <th style="width:80px">头像</th>
+            <th style="width:80px">姓名</th>
+            <th style="width:180px">简介</th>
+            <th style="width:120px" class="text-center">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="page"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../inc/footer.html%>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/css/style.css' />
+    <script src="/javascripts/js/jquery.min.js"></script>
+    <script>
+
+    	function load() {
+        $.post('/signin', $("form").serializeArray(), function(result){
+          console.log(result)
+            if (result.code == 200) {
+              $("#success").show();
+              $('#success').text("登录成功！");
+              window.setTimeout(function () { $("#success").hide() }, 3000);
+              location.href = '/index';
+            } else {
+              $("#error").show();
+              $('#error').text(result.message);
+              window.setTimeout(function () { $("#error").hide() }, 3000);
+            }
+        });
+        }
+        function loginKey(evt) {
+          if (evt.keyCode == 13) {
+            if ($("#user_login").val() != "" && $("#user_pass").val())
+              load();
+          }
+        }
+        $(function () {
+          $('.go_submit').click(function () {
+            load();
+          });
+        });
+    </script>
+  </head>
+  <body style="background-color:#f3e9e9">
+    <div class="container global">
+      <div class="panel panel-default">
+		<div class="panel-heading" style="background-color:#bc000e;text-align:center;">
+			<h4 style="color:#fff;"><%=title%></h4>
+		</div>
+        <div class="panel-body">
+			<form  method="post" id="login_form">
+                <div id="success" class="alert alert-success fade in" style="display:none;">操作成功！</div>
+                <div id="error" class="alert alert-danger fade in" style="display:none;"></div>
+                <br>
+                <div class="form-group input-group">
+					<span class="input-group-addon">
+						<span class="glyphicon glyphicon-user"></span>
+					</span>
+                    <input type="text" name="user_login" id="user_login" placeholder="请输入用户名" onkeyup="loginKey(event)" class="form-control input-lg"  aria-describedby="inputGroupSuccess2Status"/>
+				</div>
+
+                <div class="form-group input-group">
+					<span class="input-group-addon">
+                        <span class="glyphicon glyphicon-lock"></span>
+                    </span>
+                    <input type="password" name="user_pass" id="user_pass" placeholder="请输入密码" onkeyup="loginKey(event)" class="form-control input-lg"  aria-describedby="inputGroupSuccess2Status"/>
+                </div>
+				<div class="form-group">
+					<button type="button" class="btn btn-danger btn-lg btn-block go_submit" id="go_login">登录</button>
+				</div>
+
+				<div class="form-group">
+				</div>
+			</form>
+		</div>
+    <!-- <div class="panel-footer">
+			<div class="pull-left">
+				
+			</div>
+			<div class="pull-right foot_logo">
+				
+			</div>
+			<div class="clearfix"></div>
+		</div> -->
+      </div>
+    </div>
+
+  </body>
+</html>
