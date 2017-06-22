@@ -7,7 +7,7 @@ module.exports = {
     {
       //基本
       "name": "pm2app", //应用程序的名称 应用名称
-      "cwd": "/home/yishi/www/production", //应用程序所在的目录
+      "cwd": "/home/yishi/www/production/pm2app", //应用程序所在的目录
       "script": "./bin/www", //应用程序的脚本路径 实际启动脚本
       "args": "export NODE_ENV=production",//参数
       "interpreter": "/mnt/nodejs/node-package/node-v7.10.0/bin/node",//node所在目录
@@ -49,8 +49,8 @@ module.exports = {
       "host": "59.110.225.153",//服务器地址
       "ref": "origin/master",//git 分支
       "repo": "git@github.com:guozengguang/pm2app.git",
-      "path": "/home/yishi/www/production",//服务器项目目录
-      "post-deploy": "pm2 restart /home/yishi/www/production/ecosystem.config.js --env production",//代码部署完之后执行的命令
+      "path": "/home/yishi/www/production/pm2app",//服务器项目目录
+      "post-deploy": "pm2 restart /home/yishi/www/production/pm2app/ecosystem.config.js --env production",//代码部署完之后执行的命令
       "env": {
         "NODE_ENV": "production"
       }
