@@ -45,7 +45,7 @@ module.exports = {
    */
   "deploy": {
     "production": {
-      "user": "yishi",//登录账号
+      "user": "root",//登录账号
       "host": "59.110.225.153",//服务器地址
       "ref": "origin/master",//git 分支
       "repo": "git@github.com:guozengguang/pm2app.git",
